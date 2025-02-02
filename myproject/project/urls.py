@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from flashcards import views  # ✅ Add this line to import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('flashcards.urls')),
+    path('', views.landing_page, name='landing_page'),  # Now this will work
+    path('base/', views.base_page, name='base_page'),
+    path('studypage/', views.studypage, name='studypage'),
 ]

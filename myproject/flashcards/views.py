@@ -5,3 +5,7 @@ def landing_page(request):
 
 def base_page(request):
    return render(request, 'base.html')
+
+def studypage(request):
+    cards = range(1, 7)  # Example card range
+    return render(request, 'studypage.html', {'cards': cards})
