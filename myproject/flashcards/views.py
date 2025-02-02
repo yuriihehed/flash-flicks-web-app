@@ -9,3 +9,6 @@ def base_page(request):
 def studypage(request):
     cards = range(1, 7)  # Example card range
     return render(request, 'studypage.html', {'cards': cards})
+
+def edit_learn_mode(request):
+    return render(request, 'edit_learn_mode.html')

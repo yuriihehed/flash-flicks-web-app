@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Learn Mode{% endblock %}
+
+{% block content %}
+<div class="edit-learn-mode-container">
+    <h2>Edit Flashcards:</h2>
+    
+    <div class="setting">
+        <label>Study only starred items:</label>
+        <label class="switch">
+            <input type="checkbox" id="starredToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="setting">
+        <label>Shuffle terms:</label>
+        <label class="switch">
+            <input type="checkbox" id="shuffleToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <hr>
+
+    <div class="setting">
+        <label>Set study timer (Pomodoro):</label>
+        <select id="timerSelect">
+            <option>25 min study / 5 min break</option>
+            <option>50 min study / 10 min break</option>
+        </select>
+    </div>
+
+    <div class="setting">
+        <label>Ultradian Rhythm</label>
+        <small>90-minute intervals with 30-minute breaks</small>
+        <label class="switch">
+            <input type="checkbox" id="ultradianToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <hr>
+
+    <div class="setting">
+        <label><strong>Question Format:</strong></label>
+    </div>
+
+    <div class="setting">
+        <label>Answer with Term:</label>
+        <label class="switch">
+            <input type="checkbox" id="termToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="setting">
+        <label>Answer with Definition:</label>
+        <label class="switch">
+            <input type="checkbox" id="definitionToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <hr>
+
+    <div class="setting">
+        <label>Length of rounds:</label>
+        <select id="roundLength">
+            <option value="1">1 Round</option>
+            <option value="2">2 Rounds</option>
+            <option value="3">3 Rounds</option>
+            <option value="4">4 Rounds</option>
+            <option value="5">5 Rounds</option>
+            <option value="6">6 Rounds</option>
+            <option value="7">7 Rounds</option>
+            <option value="8">8 Rounds</option>
+            <option value="9">9 Rounds</option>
+            <option value="10">10 Rounds</option>
+        </select>
+    </div>
+
+    <hr>
+
+    <button class="btn btn-primary" onclick="saveSettings()">Save Updates</button>
+</div>
+
+<!-- Notification Popup -->
+<div id="saveNotification" class="notification">✅ Settings saved successfully!</div>
+
+<style>
+    .edit-learn-mode-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background: #004c99;
+        padding: 20px;
+        color: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .setting {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 10px 0;
+    }
+
+    .setting small {
+        display: block;
+        font-size: 12px;
+        color: #d1d1d1;
+        margin-top: -5px;
+    }
+
+    hr {
+        border: 0;
+        border-top: 1px solid #ddd;
+        margin: 15px 0;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 4px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    select {
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 15px;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    /* Notification Popup Style */
+    .notification {
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .notification.show {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .notification.hide {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+</style>
+
+<script>
+    function saveSettings() {
+        const starred = document.getElementById('starredToggle').checked;
+        const shuffle = document.getElementById('shuffleToggle').checked;
+        const timer = document.getElementById('timerSelect').value;
+        const ultradian = document.getElementById('ultradianToggle').checked;
+        const termAnswer = document.getElementById('termToggle').checked;
+        const definitionAnswer = document.getElementById('definitionToggle').checked;
+        const roundLength = document.getElementById('roundLength').value;
+
+        console.log({
+            starred,
+            shuffle,
+            timer,
+            ultradian,
+            termAnswer,
+            definitionAnswer,
+            roundLength
+        });
+
+        // Show notification
+        const notification = document.getElementById('saveNotification');
+        notification.classList.add('show');
+
+        // Hide after 3 seconds
+        setTimeout(() => {
+            notification.classList.add('hide');
+            setTimeout(() => {
+                notification.classList.remove('show', 'hide');
+            }, 500);
+        }, 3000);
+    }
+</script>
+{% endblock %}

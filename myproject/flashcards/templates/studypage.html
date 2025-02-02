@@ -5,7 +5,7 @@
 {% block header_content %}
 <div class="custom-header d-flex align-items-center">
     <span class="course-title">350 - Object Oriented Programming</span>
-    <button class="btn btn-secondary ms-3">Edit Learn Mode</button>
+    <a href="{% url 'edit_learn_mode' %}" class="btn btn-secondary ms-3">Edit Learn Mode</a>
 </div>
 {% endblock %}
 
@@ -19,17 +19,17 @@
     <div class="flashcard" id="card{{ i }}">
         <div class="card-inner">
             <div class="front">
-                <h2>Card {{ i }}</h2>
-                <p>Term for card {{ i }}</p>
+                <h2 contenteditable="false" class="card-title">Card {{ i }}</h2>
+                <p contenteditable="false" class="card-term">Term for card {{ i }}</p>
             </div>
             <div class="back">
-                <h2>Back of Card {{ i }}</h2>
-                <p>This is the back of the card.</p>
+                <h2 contenteditable="false" class="card-back-title">Back of Card {{ i }}</h2>
+                <p contenteditable="false" class="card-back-content">This is the back of the card.</p>
             </div>
         </div>
         <div class="top-buttons">
             <button class="oval-button star-btn" onclick="flashEffect(this)">&#9733;</button>
-            <button class="oval-button edit-btn">Edit</button>
+            <button class="oval-button edit-btn" onclick="toggleEdit(this)">Edit</button>
         </div>
     </div>
     {% endfor %}
@@ -136,6 +136,12 @@
         50% { box-shadow: 0 0 30px 20px rgb(237, 190, 163); }
         100% { box-shadow: none; }
     }
+
+    .editable {
+        border: 1px solid rgb(20, 50, 136);
+        padding: 20px;
+        border-radius: 10px;
+    }
 </style>
 
 <script>
@@ -161,7 +167,7 @@
 
     cards.forEach(card => {
         card.addEventListener('click', function (e) {
-            if (!e.target.classList.contains('star-btn')) {
+            if (!e.target.classList.contains('star-btn') && !card.classList.contains('editing')) {
                 this.classList.toggle('flipped');
             }
         });
@@ -171,6 +177,31 @@
         const card = element.closest('.flashcard');
         card.classList.add('flash');
         setTimeout(() => card.classList.remove('flash'), 500);
+    }
+
+    function toggleEdit(button) {
+        const card = button.closest('.flashcard');
+        const fields = card.querySelectorAll('.card-title, .card-term, .card-back-title, .card-back-content');
+
+        const isEditing = card.classList.contains('editing');
+
+        if (isEditing) {
+            // Save Mode
+            fields.forEach(el => {
+                el.contentEditable = "false";
+                el.classList.remove('editable');  // Remove red border
+            });
+            card.classList.remove('editing');  // Enable flipping
+            button.textContent = "Edit";
+        } else {
+            // Edit Mode
+            fields.forEach(el => {
+                el.contentEditable = "true";
+                el.classList.add('editable');  // Highlight with red border
+            });
+            card.classList.add('editing');  // Disable flipping
+            button.textContent = "Save";
+        }
     }
 
     updateCards();
