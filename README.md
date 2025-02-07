@@ -2,5 +2,5 @@
 
 # flashFlicks-team-three-product
 
-# This is a *temporary github repo for POC Demo first requirement
+# This is a github repo for POC Demo first requirement
 
