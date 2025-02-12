@@ -20,8 +20,5 @@ from flashcards import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.landing_page, name='landing_page'),  
-    path('base/', views.base_page, name='base_page'),
-    path('studypage/', views.studypage, name='studypage'),
-    path('edit-learn-mode/', views.edit_learn_mode, name='edit_learn_mode'),
+    path('', include('flashcards.urls')),
 ]
