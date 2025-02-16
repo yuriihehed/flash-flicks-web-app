@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 bg-black text-light d-flex flex-column justify-content-center align-items-center position-relative overflow-hidden p-5 shadow-lg">
+        <h2 class="mb-4 text-center">Welcome to FlashFlick, your favorite studying space.</h2>
+        <img src="{% static 'images/thunder.gif' %}" alt="Thunder Animation" class="img-fluid mb-4" style="width: 280px; height: auto;" />
+    </div>
+    <div class="col-md-6 bg-white text-dark d-flex flex-column justify-content-center align-items-center position-relative overflow-hidden p-5 shadow-lg">
+        <h2 class="text-center mb-4">Login</h2>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Please enter your email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password:</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Please enter your password" required>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{% url 'forgot_password' %}" class="text-decoration-none">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn btn-dark w-100">Log in</button>
+        </form>
+        <p class="text-center mt-3">Don't have a FlashFlicks account? <a href="{% url 'signup' %}" class="text-decoration-none">Sign up here.</a></p>
+    </div>
+</div>
+{% endblock %}
