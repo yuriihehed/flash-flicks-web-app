@@ -9,6 +9,18 @@ class CustomUser(AbstractUser):
     study_goal = models.IntegerField(default=30)  # Goal in minutes per day
     study_time = models.IntegerField(default=0)  # Total study time in minutes
 
+    groups = models.ManyToManyField(
+        "auth.Group",
+        related_name="custom_users_groups",
+        blank=True
+    )
+    
+    user_permissions = models.ManyToManyField(
+        "auth.Permission",
+        related_name="custom_users_permissions",
+        blank=True
+    )
+
 # Folder model for grouping decks 
 class Folder(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="folders")
