@@ -122,7 +122,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'project/static'),
+    os.path.join(BASE_DIR, 'project/static'),  # Keep your project static files here
 ]
 
 
@@ -130,3 +130,8 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# FOR CUSTOM USER MODEL (for login page)
+AUTH_USER_MODEL = 'flashcards.CustomUser'
+
+
