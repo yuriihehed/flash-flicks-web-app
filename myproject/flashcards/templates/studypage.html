@@ -29,7 +29,7 @@
         </div>
         <div class="top-buttons">
             <button class="oval-button star-btn" onclick="flashEffect(this)">&#9733;</button>
-            <button class="oval-button edit-btn" onclick="toggleEdit(this)">Edit</button>
+            <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
         </div>
     </div>
     {% endfor %}
@@ -179,7 +179,9 @@
         setTimeout(() => card.classList.remove('flash'), 500);
     }
 
-    function toggleEdit(button) {
+    function toggleEdit(button, event) {
+        event.stopPropagation(); //fixed bug where card flips when clicking edit button
+
         const card = button.closest('.flashcard');
         const fields = card.querySelectorAll('.card-title, .card-term, .card-back-title, .card-back-content');
 

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
 
 def landing_page(request):
    return render(request, 'landing.html')
@@ -12,3 +13,10 @@ def studypage(request):
 
 def edit_learn_mode(request):
     return render(request, 'edit_learn_mode.html')
+
+def signup(request):
+    return HttpResponse("Signup page coming soon!")  # Placeholder
+
+def forgot_password(request):
+    return render(request, 'forgot_password.html')
+
