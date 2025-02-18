@@ -1,0 +1,80 @@
+/* Custom Styles */
+.masthead {
+    background: linear-gradient(to right, #667eea, #764ba2); /* Gradient background */
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+}
+
+.divider {
+    width: 50px;
+    height: 4px;
+    background-color: #ffcc00;
+    margin: 10px auto;
+}
+
+.text-white-75 {
+    color: rgba(255, 255, 255, 0.75);
+}
+body.dark-mode {
+    background-color: #002244;
+    color: #f8f9fa; /* Light text for contrast */
+}
+body.dark-mode .navbar {
+    background-color: #021627 !important;
+}
+body.dark-mode .bg-light {
+    background-color: #0845a1 !important;
+    color: #f8f9fa;
+}
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode p {
+    color: #f8f9fa; /* Ensures all text is readable */
+}
+
+#theme-toggle {
+    margin-left: 1rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid rgba(215, 215, 215, 0.885);
+    background: transparent;
+    color: white;
+    border-radius: 4px;
+}
+
+#theme-toggle:hover {
+    background: rgba(10, 62, 173, 0.1);
+}
+
+.bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+@media (min-width: 768px) {
+    .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+    }
+}
+/* Light Mode (default) */
+body.light-mode .page-section h2,
+body.light-mode .page-section h3,
+body.light-mode .page-section p {
+    color: #212529; /* Dark text */
+}
+
+body.light-mode .page-section i {
+    color: #005bb5; /* Blue icons */
+}
+
+/* Dark Mode */
+body.dark-mode .page-section h2,
+body.dark-mode .page-section h3,
+body.dark-mode .page-section p {
+    color: #f8f9fa; /* Light text */
+}
+
+body.dark-mode .page-section i {
+    color: #ffcc00; /* Yellow icons for better contrast */
+}
