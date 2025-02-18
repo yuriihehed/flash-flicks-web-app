@@ -1,10 +1,81 @@
 {% extends "base.html" %}
 
+{% block landing_nav %}
+    {% if not user.is_authenticated %}
+    <a href="/login" class="btn btn-primary" style="margin-right: 1px;">Login</a>
+    <a href="/signup" class="btn btn-success" style="margin-left: 1px;">Sign Up</a>
+    {% endif %}
+{% endblock %}
+
 {% block title %}Home - Flashcards{% endblock %}
 
 {% block content %}
-   <h1>Welcome to Flashcards</h1>
-   <p class="lead">A simple learning tool with a customizable Bootstrap theme.</p>
+   <header class="masthead">
+      <div class="container px-4 px-lg-5 h-100">
+          <div class="row gx-4 gx-lg-5 h-100 align-items-center justify-content-center text-center">
+              <div class="col-lg-8 align-self-end">
+                  <h1> Welcome to Flashflicks! Your Favorite Place to Study Flashcards </h1>
+                  <hr class="divider" />
+              </div>
+              <div class="col-lg-8 align-self-baseline">
+                  <p class="text-white-75 mb-5">FlashFlicks is an intuitive and interactive flashcard application designed to help students and professionals learn, retain, and master information effectively. Organize your study materials with folders and decks, track your progress with insightful analytics, and stay motivated with custom study goals and streaks. Whether you're preparing for exams, learning a new language, or enhancing your professional skills, FlashFlicks makes studying efficient and fun!</p>
+                  {% if not current_user.is_authenticated %}
+                    <a class="btn btn-primary btn-xl" href="/register">Sign up for Free</a>   <!-- Change the link once we have a sign up page -->
+                  {% else %} 
+                     <a class="btn btn-primary btn-xl" href="/studypage">Start Studying</a>  <!-- Change the link to folders page-->
+                  {% endif %}
+              </div>
+          </div>
+      </div>
+  </header>
+    <!-- Flashcard Learning page -->
+    <section class="page-section" id="services">
+      <div class="row gx-4 gx-lg-5">
+         <hr class="divider" />
+         <a href="/learning-styles" class="text-decoration-none">
+            <h2 class="text-center mt-0">Explore Flashcard Learning Styles</h2>
+         </a>
+         <hr class="divider" />
+      </div>
    
-   <a href="/studypage" class="btn btn-primary" > Try Now</a>
+      <div class="row gx-4 gx-lg-5">
+         <div class="col-lg-3 col-md-6 text-center">
+            <a href="/learning-styles" class="text-decoration-none">
+               <div class="mt-5">
+                  <div class="mb-2"><i class="bi-lightbulb fs-1"></i></div>
+                  <h3 class="h4 mb-2">Active Recall</h3>
+                  <p>Boost memory retention with spaced repetition.</p>
+               </div>
+            </a>
+         </div>
+         <div class="col-lg-3 col-md-6 text-center">
+            <a href="/learning-styles" class="text-decoration-none">
+               <div class="mt-5">
+                  <div class="mb-2"><i class="bi-clock fs-1"></i></div>
+                  <h3 class="h4 mb-2">Time-Based Learning</h3>
+                  <p>Set timers to enhance focus and productivity.</p>
+               </div>
+            </a>
+         </div>
+         <div class="col-lg-3 col-md-6 text-center">
+            <a href="/learning-styles" class="text-decoration-none">
+               <div class="mt-5">
+                  <div class="mb-2"><i class="bi-check2-circle fs-1"></i></div>
+                  <h3 class="h4 mb-2">Track Progress</h3>
+                  <p>Monitor study habits and measure improvement.</p>
+               </div>
+            </a>
+         </div>
+         <div class="col-lg-3 col-md-6 text-center">
+            <a href="/learning-styles" class="text-decoration-none">
+               <div class="mt-5">
+                  <div class="mb-2"><i class="bi-star fs-1"></i></div>
+                  <h3 class="h4 mb-2">Customizable Decks</h3>
+                  <p>Organize study material with ease.</p>
+               </div>
+            </a>
+         </div>
+      </div>
+   </section>
+   
 {% endblock %}
