@@ -7,12 +7,13 @@ from django.contrib.auth import get_user_model
 class CustomUser(AbstractUser):
     """Extends Django's built-in User model to use email instead of username."""
     email = models.EmailField(unique=True)
-
-    #username = None  
+    
+    # Explicitly remove the username field
+    username = None  
 
     profile_picture = models.ImageField(upload_to="profiles/", blank=True, null=True)
-    study_goal = models.IntegerField(default=30)  # Goal in minutes per day
-    study_time = models.IntegerField(default=0)  # Total study time in minutes
+    study_goal = models.IntegerField(default=30)  
+    study_time = models.IntegerField(default=0)  
 
     groups = models.ManyToManyField(
         "auth.Group",
@@ -31,7 +32,7 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
-
+    
 # Folder model for grouping decks 
 class Folder(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="folders")
@@ -91,7 +92,7 @@ class UserProfile(models.Model):
     folders = models.ManyToManyField(Folder)
 
     def __str__(self):
-        return self.user.username
+        return self.user.email
     
 #  Category model
 class Category(models.Model):
