@@ -103,7 +103,18 @@
                             <a class="nav-link active" href="/homepage">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Explore</a>
+                            <a class="nav-link active" href="/class-name>">Folders</a>  <!-- Need to change the link -->
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="dropdown01"
+                               data-bs-toggle="dropdown" aria-expanded="false">Explore</a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdown01">
+                                <li><a class="dropdown-item" href="/progress">View Progress</a></li>
+                                <li><a class="dropdown-item" href="/learning-styles">Explore Flashcard Learning Styles</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/settings">Settings</a>
                         </li>
                     </ul>
                     <form class="d-flex">
@@ -112,11 +123,12 @@
                     <button id="theme-toggle" type="button">
                         <span class="light-mode-icon">🌞</span>
                         <span class="dark-mode-icon" style="display: none;">🌙</span>
-                    </button>
+                    </button> 
+                    {% block header_content %}{% endblock %}
                 </div>
             </div>
         </nav>
-
+        {% block container %}
         <div class="container">
             <div class="bg-light p-5 rounded">
                 <div class="col-sm-8 mx-auto">
@@ -130,7 +142,8 @@
                     {% endblock %}
                 </div>
             </div>
-        </div>
+        </div> 
+        {% endblock %} 
     </main>
 
     <!-- Bootstrap Bundle with Popper -->
