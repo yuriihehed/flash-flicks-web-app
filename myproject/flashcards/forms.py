@@ -44,7 +44,7 @@ class FlashcardForm(forms.ModelForm):
         # This form is based on the Flashcard model
         model = Flashcard
         # These are the fields that will be displayed in the form
-        fields = ["term", "answer", "image"] 
+        fields = ["term", "definition", "image"] 
         # Adding this here so its easier to modify my html file 
         widgets = {
             'term': forms.TextInput(attrs={

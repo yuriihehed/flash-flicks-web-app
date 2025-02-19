@@ -63,12 +63,12 @@ class Flashcard(models.Model):
         default=None
     )
     term = models.CharField(max_length=200, default = None)  # required text for flashcard
-    answer = models.TextField()  # required text for flashcard
+    definition = models.TextField()  # required text for flashcard
     image = models.ImageField(upload_to='images/', blank=True, null=True)  # optional image for flashcard (can be blank)
     is_favorite = models.BooleanField(default=False)  # Starred flashcards
     
     def __str__(self):
-        return f"{self.term}: {self.answer}"  # flashcard term and answer
+        return f"{self.term}: {self.definition}"  # flashcard term and answer
     
 # User profile model
 class UserProfile(models.Model):
