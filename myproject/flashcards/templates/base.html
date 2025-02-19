@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <title>{% block title %}Navbar Template{% endblock %}</title>
-
+ 
     {% load static %}
     <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="{% static 'admin/css/styles.css' %}" rel="stylesheet">
+    <!-- custom css for create flashcards -->
+    <link href="{% static 'css/create_flashcards_custom.css' %}" rel="stylesheet">
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
     <!-- Bootstrap Icons-->
@@ -26,11 +28,14 @@
     <style>
         /* Theme-specific styles */
         /* Light Mode Styles */
+        /* Light Mode Styles */
         body.light-mode {
             background-color: #dbe6f6;
             color: #212529;
         }
         body.light-mode .navbar {
+            background-color: #005bb5 !important;
+            color: #ffffff !important; /* Ensures text remains readable */
             background-color: #005bb5 !important;
             color: #ffffff !important; /* Ensures text remains readable */
         }
@@ -39,8 +44,14 @@
         }
 
         /* Dark Mode Styles */
+        body.light-mode h1, body.light-mode h2, body.light-mode h3, body.light-mode p {
+            color: #212529; /* Ensure dark text for readability */
+        }
+ 
+        /* Dark Mode Styles */
         body.dark-mode {
             background-color: #002244;
+            color: #f8f9fa; /* Light text for contrast */
             color: #f8f9fa; /* Light text for contrast */
         }
         body.dark-mode .navbar {
@@ -62,11 +73,11 @@
             color: white;
             border-radius: 4px;
         }
-
+ 
         #theme-toggle:hover {
             background: rgba(10, 62, 173, 0.1);
         }
-
+ 
         .bd-placeholder-img {
             font-size: 1.125rem;
             text-anchor: middle;
@@ -74,7 +85,7 @@
             -moz-user-select: none;
             user-select: none;
         }
-
+ 
         @media (min-width: 768px) {
             .bd-placeholder-img-lg {
                 font-size: 3.5rem;
@@ -96,11 +107,12 @@
                         aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-
+ 
                 <div class="collapse navbar-collapse" id="navbarsExample01">
                     <ul class="navbar-nav me-auto mb-2">
                         <li class="nav-item">
                             <a class="nav-link active" href="/homepage">Home</a>
+                    
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="/class-name>">Folders</a>  <!-- Need to change the link -->
@@ -145,16 +157,16 @@
         </div> 
         {% endblock %} 
     </main>
-
+ 
     <!-- Bootstrap Bundle with Popper -->
     <script src="{% static 'bootstrap/bootstrap.bundle.min.js' %}"></script>
-
+ 
     <!-- Theme Toggle Script -->
 <script>
     const themeToggle = document.getElementById('theme-toggle');
     const lightIcon = document.querySelector('.light-mode-icon');
     const darkIcon = document.querySelector('.dark-mode-icon');
-
+ 
     function setTheme(theme) {
         if (theme === 'dark') {
             document.body.classList.remove('light-mode');
@@ -168,11 +180,11 @@
             darkIcon.style.display = 'none';
         }
     }
-
+ 
     // Initialize theme from localStorage
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
-
+ 
     // Theme toggle handler
     themeToggle.addEventListener('click', () => {
         const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
@@ -180,6 +192,6 @@
         setTheme(newTheme);
     });
 </script>
-
+ 
 </body>
 </html>

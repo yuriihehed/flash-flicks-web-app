@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Flashcard Set{% endblock %}
+
+{% block container %}
+<!-- Include external CSS (Bootstrap and custom) -->
+<link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/custom.css' %}" rel="stylesheet">
+
+<style>
+    /* Sidebar transition styles */
+    #sidebar {
+        transition: width 0.3s ease-in-out;
+    }
+    .sidebar-collapsed {
+        width: 40px !important;  /* Collapsed width */
+        overflow: hidden;
+    }
+    .hamburger-btn {
+        color: white;
+        background-color: transparent;
+        border: none;
+        font-size: 24px;
+    }
+</style>
+
+<!-- Wrapper for full-height layout with sidebar on left -->
+<div class="d-flex" style="min-height: 100vh;">
+  
+    <!-- SIDEBAR NAVIGATION (Left Side) -->
+    <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5;">
+        <ul class="nav flex-column">
+            <li class="nav-item border-bottom border-dark">
+                <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">☰</button>
+            </li>
+            <li class="nav-item border-bottom border-dark">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button" aria-expanded="false" aria-controls="classesCollapse">
+                    Classes
+                </a>
+                <div class="collapse" id="classesCollapse">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Class 101</li>
+                        <li class="list-group-item">Class 102</li>
+                        <button class="btn btn-primary" onclick="window.location.href='#'">Go to Classes</button>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item border-bottom border-dark">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse" role="button" aria-expanded="false" aria-controls="flashcardsCollapse">
+                    Flashcards
+                </a>
+                <div class="collapse" id="flashcardsCollapse">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Flashcard 1</li>
+                        <li class="list-group-item">Flashcard 2</li>
+                        <button class="btn btn-primary" onclick="window.location.href='#'">Go to Flashcards</button>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">
+                    Folders
+                </a>
+                <div class="collapse" id="foldersCollapse">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Folder A</li>
+                        <li class="list-group-item">Folder B</li>
+                        <button class="btn btn-primary" onclick="window.location.href='#'">Go to Folders</button>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <!-- END SIDEBAR NAVIGATION -->
+
+    <!-- MAIN CONTENT AREA (Right Side) -->
+    <div class="flex-grow-1 p-4">
+        <!-- Centered Page Title -->
+        <h1 class="text-center mb-4">Create a New Flashcard Set</h1>
+        
+        <!-- Flashcard Set Creation Form -->
+        <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            
+            <!-- Title Field -->
+            <div class="mb-3">
+                {{ set_form.title }}
+            </div>
+            
+            <!-- Description Field -->
+            <div class="mb-3">
+                {{ set_form.description }}
+            </div>
+            
+            {# Optional: a "+ Add a card" button above the cards container (if desired) #}
+            <button type="button" id="add-card-btn" style="background: none; border: none; color: #000; text-decoration: underline; width: fit-content; padding: 0; cursor: pointer;">
+                + Add a card
+            </button>
+            
+            {# Cards Container: Existing flashcard forms will be here, and new ones will be appended #}
+            <div id="cards-container">
+                {% for form in formset %}
+                <div class="card-form mb-3 border p-3">
+                    <h5>{{ forloop.counter }}</h5> <!-- Numbering each card -->
+                    <!-- Term Field -->
+                    <div class="mb-2">
+                        <label class="form-label">Term</label>
+                        {{ form.term }}
+                    </div>
+                    <!-- Definition Field -->
+                    <div class="mb-2">
+                        <label class="form-label">Definition</label>
+                        {{ form.definition }}
+                    </div>
+                    <!-- Image Field -->
+                    <div class="mb-2">
+                        <label class="form-label">Image</label>
+                        {{ form.image }}
+                    </div>
+                    {% if form.instance.pk %}
+                    <div class="form-check">
+                        <label class="form-check-label" for="id_DELETE_{{ forloop.counter0 }}">Delete</label>
+                        {{ form.DELETE }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            {# Hidden Empty Form Template for Adding New Cards Dynamically #}
+            <div id="empty-form" style="display: none;">
+                {{ formset.empty_form.as_p }}
+            </div>
+            
+            <!-- "ADD A CARD" Button at Bottom -->
+            <button type="button" id="add-card-btn2" class="btn btn-secondary w-100 mb-3">
+                ADD A CARD
+            </button>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">
+                Create
+            </button>
+        </form>
+    </div>
+    <!-- END MAIN CONTENT AREA -->
+</div>
+
+<!-- JavaScript: Sidebar Toggle and Dynamic Add Card Functionality -->
+<script>
+    // Sidebar Toggle
+    document.getElementById("sidebarToggle").addEventListener("click", function() {
+        var sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("sidebar-collapsed");
+    });
+
+    // "ADD A CARD" Button: Add new card form dynamically
+    function addCard() {
+        // Get the container for the cards
+        var container = document.getElementById('cards-container');
+        // Get the current total forms count from the management form
+        var totalFormsInput = document.querySelector('[name="form-TOTAL_FORMS"]');
+        var totalForms = parseInt(totalFormsInput.value);
+        // Get the empty form template HTML
+        var emptyFormHtml = document.getElementById('empty-form').innerHTML;
+        // Replace __prefix__ placeholder with the current totalForms value
+        var newFormHtml = emptyFormHtml.replace(/__prefix__/g, totalForms);
+        // Create a new div to hold the new form
+        var newFormDiv = document.createElement('div');
+        newFormDiv.className = 'card-form mb-3 border p-3';
+        newFormDiv.innerHTML = `<h5> ${totalForms + 1}</h5>` + newFormHtml;
+        // Append the new form to the container
+        container.appendChild(newFormDiv);
+        // Increment the TOTAL_FORMS count so Django knows about the new form
+        totalFormsInput.value = totalForms + 1;
+    }
+    // "ADD A CARD" Button: Add new card form dynamically
+    document.getElementById('add-card-btn').addEventListener('click', addCard);
+    document.getElementById('add-card-btn2').addEventListener('click', addCard);
+</script>
+
+{% endblock %}

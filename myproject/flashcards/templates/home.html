@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Home Dashboard{% endblock %}
+
+{% block container %}
+<div class="custom-container"></div>
+
+
+{% load static %}
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
+
+<style>
+    
+    #sidebar {
+        transition: width 0.3s ease-in-out;
+    }
+    
+    .sidebar-collapsed {
+        width: 40px !important; /* Keep only the toggle button visible */
+        overflow: hidden;
+    }
+    .hamburger-btn {
+        color: white;
+        background-color: transparent;
+        border: none;
+        font-size: 24px; /* Adjust size if needed */
+    }
+    
+</style>
+
+<!-- Wrapper -->
+<div class="d-flex flex-column " style="min-height: 100vh;">
+
+    <!-- Content Below Header -->
+    <div class="d-flex flex-grow-1">
+        
+        <!-- Dynamic Sidebar -->
+        <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
+            <ul class="nav flex-column">
+                <li class="nav-item border-bottom border-dark">
+                    <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">
+                        ☰
+                    </button>
+                </li>   
+                <li class="nav-item border-bottom border-dark">
+                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button" aria-expanded="false" aria-controls="classesCollapse">Classes</a>
+                    <div class="collapse" id="classesCollapse">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Class 101</li>
+                            <li class="list-group-item">Class 102</li>
+                            <button class="btn btn-primary" onclick="window.location.href='#'">Go to Classes</button>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item border-bottom border-dark">
+                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse" role="button" aria-expanded="false" aria-controls="flashcardsCollapse">Flashcards</a>
+                    <div class="collapse" id="flashcardsCollapse">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Flashcard 1</li>
+                            <li class="list-group-item">Flashcard 2</li>
+                            <button class="btn btn-primary" onclick="window.location.href='#'">Go to Flashcards</button>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+                    <div class="collapse" id="foldersCollapse">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Folder A</li>
+                            <li class="list-group-item">Folder B</li>
+                            <button class="btn btn-primary" onclick="window.location.href='#'">Go to Folders</button>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="d-flex flex-grow-1 pe-5 p-2">
+            <!-- Main Content -->
+            <div class="flex-grow-1 ps-5 p-2">
+
+                <!-- Welcome -->
+                <h2 class="welcome-message">Welcome, {{ user.username }}</h2>
+
+                <!-- Dashboard -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Progress Tracker</h5>
+                                <p class="card-text">Track your study progress here.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Calendar</h5>
+                                <p class="card-text">Manage your due date here.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">My Account</h5>
+                                <p class="card-text">Manage your account settings here.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mb-4">
+                <button class="btn btn-secondary me-2">+ Create New Study Set</button>
+                <button class="btn btn-secondary">+ Create New Folder</button>
+                </div>
+
+
+
+                <!-- Folders Section -->
+                <div class="mb-3">
+                    <h3>Folders:</h3>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="col-md-2">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Folder A</h5>
+                                    <p class="card-text">Manage your folder.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Folder B</h5>
+                                    <p class="card-text">Manage your folder.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Folder C</h5>
+                                    <p class="card-text">Manage your folder.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Folder D</h5>
+                                    <p class="card-text">Manage your folder.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("sidebarToggle").addEventListener("click", function () {
+        let sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("sidebar-collapsed");
+    });
+</script>
+{% endblock %}
