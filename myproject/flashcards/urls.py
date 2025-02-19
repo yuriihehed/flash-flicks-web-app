@@ -16,6 +16,7 @@ urlpatterns = [
     # FOR FUTURE PASSWORD RESET FUNCTIONALITY
     path('signup/', views.signup, name='signup'),  # Temporary placeholder
     
+    path('create-flashcard-set', views.create_flashcard_set, name='create_flashcard_set'), # need the homepage to function properly first
     #Home Page
     path('homepage/', views.home, name='home'),
 ]
