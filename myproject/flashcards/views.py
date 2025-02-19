@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .forms import FlashcardSetForm, FlashcardForm, FlashcardFormSet
-from .models import Flashcard
-from django.forms.models import modelformset_factory
+from .models import Flashcard, Folder, FlashcardSet
+from django.forms.models import modelformset_factory 
+import json
 
 
 def landing_page(request):
@@ -26,6 +27,32 @@ def forgot_password(request):
 
 def home(request):
     return render(request, 'home.html')
+
+def create_folder(request):
+    if request.method == "POST":
+        folder_name = request.POST.get("name", "")
+        if folder_name:
+            folder = Folder.objects.create(name=folder_name)
+            return JsonResponse({"success": True, "folder_name": folder.name})
+        return JsonResponse({"success": False})
+
+    return render(request, "create_folder.html") 
+
+def folder(request, slug=None):
+    # Get the first folder if no slug is provided
+    if slug is None:
+        folder = Folder.objects.first()
+        if folder:
+            return redirect('folder', slug=folder.slug)  # Redirect to the first folder's page
+        else:
+            # If no folders exist, create a general folder representation
+            return render(request, 'folder.html', {'folder': None, 'flashcards': []})
+
+    # If slug is provided, get the specified folder
+    folder = get_object_or_404(Folder, slug=slug)
+    flashcards = Flashcard.objects.filter(flashcard_set__folder=folder)  # Get flashcards via FlashcardSet
+    return render(request, 'folder.html', {'folder': folder, 'flashcards': flashcards})
+
 
 def create_flashcard_set(request):
     # We can also define the formset here if not defined in forms.py

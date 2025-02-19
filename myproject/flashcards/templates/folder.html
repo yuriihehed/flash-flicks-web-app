@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Home Dashboard{% endblock %}
+
+{% block container %}
+{% include 'partials/folder_modal.html' %}
+<div class="custom-container"></div>
+
+<!-- Wrapper -->
+<div class="d-flex flex-column " style="min-height: 100vh;">
+
+    <!-- Content Below Header -->
+    <div class="d-flex flex-grow-1">
+        
+        <!-- Dynamic Sidebar -->
+        <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
+            <ul class="nav flex-column">
+                <li class="nav-item border-bottom border-dark">
+                    <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">
+                        ☰
+                    </button>
+                </li>   
+                <li class="nav-item border-bottom border-dark">
+                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+                    <div class="collapse show" id="foldersCollapse">
+                        <ul class="list-group list-group-flush">
+                            <!-- Default General Folder -->
+                            <li class="list-group-item">
+                                <a href="{% url 'folder_detail' 'general' %}" class="text-decoration-none">📁 General Folder</a>
+                            </li>
+                            <!-- User Folders -->
+                            {% for folder in user_folders %}
+                            <li class="list-group-item">
+                                <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item text-muted">No folders created yet.</li>
+                            {% endfor %}
+                            <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="d-flex flex-grow-1 pe-5 p-2">
+            <div class="flex-grow-1 ps-5 p-2">
+
+                <!-- Welcome -->
+                <h2 class="welcome-message">Welcome, {{ user.username }}</h2>
+
+                <!-- Action Buttons -->
+                <div class="mb-4">
+                    <a class="btn btn-secondary me-2" href='/create-flashcard-set'>+ Create New Study Set</a>
+                    <a class="btn btn-secondary me-2" id="openModal">+ Create New Folder</a>
+                </div>
+
+                <!-- Folders Section -->
+                <div class="mb-3">
+                    <h3>Folders:</h3>
+                    <div class="d-flex flex-wrap gap-3">
+                        <!-- Default General Folder -->
+                        <div class="col-md-2">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">📁 General Folder</h5>
+                                    <p class="card-text">This is your default folder.</p>
+                                    <a href="{% url 'folder_detail' 'general' %}" class="btn btn-primary">Open</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- User Folders -->
+                        {% for folder in user_folders %}
+                        <div class="col-md-2">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">📁 {{ folder.name }}</h5>
+                                    <p class="card-text">Manage your folder.</p>
+                                    <a href="{% url 'folder_detail' folder.slug %}" class="btn btn-primary">Open</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">You have no folders yet. Create one!</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("sidebarToggle").addEventListener("click", function () {
+        let sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("sidebar-collapsed");
+    });
+</script>
+{% endblock %}

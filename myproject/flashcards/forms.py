@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
 from .models import Flashcard
 from .models import Folder
-from .models import Deck
 from .models import FlashcardSet
 from django.forms.models import modelformset_factory
 
@@ -25,7 +24,7 @@ class FlashcardSetForm(forms.ModelForm):
         # This form is based on the FlashcardSet model
         model = FlashcardSet
         # These are the fields that will be displayed in the form
-        fields = ["title", "description"]
+        fields = ["title", "description", "folder"]
         # These are the widgets that will be used to render the form fields
         widgets = {
             'title': forms.TextInput(attrs={
@@ -58,20 +57,17 @@ class FlashcardForm(forms.ModelForm):
         }
 
 # The formset lets you manage multiple Flashcard objects in a single form(add, edit, delete)
-FlashcardFormSet = modelformset_factory(
+FlashcardFormSet = modelformset_factory (
     Flashcard, 
     form=FlashcardForm, 
     extra=3,  # how many blank forms are displayed
     can_delete=True # can delete existing forms (a checkbox is displayed on each form to allow removal of the card if needed)
 )
+
         
 class FolderForm(forms.ModelForm):
     class Meta:
         model = Folder
-        fields = ["name"]
+        fields = ['name', 'parent']
 
-class DeckForm(forms.ModelForm):
-    class Meta:
-        model = Deck
-        fields = ["folder", "name", "description"]
 

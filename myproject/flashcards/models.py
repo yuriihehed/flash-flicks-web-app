@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
+
 
 # Custom user model
 class CustomUser(AbstractUser):
@@ -20,22 +22,27 @@ class CustomUser(AbstractUser):
         blank=True
     )
 
+CustomUser = get_user_model()
+
+def get_default_user():
+    return CustomUser.objects.first().id if CustomUser.objects.exists() else None
+
+
 # Folder model for grouping decks 
 class Folder(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="folders")
     name = models.CharField(max_length=100)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subfolders')
     created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(unique=True, blank=True)
 
-    def __str__(self):
-        return self.name
-    
-# Single deck model - reviewed
-class Deck(models.Model):
-    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name="decks")
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='decks')
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)  # Generate slug from the name
+            # Ensure slug uniqueness
+            while Folder.objects.filter(slug=self.slug).exists():
+                self.slug += "-" + str(Folder.objects.filter(slug__startswith=self.slug).count())
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -46,6 +53,10 @@ class FlashcardSet(models.Model):
     description = models.TextField(blank=True, null = True) # optional description for flashcard (can be blank)
     created_at = models.DateTimeField(auto_now_add=True)  # auto set the created date
     updated_at = models.DateTimeField(auto_now=True)  # auto set the updated date
+    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='flashcard_sets') # added by Gulbanu
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=get_default_user, null=True, blank=True)
+
+
     
     # returns the title of the flashcard set
     def __str__(self):
@@ -62,7 +73,7 @@ class Flashcard(models.Model):
         related_name='flashcards',
         default=None
     )
-    term = models.CharField(max_length=200, default = None)  # required text for flashcard
+    term = models.CharField(max_length=200, default="Unknown Term")  # required text for flashcard
     definition = models.TextField()  # required text for flashcard
     image = models.ImageField(upload_to='images/', blank=True, null=True)  # optional image for flashcard (can be blank)
     is_favorite = models.BooleanField(default=False)  # Starred flashcards
@@ -72,7 +83,7 @@ class Flashcard(models.Model):
     
 # User profile model
 class UserProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE,  default=None)
     folders = models.ManyToManyField(Folder)
 
     def __str__(self):
@@ -81,17 +92,16 @@ class UserProfile(models.Model):
 #  Category model
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    decks = models.ManyToManyField(Deck) 
+    deck = models.ManyToManyField(FlashcardSet) 
 
     def __str__(self):
         return self.name
 
-
 # Progress model - reviewed
 class Progress(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,  default=None)
     flashcard = models.ForeignKey(Flashcard, on_delete=models.CASCADE)
-    deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
+    deck = models.ForeignKey(FlashcardSet, on_delete=models.CASCADE)
     last_reviewed = models.DateTimeField(auto_now=True)
     study_attempts = models.IntegerField(default=0)
     correct_attempts = models.PositiveIntegerField(default=0)
@@ -102,7 +112,7 @@ class Progress(models.Model):
 
 # Study streak model - reviewed
 class StudyStreak(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,  default=None)
     last_study_date = models.DateField(auto_now=True)
     current_streak = models.PositiveIntegerField(default=0)
     longest_streak = models.PositiveIntegerField(default=0) 

@@ -1,23 +1,14 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Home Dashboard{% endblock %}
 
 {% block container %}
+{% include 'partials/folder_modal.html' %}
 <div class="custom-container"></div>
-
-
-{% load static %}
-    <!-- Bootstrap CSS -->
-    <link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
-
 <style>
-    
     #sidebar {
         transition: width 0.3s ease-in-out;
     }
-    
     .sidebar-collapsed {
         width: 40px !important; /* Keep only the toggle button visible */
         overflow: hidden;
@@ -30,7 +21,6 @@
     }
     
 </style>
-
 <!-- Wrapper -->
 <div class="d-flex flex-column " style="min-height: 100vh;">
 
@@ -116,11 +106,10 @@
 
                 <!-- Action Buttons -->
                 <div class="mb-4">
-                <button class="btn btn-secondary me-2">+ Create New Study Set</button>
-                <button class="btn btn-secondary">+ Create New Folder</button>
+                <a class="btn btn-secondary me-2" href='/create-flashcard-set' >+ Create New Study Set</a>
+                <!-- <a class="btn btn-secondary me-2" href="{% url 'create_folder' %}">+ Create New Folder</a> -->
+                <a class="btn btn-secondary me-2" id="openModal">+ Create New Folder</a> <!-- Open Modal Button -->
                 </div>
-
-
 
                 <!-- Folders Section -->
                 <div class="mb-3">
@@ -166,10 +155,35 @@
     </div>
 </div>
 
+<!--  ______________________________________________-->
+<!-- Popup Modal -->
+<div id="folderModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Create a New Folder</h2>
+        <form method="POST" id="folderForm">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Enter folder name" required>
+            <button type="submit">Create</button>
+        </form>
+        <div id="responseMessage"></div>
+    </div>
+</div>
+
+<!-- Modal and Form Submission JavaScript -->
+<script>
+    var folderCreateUrl = "{% url 'create_folder' %}";
+    var csrfToken = "{{ csrf_token }}";
+</script>
+<link rel="stylesheet" href="{% static 'css/modal.css' %}">
+<script src="{% static 'js/folder.js' %}"></script>
+
+<!-- Sidebar Toggle JavaScript ______________________________________________-->
 <script>
     document.getElementById("sidebarToggle").addEventListener("click", function () {
         let sidebar = document.getElementById("sidebar");
         sidebar.classList.toggle("sidebar-collapsed");
     });
 </script>
+
 {% endblock %}

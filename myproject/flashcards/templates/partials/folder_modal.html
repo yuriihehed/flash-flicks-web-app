@@ -1,0 +1,13 @@
+<!-- templates/partials/folder_modal.html -->
+<div id="folderModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Create a New Folder</h2>
+        <form method="POST" id="folderForm">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Enter folder name" required>
+            <button type="submit">Create</button>
+        </form>
+        <div id="responseMessage"></div>
+    </div>
+</div>

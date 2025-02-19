@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Create a New Folder</h2>
+<form method="POST" id="folderForm">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Enter folder name" required>
+    <button type="submit">Create</button>
+</form>
+
+<div id="responseMessage"></div>
+
+<script>
+    document.getElementById("folderForm").addEventListener("submit", function(event) {
+        event.preventDefault();  // Prevent traditional form submission
+        var formData = new FormData(this);
+
+        fetch("{% url 'create_folder' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("responseMessage").innerHTML = "Folder created: " + data.folder_name;
+            } else {
+                document.getElementById("responseMessage").innerHTML = "Folder creation failed.";
+            }
+        });
+    });
+</script>
+{% endblock %}
