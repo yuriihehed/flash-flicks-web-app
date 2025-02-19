@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Flashcard Set{% endblock %}
+
+{% block container %}
+<!-- Include external CSS (Bootstrap and custom) -->
+<link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/custom.css' %}" rel="stylesheet">
+
+<style>
+    /* Sidebar transition styles */
+    #sidebar {
+        transition: width 0.3s ease-in-out;
+    }
+    .sidebar-collapsed {
+        width: 40px !important;  /* Collapsed width */
+        overflow: hidden;
+    }
+    .hamburger-btn {
+        color: white;
+        background-color: transparent;
+        border: none;
+        font-size: 24px;
+    }
+</style>
+
+<!-- Wrapper for full-height layout with sidebar on left -->
+<div class="d-flex" style="min-height: 100vh;">
+  
+    <!-- SIDEBAR NAVIGATION (Left Side) -->
+    <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5;">
+        <ul class="nav flex-column">
+            <li class="nav-item border-bottom border-dark">
+                <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">☰</button>
+            </li>
+            <li class="nav-item border-bottom border-dark">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button" aria-expanded="false" aria-controls="classesCollapse">
+                    Classes
+                </a>
+                <div class="collapse" id="classesCollapse">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Class 101</li>
+                        <li class="list-group-item">Class 102</li>
+                        <button class="btn btn-primary" onclick="window.location.href='#'">Go to Classes</button>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item border-bottom border-dark">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse" role="button" aria-expanded="false" aria-controls="flashcardsCollapse">
+                    Flashcards
+                </a>
+                <div class="collapse" id="flashcardsCollapse">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Flashcard 1</li>
+                        <li class="list-group-item">Flashcard 2</li>
+                        <button class="btn btn-primary" onclick="window.location.href='#'">Go to Flashcards</button>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">
+                    Folders
+                </a>
+                <div class="collapse" id="foldersCollapse">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Folder A</li>
+                        <li class="list-group-item">Folder B</li>
+                        <button class="btn btn-primary" onclick="window.location.href='#'">Go to Folders</button>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <!-- END SIDEBAR NAVIGATION -->
+
+    <!-- MAIN CONTENT AREA (Right Side) -->
+    <div class="flex-grow-1 p-4">
+        <!-- Centered Page Title with Buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-center">Edit Flashcard Set</h1>
+            <div>
+                <button type="button" class="btn btn-danger me-2" onclick="window.location.href='{% url "home" %}'">Cancel</button>
+                <button type="submit" form="edit-flashcard-form" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+        
+        <form id="edit-flashcard-form" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
+            {% csrf_token %}
+            {{ set_form.as_p }}
+            {{ formset.management_form }}
+            
+            <div id="cards-container">
+                {% for form in formset %}
+                <div class="card-form mb-3 border p-3">
+                    <h5>Card {{ forloop.counter }}</h5>
+                    {{ form.as_p }}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div id="empty-form" style="display: none;">
+                {{ formset.empty_form.as_p }}
+            </div>
+            
+            <button type="button" id="add-card-btn" class="btn btn-secondary w-100 mb-3">+ Add a card</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById("add-card-btn").addEventListener("click", function() {
+        var container = document.getElementById('cards-container');
+        var totalFormsInput = document.querySelector('[name="form-TOTAL_FORMS"]');
+        var totalForms = parseInt(totalFormsInput.value);
+        var emptyFormHtml = document.getElementById('empty-form').innerHTML;
+        var newFormHtml = emptyFormHtml.replace(/__prefix__/g, totalForms);
+        var newFormDiv = document.createElement('div');
+        newFormDiv.className = 'card-form mb-3 border p-3';
+        newFormDiv.innerHTML = `<h5>Card ${totalForms + 1}</h5>` + newFormHtml;
+        container.appendChild(newFormDiv);
+        totalFormsInput.value = totalForms + 1;
+    });
+</script>
+{% endblock %}

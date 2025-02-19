@@ -18,6 +18,7 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),  # Temporary placeholder
     
     path('create-flashcard-set', views.create_flashcard_set, name='create_flashcard_set'), # need the homepage to function properly first
+    path('edit-flashcard-set/<int:pk>/', views.edit_flashcard_set, name='edit_flashcard_set'), # for the edit page of the flashcard set
     #Home Page
     path('homepage/', views.home, name='home'),
 ]
