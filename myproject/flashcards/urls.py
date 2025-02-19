@@ -13,9 +13,6 @@ urlpatterns = [
     path('login/', views.login_page, name='login'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('register/', views.register, name='register'),
-
-    # FOR FUTURE PASSWORD RESET FUNCTIONALITY
-    path('signup/', views.signup, name='signup'),  # Temporary placeholder
     
     path('create-flashcard-set', views.create_flashcard_set, name='create_flashcard_set'), # need the homepage to function properly first
     path('edit-flashcard-set/<int:pk>/', views.edit_flashcard_set, name='edit_flashcard_set'), # for the edit page of the flashcard set
