@@ -9,15 +9,20 @@ from django.forms.models import modelformset_factory
 class RegisterForm(UserCreationForm):
     email = forms.EmailField()
     class Meta:
-        model = CustomUser
-        fields = ["username", "email", "password1", "password2"]
+        model = CustomUser # removing username from the form since models.py does not use it
+        fields = [ "email", "password1", "password2"]
 
         error_messages = {
-            'username': {
-                "required": "A username is required.",
-                'unique': 'A user with that name already exists.'
+            'email': {
+                "required": "A email is required.",
+                'unique': 'A user with that email already exists.'
             }
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop('username', None)
+
+
 # The form manages creating/updating a FlashcardSet object in the database
 class FlashcardSetForm(forms.ModelForm):
     class Meta:

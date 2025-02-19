@@ -28,9 +28,6 @@ def studypage(request):
 def edit_learn_mode(request):
     return render(request, 'edit_learn_mode.html')
 
-def signup(request):
-    return HttpResponse("Signup page coming soon!")  # Placeholder
-
 def forgot_password(request):
     return render(request, 'forgot_password.html')
 
@@ -140,7 +137,7 @@ def login_page(request):
 
         if user:
             login(request, user)
-            return redirect("base_page")  # Redirect to home/dashboard
+            return redirect("homepage")  # Redirect to home/dashboard
         else:
             messages.error(request, "Invalid email or password.")
 

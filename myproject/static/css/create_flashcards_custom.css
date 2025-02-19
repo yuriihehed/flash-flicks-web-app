@@ -1,7 +1,18 @@
 /* custom.css */
-
-/* 1) Override default Bootstrap form styling */
-.form-label,
+.form-label {
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  width: 100%; 
+  padding: 0.5rem !important; 
+  border: 1px solid #ccc !important; 
+  border-radius: 0 !important; 
+  background-color: #fff !important;
+  color: #000 !important; 
+  font-weight: normal;
+  text-align: center; 
+  height: 38px;
+}
 .form-control {
   /* Remove or soften Bootstrap’s margin/padding/borders as desired */
   margin: 0 !important;
@@ -11,6 +22,7 @@
   background-color: #fff !important;
   color: #000 !important;
 }
+
 
 /* If you don't want the 'form-control' class at all,
    remove it from your template or do something minimal here. */

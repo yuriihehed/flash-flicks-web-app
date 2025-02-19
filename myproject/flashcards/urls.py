@@ -13,8 +13,6 @@ urlpatterns = [
     path('login/', views.login_page, name='login'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('register/', views.register, name='register'),
-
-    path('register/', views.signup, name='signup'),  # Temporary placeholder
     
     path('create-flashcard-set/', views.create_flashcard_set, name='create_flashcard_set'), # need the homepage to function properly first
     #Home Page
