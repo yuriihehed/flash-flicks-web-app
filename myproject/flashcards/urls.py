@@ -17,7 +17,7 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),  # Temporary placeholder
     
     #Home Page
-    path('home/', views.home, name='home'),
+    path('homepage/', views.home, name='home'),
 ]
 
 if settings.DEBUG:
