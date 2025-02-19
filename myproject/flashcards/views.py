@@ -22,6 +22,3 @@ def forgot_password(request):
 
 def homepage(request):
     return render(request, 'homepage.html')
-
-def home(request):
-    return render(request, 'home.html')

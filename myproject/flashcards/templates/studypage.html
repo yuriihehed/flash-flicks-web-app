@@ -204,4 +204,14 @@
         } else {
             // Edit Mode
             fields.forEach(el => {
-                el.contentEditable = "tru
+                el.contentEditable = "true";
+                el.classList.add('editable');  // Highlight with red border
+            });
+            card.classList.add('editing');  // Disable flipping
+            button.textContent = "Save";
+        }
+    }
+
+    updateCards();
+</script>
+{% endblock %}
