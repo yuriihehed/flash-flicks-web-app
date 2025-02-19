@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-
 # Custom user model
 class CustomUser(AbstractUser):
     """Extends Django's built-in User model."""
@@ -41,17 +40,35 @@ class Deck(models.Model):
     def __str__(self):
         return self.name
     
-# Single flashcard model - reviewed
-class Flashcard(models.Model):
-    deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name='flashcards')
-    question = models.TextField()
-    answer = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_favorite = models.BooleanField(default=False)  # Starred flashcards
-
+# The flashcard set model hold the overall title and description of the flashcard set
+class FlashcardSet(models.Model):
+    title = models.CharField(max_length=200)  # required text for flashcard
+    description = models.TextField(blank=True, null = True) # optional description for flashcard (can be blank)
+    created_at = models.DateTimeField(auto_now_add=True)  # auto set the created date
+    updated_at = models.DateTimeField(auto_now=True)  # auto set the updated date
+    
+    # returns the title of the flashcard set
     def __str__(self):
-        return self.question[:50]
+        return self.title
 
+# The flashcard model holds the question and answer for the flashcard
+class Flashcard(models.Model):
+    # flashcard_set: a foreign key referencing the flashcard set the flashcard belongs to
+    # on_delete=models.CASCADE: when the flashcard set is deleted, delete the flashcard
+    # related_name='flashcards': lets you access cards with flashcard_set.flashcards.all()
+    flashcard_set = models.ForeignKey(
+        FlashcardSet, 
+        on_delete=models.CASCADE, 
+        related_name='flashcards',
+        default=None
+    )
+    term = models.CharField(max_length=200, default = None)  # required text for flashcard
+    answer = models.TextField()  # required text for flashcard
+    image = models.ImageField(upload_to='images/', blank=True, null=True)  # optional image for flashcard (can be blank)
+    is_favorite = models.BooleanField(default=False)  # Starred flashcards
+    
+    def __str__(self):
+        return f"{self.term}: {self.answer}"  # flashcard term and answer
     
 # User profile model
 class UserProfile(models.Model):
@@ -93,3 +110,7 @@ class StudyStreak(models.Model):
 
     def __str__(self):
         return f'{self.user.username}\'s study streak'  # User's study streak
+    
+    
+
+    
