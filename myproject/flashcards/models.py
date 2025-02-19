@@ -8,7 +8,7 @@ class CustomUser(AbstractUser):
     """Extends Django's built-in User model to use email instead of username."""
     email = models.EmailField(unique=True)
 
-    username = None  
+    #username = None  
 
     profile_picture = models.ImageField(upload_to="profiles/", blank=True, null=True)
     study_goal = models.IntegerField(default=30)  # Goal in minutes per day

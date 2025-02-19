@@ -81,7 +81,7 @@ def create_flashcard_set(request):
                     flashcard.save()
 
             # Redirect to some page, e.g., a list of all flashcard sets
-            return redirect('flashcard_sets_list')
+            return redirect('flashcard_sets_list') # Placeholder
     else:
         set_form = FlashcardSetForm()
         # We pass an empty queryset, so we’re not editing existing cards
@@ -93,6 +93,39 @@ def create_flashcard_set(request):
     }
     return render(request, 'create_flashcard_set.html', context)
 
+def edit_flashcard_set(request, pk):
+    # Retrieve the FlashcardSet instance by its primary key (pk)
+    flashcard_set = get_object_or_404(FlashcardSet, pk=pk)
+
+    if request.method == 'POST':
+        # If the request method is POST, bind the form and formset to the POST data
+        set_form = FlashcardSetForm(request.POST, instance=flashcard_set)
+        formset = FlashcardFormSet(request.POST, request.FILES, queryset=flashcard_set.flashcards.all())
+
+        # if its valid save the form and formset
+        if set_form.is_valid() and formset.is_valid():
+            set_form.save()
+
+            # then save each individual card
+            for form in formset:
+                if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                    form.save()
+                    
+            # redirect to some page, e.g., a list of all flashcard sets
+            return redirect('flashcard_sets_list')  # Placeholder
+    else:
+        # If the request method is GET, populate the form and formset with the existing data
+        set_form = FlashcardSetForm(instance=flashcard_set)
+        formset = FlashcardFormSet(queryset=flashcard_set.flashcards.all())
+        
+    # Pass the form, formset, and flashcard set to the template context
+    context = {
+        'set_form': set_form,
+        'formset': formset,
+        'flashcard_set': flashcard_set
+    }
+    # Render the edit_flashcard_set.html template with the context
+    return render(request, 'edit_flashcard_set.html', context)
 
 
 User = get_user_model()

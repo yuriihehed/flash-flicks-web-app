@@ -71,7 +71,22 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
+<<<<<<< HEAD
                 ('deck', models.ManyToManyField(to='flashcards.flashcardset')),
+=======
+                ('decks', models.ManyToManyField(to='flashcards.deck')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Flashcard',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('question', models.TextField()),
+                ('answer', models.TextField()),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('is_favorite', models.BooleanField(default=False)),
+                ('deck', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='flashcards', to='flashcards.deck')),
+>>>>>>> upstream/main
             ],
         ),
         migrations.CreateModel(
