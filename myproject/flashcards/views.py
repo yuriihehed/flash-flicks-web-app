@@ -1,8 +1,17 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from .forms import FlashcardSetForm, FlashcardForm, FlashcardFormSet
 from .models import Flashcard, Folder, FlashcardSet
 from django.forms.models import modelformset_factory 
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from .models import UserProfile
+from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak
 import json
 
 
@@ -87,3 +96,52 @@ def create_flashcard_set(request):
     }
     return render(request, 'create_flashcard_set.html', context)
 
+
+
+User = get_user_model()
+
+def register(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm")
+
+        if not email or not password or not confirm_password:
+            messages.error(request, "All fields are required.")
+            return render(request, "register.html")
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return render(request, "register.html")
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already in use.")
+            return render(request, "register.html")
+
+    
+        user = User(email=email)
+        user.set_password(password)
+        user.save()
+
+    
+        UserProfile.objects.create(user=user)
+
+        messages.success(request, "Registration successful! Please log in.")
+        return redirect("login")
+
+    return render(request, "register.html")
+
+def login_page(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        user = authenticate(username=email, password=password)
+
+        if user:
+            login(request, user)
+            return redirect("base_page")  # Redirect to home/dashboard
+        else:
+            messages.error(request, "Invalid email or password.")
+
+    return render(request, "login.html")

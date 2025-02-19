@@ -10,8 +10,9 @@ urlpatterns = [
     path('base/', views.base_page, name='base_page'),
     path('studypage/', views.studypage, name='studypage'),    
     path('edit-learn-mode/', views.edit_learn_mode, name='edit_learn_mode'),
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'), 
+    path('login/', views.login_page, name='login'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('register/', views.register, name='register'),
 
     path('register/', views.signup, name='signup'),  # Temporary placeholder
     

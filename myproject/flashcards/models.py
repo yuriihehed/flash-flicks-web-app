@@ -5,8 +5,12 @@ from django.contrib.auth import get_user_model
 
 # Custom user model
 class CustomUser(AbstractUser):
-    """Extends Django's built-in User model."""
-    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    """Extends Django's built-in User model to use email instead of username."""
+    email = models.EmailField(unique=True)
+
+    username = None  
+
+    profile_picture = models.ImageField(upload_to="profiles/", blank=True, null=True)
     study_goal = models.IntegerField(default=30)  # Goal in minutes per day
     study_time = models.IntegerField(default=0)  # Total study time in minutes
 
@@ -15,18 +19,18 @@ class CustomUser(AbstractUser):
         related_name="custom_users_groups",
         blank=True
     )
-    
+
     user_permissions = models.ManyToManyField(
         "auth.Permission",
         related_name="custom_users_permissions",
         blank=True
     )
 
-CustomUser = get_user_model()
+    USERNAME_FIELD = "email"  
+    REQUIRED_FIELDS = []  
 
-def get_default_user():
-    return CustomUser.objects.first().id if CustomUser.objects.exists() else None
-
+    def __str__(self):
+        return self.email
 
 # Folder model for grouping decks 
 class Folder(models.Model):
@@ -54,7 +58,7 @@ class FlashcardSet(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # auto set the created date
     updated_at = models.DateTimeField(auto_now=True)  # auto set the updated date
     folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='flashcard_sets') # added by Gulbanu
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=get_default_user, null=True, blank=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
 
 
     
