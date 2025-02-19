@@ -20,3 +20,6 @@ def signup(request):
 def forgot_password(request):
     return render(request, 'forgot_password.html')
 
+def home(request):
+    return render(request, 'Home_Page/home.html')
+

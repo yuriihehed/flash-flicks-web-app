@@ -1,4 +1,6 @@
-#!/Users/gulbanumadiyarova/flashFlicks-team-three-product/venv/bin/python3.11
+#!/bin/sh
+'''exec' "/Users/johnsm1/Documents/School/CSC 394/POC/poc-team-3/venv/bin/python" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys
