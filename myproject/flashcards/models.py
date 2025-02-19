@@ -3,8 +3,12 @@ from django.contrib.auth.models import AbstractUser
 
 # Custom user model
 class CustomUser(AbstractUser):
-    """Extends Django's built-in User model."""
-    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    """Extends Django's built-in User model to use email instead of username."""
+    email = models.EmailField(unique=True)
+
+    username = None  
+
+    profile_picture = models.ImageField(upload_to="profiles/", blank=True, null=True)
     study_goal = models.IntegerField(default=30)  # Goal in minutes per day
     study_time = models.IntegerField(default=0)  # Total study time in minutes
 
@@ -13,12 +17,18 @@ class CustomUser(AbstractUser):
         related_name="custom_users_groups",
         blank=True
     )
-    
+
     user_permissions = models.ManyToManyField(
         "auth.Permission",
         related_name="custom_users_permissions",
         blank=True
     )
+
+    USERNAME_FIELD = "email"  
+    REQUIRED_FIELDS = []  
+
+    def __str__(self):
+        return self.email
 
 # Folder model for grouping decks 
 class Folder(models.Model):
