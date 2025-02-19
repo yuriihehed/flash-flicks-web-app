@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('question', models.TextField()),
-                ('definition', models.TextField()),
+                ('answer', models.TextField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('is_favorite', models.BooleanField(default=False)),
                 ('deck', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='flashcards', to='flashcards.deck')),
