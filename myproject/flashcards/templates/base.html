@@ -26,7 +26,7 @@
     <link href="{% static 'admin/css/styles.css' %}" rel="stylesheet" />
     <!-- Custom CSS -->
     <link href="{% static 'css/custom.css' %}" rel="stylesheet">
-
+<!-- ___________________________________ Move it to Custom CSS ________________________________________-->
     <style>
         /* Theme-specific styles */
         /* Light Mode Styles */
@@ -94,6 +94,8 @@
             }
         }
     </style>
+    <!-- ___________________________________ Move it to Custom CSS ________________________________________-->
+
 </head>
 <body>
     <main>
@@ -116,28 +118,34 @@
                             <a class="nav-link active" href="/homepage">Home</a>
                     
                         </li>
+                        <!-- Removing this until next version 
                         <li class="nav-item">
-                            <a class="nav-link active" href="/class-name>">Folders</a>  <!-- Need to change the link -->
+                            <a class="nav-link active" href="/class-name>">Folders</a> -->  <!-- Need to change the link -->
+                            <!--
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="dropdown01"
                                data-bs-toggle="dropdown" aria-expanded="false">Explore</a>
                             <ul class="dropdown-menu" aria-labelledby="dropdown01">
-                                <li><a class="dropdown-item" href="/progress">View Progress</a></li>
+                                <li><a class="dropdown-item" href="/progress">View Progress</a></li> --> <!--
                                 <li><a class="dropdown-item" href="/learning-styles">Explore Flashcard Learning Styles</a></li>
                             </ul>
+                        </li> -->
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/learning-styles">Explore Flashcard Learning Styles</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="/settings">Settings</a>
                         </li>
-                    </ul>
+                    </ul> 
+                    <!--
                     <form class="d-flex">
                         <input class="form-control me-2" type="text" placeholder="Search">
                     </form>
                     <button id="theme-toggle" type="button">
                         <span class="light-mode-icon">🌞</span>
                         <span class="dark-mode-icon" style="display: none;">🌙</span>
-                    </button> 
+                    </button>  -->
                     {% block header_content %}{% endblock %}
                 </div>
             </div>

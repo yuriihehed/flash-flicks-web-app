@@ -6,18 +6,25 @@
 {% include 'partials/folder_modal.html' %}
 <div class="custom-container"></div>
 <style>
+    .toggle-btn {
+
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out; /* Smooth movement */
+    }
+    .sidebar-collapsed .toggle-btn {
+        transform: rotate(180deg); /* Flip arrow */
+        left: 5px; /* Move it slightly inward when collapsed */
+    }
     #sidebar {
         transition: width 0.3s ease-in-out;
     }
     .sidebar-collapsed {
         width: 40px !important; /* Keep only the toggle button visible */
         overflow: hidden;
-    }
-    .hamburger-btn {
-        color: white;
-        background-color: transparent;
-        border: none;
-        font-size: 24px; /* Adjust size if needed */
     }
     
 </style>
@@ -31,8 +38,8 @@
         <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
             <ul class="nav flex-column">
                 <li class="nav-item border-bottom border-dark">
-                    <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">
-                        ☰
+                    <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
+                        ➜
                     </button>
                 </li>   
                 <li class="nav-item border-bottom border-dark">
@@ -180,10 +187,25 @@
 
 <!-- Sidebar Toggle JavaScript ______________________________________________-->
 <script>
-    document.getElementById("sidebarToggle").addEventListener("click", function () {
-        let sidebar = document.getElementById("sidebar");
+document.addEventListener("DOMContentLoaded", function () {
+    var sidebar = document.getElementById("sidebar");
+    var toggleBtn = document.getElementById("sidebarToggle");
+
+    // Ensure sidebar starts collapsed
+    sidebar.classList.add("sidebar-collapsed");
+
+    toggleBtn.addEventListener("click", function () {
         sidebar.classList.toggle("sidebar-collapsed");
+        sidebar.classList.toggle("sidebar-expanded");
+
+        if (sidebar.classList.contains("sidebar-collapsed")) {
+            toggleBtn.innerHTML = "➜"; // Arrow pointing right (collapsed)
+        } else {
+            toggleBtn.innerHTML = "➡"; // Arrow pointing left (expanded)
+        }
     });
+});
+
 </script>
 
 {% endblock %}
