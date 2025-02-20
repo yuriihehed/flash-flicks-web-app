@@ -27,7 +27,7 @@
 
 <!-- Wrapper for full-height layout with sidebar on left -->
 <div class="d-flex" style="min-height: 100vh;">
-  
+
     <!-- SIDEBAR NAVIGATION (Left Side) -->
     <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5;">
         <ul class="nav flex-column">
@@ -78,27 +78,27 @@
     <div class="flex-grow-1 p-4">
         <!-- Centered Page Title -->
         <h1 class="text-center mb-4">Create a New Flashcard Set</h1>
-        
+
         <!-- Flashcard Set Creation Form -->
         <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
             {% csrf_token %}
             {{ formset.management_form }}
-            
+
             <!-- Title Field -->
             <div class="mb-3">
                 {{ set_form.title }}
             </div>
-            
+
             <!-- Description Field -->
             <div class="mb-3">
                 {{ set_form.description }}
             </div>
-            
+
             {# Optional: a "+ Add a card" button above the cards container (if desired) #}
             <button type="button" id="add-card-btn" style="background: none; border: none; color: #000; text-decoration: underline; width: fit-content; padding: 0; cursor: pointer;">
                 + Add a card
             </button>
-            
+
             {# Cards Container: Existing flashcard forms will be here, and new ones will be appended #}
             <div id="cards-container">
                 {% for form in formset %}
@@ -128,17 +128,17 @@
                 </div>
                 {% endfor %}
             </div>
-            
+
             {# Hidden Empty Form Template for Adding New Cards Dynamically #}
             <div id="empty-form" style="display: none;">
                 {{ formset.empty_form.as_p }}
             </div>
-            
+
             <!-- "ADD A CARD" Button at Bottom -->
             <button type="button" id="add-card-btn2" class="btn btn-secondary w-100 mb-3">
                 ADD A CARD
             </button>
-            
+
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary">
                 Create
