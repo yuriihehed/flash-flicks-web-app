@@ -23,7 +23,6 @@ logs/
 *.pid
 *.swp
 
-
 # Docker
 .dockerignore
 docker-compose.override.yml
