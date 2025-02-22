@@ -2,23 +2,12 @@
 {
     function setTheme(mode) {
         if (mode !== "light" && mode !== "dark" && mode !== "auto") {
-            console.error(`Invalid theme mode: ${mode}. Resetting to auto.`);
+            console.error(`Got invalid theme mode: ${mode}. Resetting to auto.`);
             mode = "auto";
         }
-    
         document.documentElement.dataset.theme = mode;
         localStorage.setItem("theme", mode);
-    
-        // Remove any existing mode classes
-        document.body.classList.remove("light-mode", "dark-mode");
-    
-        // Apply the selected theme
-        if (mode === "dark") {
-            document.body.classList.add("dark-mode");
-        } else if (mode === "light") {
-            document.body.classList.add("light-mode");
-        }
-    }    
+    }
 
     function cycleTheme() {
         const currentTheme = localStorage.getItem("theme") || "auto";

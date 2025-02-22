@@ -55,6 +55,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('folder', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='flashcard_sets', to='flashcards.Folder')),
             ],
         ),
         migrations.CreateModel(

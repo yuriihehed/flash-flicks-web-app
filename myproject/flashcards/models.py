@@ -80,7 +80,7 @@ class Flashcard(models.Model):
         related_name='flashcards',
         default=None
     )
-    term = models.CharField(max_length=200, default="Unknown Term")  # required text for flashcard
+    term = models.CharField(max_length=200, default="")  # required text for flashcard
     definition = models.TextField()  # required text for flashcard
     image = models.ImageField(upload_to='images/', blank=True, null=True)  # optional image for flashcard (can be blank)
     is_favorite = models.BooleanField(default=False)  # Starred flashcards
