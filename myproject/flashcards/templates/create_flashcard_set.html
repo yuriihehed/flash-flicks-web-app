@@ -13,10 +13,13 @@
     #sidebar {
         transition: width 0.3s ease-in-out;
     }
+
     .sidebar-collapsed {
-        width: 40px !important;  /* Collapsed width */
+        width: 40px !important;
+        /* Collapsed width */
         overflow: hidden;
     }
+
     .hamburger-btn {
         color: white;
         background-color: transparent;
@@ -35,7 +38,8 @@
                 <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">☰</button>
             </li>
             <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button" aria-expanded="false" aria-controls="classesCollapse">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button"
+                    aria-expanded="false" aria-controls="classesCollapse">
                     Classes
                 </a>
                 <div class="collapse" id="classesCollapse">
@@ -47,7 +51,8 @@
                 </div>
             </li>
             <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse" role="button" aria-expanded="false" aria-controls="flashcardsCollapse">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse" role="button"
+                    aria-expanded="false" aria-controls="flashcardsCollapse">
                     Flashcards
                 </a>
                 <div class="collapse" id="flashcardsCollapse">
@@ -59,7 +64,8 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button"
+                    aria-expanded="false" aria-controls="foldersCollapse">
                     Folders
                 </a>
                 <div class="collapse" id="foldersCollapse">
@@ -76,73 +82,37 @@
 
     <!-- MAIN CONTENT AREA (Right Side) -->
     <div class="flex-grow-1 p-4">
-        <!-- Centered Page Title -->
-        <h1 class="text-center mb-4">Create a New Flashcard Set</h1>
+        <!-- Centered Page Title with Buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-center">Create Flashcard Set</h1>
+            <div>
+                <button type="button" class="btn btn-danger me-2"
+                    onclick="window.location.href='{% url 'home' %}'">Cancel</button>
+                <button type="submit" form="create-flashcard-form" class="btn btn-primary">Create</button>
+            </div>
+        </div>
 
-        <!-- Flashcard Set Creation Form -->
-        <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
+        <form id="create-flashcard-form" method="POST" enctype="multipart/form-data"
+            style="display: flex; flex-direction: column; gap: 1rem;">
             {% csrf_token %}
+            {{ set_form.as_p }}
             {{ formset.management_form }}
 
-            <!-- Title Field -->
-            <div class="mb-3">
-                {{ set_form.title }}
-            </div>
-
-            <!-- Description Field -->
-            <div class="mb-3">
-                {{ set_form.description }}
-            </div>
-
-            {# Optional: a "+ Add a card" button above the cards container (if desired) #}
-            <button type="button" id="add-card-btn" style="background: none; border: none; color: #000; text-decoration: underline; width: fit-content; padding: 0; cursor: pointer;">
-                + Add a card
-            </button>
-
-            {# Cards Container: Existing flashcard forms will be here, and new ones will be appended #}
             <div id="cards-container">
                 {% for form in formset %}
                 <div class="card-form mb-3 border p-3">
-                    <h5>{{ forloop.counter }}</h5> <!-- Numbering each card -->
-                    <!-- Term Field -->
-                    <div class="mb-2">
-                        <label class="form-label">Term</label>
-                        {{ form.term }}
-                    </div>
-                    <!-- Definition Field -->
-                    <div class="mb-2">
-                        <label class="form-label">Definition</label>
-                        {{ form.definition }}
-                    </div>
-                    <!-- Image Field -->
-                    <div class="mb-2">
-                        <label class="form-label">Image</label>
-                        {{ form.image }}
-                    </div>
-                    {% if form.instance.pk %}
-                    <div class="form-check">
-                        <label class="form-check-label" for="id_DELETE_{{ forloop.counter0 }}">Delete</label>
-                        {{ form.DELETE }}
-                    </div>
-                    {% endif %}
+                    <h5>{{ forloop.counter }}</h5>
+                    {{ form.as_p }}
                 </div>
                 {% endfor %}
             </div>
-
-            {# Hidden Empty Form Template for Adding New Cards Dynamically #}
             <div id="empty-form" style="display: none;">
                 {{ formset.empty_form.as_p }}
             </div>
 
-            <!-- "ADD A CARD" Button at Bottom -->
-            <button type="button" id="add-card-btn2" class="btn btn-secondary w-100 mb-3">
-                ADD A CARD
-            </button>
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary">
-                Create
-            </button>
+            <button type="button" id="add-card-btn" class="btn btn-secondary w-100 mb-3">+ Add a card</button>
+            <!-- Save Button -->
+            <button type="submit" form="create-flashcard-form" class="btn btn-primary">Create</button>
         </form>
     </div>
     <!-- END MAIN CONTENT AREA -->
@@ -151,7 +121,7 @@
 <!-- JavaScript: Sidebar Toggle and Dynamic Add Card Functionality -->
 <script>
     // Sidebar Toggle
-    document.getElementById("sidebarToggle").addEventListener("click", function() {
+    document.getElementById("sidebarToggle").addEventListener("click", function () {
         var sidebar = document.getElementById("sidebar");
         sidebar.classList.toggle("sidebar-collapsed");
     });
