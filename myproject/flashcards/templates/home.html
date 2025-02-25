@@ -73,19 +73,20 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse"> Folders</a>
                     <div class="collapse" id="foldersCollapse">
                         <ul class="list-group list-group-flush">
                             {% for folder in folders %}
-                                <li class="list-group-item">{{ folder.name }}</li>
+                                <li class="list-group-item"> {{ folder.name }}</li>
                             {% empty %}
                                 <li class="list-group-item text-muted">No folders available</li>
                             {% endfor %}    
-                            <button class="btn btn-primary" onclick="window.location.href='#'">Go to Folders</button>
+                            <button class="btn btn-primary" onclick="window.location.href='#'"> Go to Folders</button>
                         </ul>
                     </div>
                 </li>
-                
+            </li>   
+        
             </ul>
         </div>
 

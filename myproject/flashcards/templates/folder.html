@@ -6,7 +6,36 @@
 {% block container %}
 {% include 'partials/folder_modal.html' %}
 <div class="custom-container"></div>
+<style>
+    .toggle-btn {
 
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out; /* Smooth movement */
+    }
+    .sidebar-collapsed .toggle-btn {
+        transform: rotate(180deg); /* Flip arrow */
+        left: 5px; /* Move it slightly inward when collapsed */
+    }
+    #sidebar {
+        transition: width 0.3s ease-in-out;
+    }
+    .sidebar-collapsed {
+        width: 65px !important; /* Keep only the toggle button visible */
+        overflow: hidden;
+    }
+    .card {
+        transition: background-color 0.3s ease-in-out;  /* Smooth transition */
+    }
+
+    .card:hover {
+        background-color: lightgray !important;  /* Change background to light gray on hover */
+    }
+    
+</style>
 <!-- Wrapper -->
 <div class="d-flex flex-column " style="min-height: 100vh;">
 
@@ -20,15 +49,11 @@
                     <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
                         ➜
                     </button>
-                </li>   
+                </li>
                 <li class="nav-item border-bottom border-dark">
                     <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
                     <div class="collapse show" id="foldersCollapse">
-                        <ul class="list-group list-group-flush">
-                            <!-- Default General Folder -->
-                            <li class="list-group-item">
-                                <a href="{% url 'folder_detail' 'general' %}" class="text-decoration-none">📁 General Folder</a>
-                            </li>
+                        <ul class="list-group list-group-flush">                    
                             <!-- User Folders -->
                             {% for folder in user_folders %}
                             <li class="list-group-item">
@@ -62,16 +87,6 @@
                 <div class="mb-3">
                     <h3>Folders:</h3>
                     <div class="d-flex flex-wrap gap-3">
-                        <!-- Default General Folder -->
-                        <div class="col-md-2">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">📁 General Folder</h5>
-                                    <p class="card-text">This is your default folder.</p>
-                                    <a href="{% url 'folder_detail' 'general' %}" class="btn btn-primary">Open</a>
-                                </div>
-                            </div>
-                        </div>
                         <!-- User Folders -->
                         {% for folder in user_folders %}
                         <div class="col-md-2">
@@ -93,6 +108,7 @@
         </div>
     </div>
 </div>
+
 <!--  ______________________________________________-->
 <!-- Popup Modal -->
 <div id="folderModal" class="modal">
@@ -132,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (sidebar.classList.contains("sidebar-collapsed")) {
             toggleBtn.innerHTML = "➜"; // Arrow pointing right (collapsed)
         } else {
-            toggleBtn.innerHTML = "➡"; // Arrow pointing left (expanded)
+            toggleBtn.innerHTML = "➜"; // Arrow pointing left (expanded)
         }
     });
 });
