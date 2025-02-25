@@ -183,7 +183,7 @@ def login_page(request):
 
         if user:
             login(request, user)
-            return redirect("homepage")  # Redirect to home/dashboard
+            return redirect("home")
         else:
             messages.error(request, "Invalid email or password.")
 
