@@ -32,7 +32,20 @@ def forgot_password(request):
     return render(request, 'forgot_password.html')
 
 def home(request):
-    return render(request, 'home.html')
+    folders = Folder.objects.all()
+    if request.method == "POST":
+        # Get folder name from form submission
+        folder_name = request.POST.get("name", "").strip()
+
+        if not folder_name:
+            messages.error(request, "Folder name cannot be empty.")
+        else:
+            # Create the folder
+            Folder.objects.create(user=request.user, name=folder_name)
+            messages.success(request, "Folder created successfully!")
+
+        return redirect("homepage")
+    return render(request, 'home.html', {'folders': folders})
 
 def create_folder(request):
     if request.method == "POST":

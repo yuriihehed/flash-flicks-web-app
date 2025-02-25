@@ -66,8 +66,11 @@
                     <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
                     <div class="collapse" id="foldersCollapse">
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Folder A</li>
-                            <li class="list-group-item">Folder B</li>
+                            {% for folder in folders %}
+                                <li class="list-group-item">{{ folder.name }}</li>
+                            {% empty %}
+                                <li class="list-group-item text-muted">No folders available</li>
+                            {% endfor %}    
                             <button class="btn btn-primary" onclick="window.location.href='#'">Go to Folders</button>
                         </ul>
                     </div>
@@ -122,39 +125,17 @@
                 <div class="mb-3">
                     <h3>Folders:</h3>
                     <div class="d-flex flex-wrap gap-3">
+                        {% for folder in folders %}
                         <div class="col-md-2">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title">Folder A</h5>
-                                    <p class="card-text">Manage your folder.</p>
+                                    <h5 class="card-title">{{ folder.name }}</h5>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Folder B</h5>
-                                    <p class="card-text">Manage your folder.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Folder C</h5>
-                                    <p class="card-text">Manage your folder.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Folder D</h5>
-                                    <p class="card-text">Manage your folder.</p>
-                                </div>
-                            </div>
-                        </div>
-                        
+                        {% empty %}
+                        <p>No folders found.</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>

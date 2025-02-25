@@ -64,8 +64,11 @@
                 </a>
                 <div class="collapse" id="foldersCollapse">
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Folder A</li>
-                        <li class="list-group-item">Folder B</li>
+                        {% for folder in folders %}
+                            <li class="list-group-item">{{ folder.name }}</li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No folders available</li>
+                        {% endfor %} 
                         <button class="btn btn-primary" onclick="window.location.href='#'">Go to Folders</button>
                     </ul>
                 </div>
