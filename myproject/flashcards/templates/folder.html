@@ -17,7 +17,7 @@
         <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
             <ul class="nav flex-column">
                 <li class="nav-item border-bottom border-dark">
-                    <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">
+                    <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
                         ➜
                     </button>
                 </li>   
@@ -38,6 +38,7 @@
                             <li class="list-group-item text-muted">No folders created yet.</li>
                             {% endfor %}
                             <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
+
                         </ul>
                     </div>
                 </li>
@@ -54,7 +55,7 @@
                 <!-- Action Buttons -->
                 <div class="mb-4">
                     <a class="btn btn-secondary me-2" href='/create-flashcard-set'>+ Create New Study Set</a>
-                    <a class="btn btn-secondary me-2" id="openModal">+ Create New Folder</a>
+                    <a class="btn btn-secondary me-2" id="openModalMain">+ Create New Folder</a>
                 </div>
 
                 <!-- Folders Section -->

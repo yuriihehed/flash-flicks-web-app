@@ -12,6 +12,8 @@ from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStr
 from django.db.models import Count
 import json
 from .models import Folder
+from django.views.decorators.http import require_POST
+from django.utils.text import slugify
 
 
 
@@ -84,26 +86,70 @@ def folder_detail(request, slug):
         messages.error(request, "Folder not found.")
         return redirect('folder_list')
 
+
+@require_POST
 def create_folder(request):
-    """AJAX view for creating a new folder"""
-    if request.method == "POST" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        name = request.POST.get('name')
+    """View for creating a new folder via AJAX"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Authentication required'})
+    
+    try:
+        name = request.POST.get('name', '').strip()
         
-        if name:
-            # Create a new folder
-            folder = Folder.objects.create(
-                name=name,
-                user=request.user,
-                # Leave parent blank for now, or get it from form if needed
-            )
+        # Validate folder name
+        if not name:
+            return JsonResponse({'success': False, 'error': 'Folder name is required'})
+        
+        # Generate a slug from the name
+        base_slug = slugify(name)
+        slug = base_slug
+        
+        # If slug already exists, make it unique
+        counter = 1
+        while Folder.objects.filter(slug=slug, user=request.user).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+        
+        # Create the folder
+        folder = Folder.objects.create(
+            name=name,
+            slug=slug,
+            user=request.user
+        )
+        
+        return JsonResponse({
+            'success': True, 
+            'folder_name': folder.name,
+            'folder_slug': folder.slug,
+            'redirect_url': f'/folder/{folder.slug}/'  # Include redirect URL if needed
+        })
+        
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Folder creation error: {str(e)}")
+        return JsonResponse({'success': False, 'error': str(e)})
+    
+
+# def create_folder(request):
+#     """AJAX view for creating a new folder"""
+#     if request.method == "POST" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#         name = request.POST.get('name')
+        
+#         if name:
+#             # Create a new folder
+#             folder = Folder.objects.create(
+#                 name=name,
+#                 user=request.user,
+#                 # Leave parent blank for now, or get it from form if needed
+#             )
             
-            return JsonResponse({
-                'success': True,
-                'folder_name': folder.name,
-                'folder_slug': folder.slug
-            })
+#             return JsonResponse({
+#                 'success': True,
+#                 'folder_name': folder.name,
+#                 'folder_slug': folder.slug
+#             })
         
-    return JsonResponse({'success': False})
+#     return JsonResponse({'success': False})
 
 
 def create_flashcard_set(request):
