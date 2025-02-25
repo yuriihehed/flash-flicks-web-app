@@ -13,6 +13,8 @@ from django.contrib.auth import get_user_model
 from .models import UserProfile
 from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak
 import json
+from .models import Folder
+
 
 
 def landing_page(request):
@@ -47,30 +49,61 @@ def home(request):
         return redirect("homepage")
     return render(request, 'home.html', {'folders': folders})
 
-def create_folder(request):
-    if request.method == "POST":
-        folder_name = request.POST.get("name", "")
-        if folder_name:
-            folder = Folder.objects.create(name=folder_name)
-            return JsonResponse({"success": True, "folder_name": folder.name})
-        return JsonResponse({"success": False})
+def folder_list(request):
+    """View for showing all folders"""
+    folders = Folder.objects.filter(user=request.user)
+    return render(request, 'folder.html', {'folders': folders})
 
-    return render(request, "create_folder.html") 
-
-def folder(request, slug=None):
-    # Get the first folder if no slug is provided
-    if slug is None:
-        folder = Folder.objects.first()
-        if folder:
-            return redirect('folder', slug=folder.slug)  # Redirect to the first folder's page
+def folder_detail(request, slug):
+    """View for showing a specific folder and its contents"""
+    if not slug:
+        return redirect('folder_list')
+    
+    try:
+        # Handle the 'general' folder case
+        if slug == 'general':
+            # You might need to create a general folder if it doesn't exist
+            folder, created = Folder.objects.get_or_create(
+                name="General", 
+                user=request.user,
+                defaults={'slug': 'general'}
+            )
         else:
-            # If no folders exist, create a general folder representation
-            return render(request, 'folder.html', {'folder': None, 'flashcards': []})
+            folder = get_object_or_404(Folder, slug=slug, user=request.user)
+        
+        # Get flashcard sets belonging to this folder
+        flashcard_sets = FlashcardSet.objects.filter(folder=folder)
+        
+        context = {
+            'folder': folder,
+            'flashcard_sets': flashcard_sets,
+            'folders': Folder.objects.filter(user=request.user)  # For sidebar
+        }
+        return render(request, 'folder_detail.html', context)
+    except Folder.DoesNotExist:
+        messages.error(request, "Folder not found.")
+        return redirect('folder_list')
 
-    # If slug is provided, get the specified folder
-    folder = get_object_or_404(Folder, slug=slug)
-    flashcards = Flashcard.objects.filter(flashcard_set__folder=folder)  # Get flashcards via FlashcardSet
-    return render(request, 'folder.html', {'folder': folder, 'flashcards': flashcards})
+def create_folder(request):
+    """AJAX view for creating a new folder"""
+    if request.method == "POST" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        name = request.POST.get('name')
+        
+        if name:
+            # Create a new folder
+            folder = Folder.objects.create(
+                name=name,
+                user=request.user,
+                # Leave parent blank for now, or get it from form if needed
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'folder_name': folder.name,
+                'folder_slug': folder.slug
+            })
+        
+    return JsonResponse({'success': False})
 
 
 def create_flashcard_set(request):
@@ -183,7 +216,7 @@ def login_page(request):
 
         if user:
             login(request, user)
-            return redirect("homepage")  # Redirect to home/dashboard
+            return redirect("home")  # Redirect to home/dashboard
         else:
             messages.error(request, "Invalid email or password.")
 

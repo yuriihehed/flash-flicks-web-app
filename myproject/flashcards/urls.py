@@ -19,8 +19,9 @@ urlpatterns = [
     #Home Page
     path('homepage/', views.home, name='home'), 
     #Folder
-    path('folder/<slug:slug>/', views.folder, name='folder'),
-    path('folder/', views.folder, name='folder'),
+    path('folder/<slug:slug>/', views.folder_detail, name='folder_detail'),
+    path('folder/', views.folder_list, name='folder_list'),
+    
     path('create-folder/', views.create_folder, name='create_folder'),
 
 ]

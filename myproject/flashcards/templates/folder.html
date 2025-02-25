@@ -1,3 +1,4 @@
+<!-- folder.html -->
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Home Dashboard{% endblock %}
@@ -17,7 +18,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item border-bottom border-dark">
                     <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">
-                        ☰
+                        ➜
                     </button>
                 </li>   
                 <li class="nav-item border-bottom border-dark">
@@ -91,11 +92,50 @@
         </div>
     </div>
 </div>
+<!--  ______________________________________________-->
+<!-- Popup Modal -->
+<div id="folderModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Create a New Folder</h2>
+        <form method="POST" id="folderForm">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Enter folder name" required>
+            <button type="submit">Create</button>
+        </form>
+        <div id="responseMessage"></div>
+    </div>
+</div>
 
+<!-- Modal and Form Submission JavaScript -->
 <script>
-    document.getElementById("sidebarToggle").addEventListener("click", function () {
-        let sidebar = document.getElementById("sidebar");
-        sidebar.classList.toggle("sidebar-collapsed");
-    });
+    var folderCreateUrl = "{% url 'create_folder' %}";
+    var csrfToken = "{{ csrf_token }}";
 </script>
+<link rel="stylesheet" href="{% static 'css/modal.css' %}">
+<script src="{% static 'js/folder.js' %}"></script>
+
+<!-- Sidebar Toggle JavaScript ______________________________________________-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var sidebar = document.getElementById("sidebar");
+    var toggleBtn = document.getElementById("sidebarToggle");
+
+    // Ensure sidebar starts collapsed
+    sidebar.classList.add("sidebar-collapsed");
+
+    toggleBtn.addEventListener("click", function () {
+        sidebar.classList.toggle("sidebar-collapsed");
+        sidebar.classList.toggle("sidebar-expanded");
+
+        if (sidebar.classList.contains("sidebar-collapsed")) {
+            toggleBtn.innerHTML = "➜"; // Arrow pointing right (collapsed)
+        } else {
+            toggleBtn.innerHTML = "➡"; // Arrow pointing left (expanded)
+        }
+    });
+});
+
+</script>
+
 {% endblock %}

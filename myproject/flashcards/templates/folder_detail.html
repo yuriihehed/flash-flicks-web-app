@@ -1,0 +1,55 @@
+<!-- folder_detail.html -->
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ folder.name }} - Folder{% endblock %}
+
+{% block container %}
+{% include 'partials/folder_modal.html' %}
+
+<div class="d-flex flex-column" style="min-height: 100vh;">
+    <!-- Content section -->
+    <div class="d-flex flex-grow-1">
+        <!-- Sidebar code (same as home.html) -->
+        
+        <!-- Main content -->
+        <div class="flex-grow-1 ps-5 p-2">
+            <h2>{{ folder.name }}</h2>
+            
+            <!-- Action buttons -->
+            <div class="mb-4">
+                <a class="btn btn-secondary me-2" href='/create-flashcard-set?folder={{ folder.id }}'>+ Create New Study Set</a>
+                <a class="btn btn-secondary me-2" id="openModal">+ Create New Folder</a>
+            </div>
+            
+            <!-- Flashcard sets in this folder -->
+            <div class="mb-3">
+                <h3>Study Sets:</h3>
+                <div class="d-flex flex-wrap gap-3">
+                    {% for set in flashcard_sets %}
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ set.title }}</h5>
+                                <p class="card-text">{{ set.description|truncatechars:50 }}</p>
+                                <a href="{% url 'flashcard_set_detail' set.id %}" class="btn btn-primary">Study</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>No study sets in this folder yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include the modal and scripts (same as home.html) -->
+<script>
+    var folderCreateUrl = "{% url 'create_folder' %}";
+    var csrfToken = "{{ csrf_token }}";
+</script>
+<link rel="stylesheet" href="{% static 'css/modal.css' %}">
+<script src="{% static 'js/folder.js' %}"></script>
+
+{% endblock %}
