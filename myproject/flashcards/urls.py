@@ -16,8 +16,11 @@ urlpatterns = [
     
     path('create-flashcard-set', views.create_flashcard_set, name='create_flashcard_set'), # need the homepage to function properly first
     path('edit-flashcard-set/<int:pk>/', views.edit_flashcard_set, name='edit_flashcard_set'), # for the edit page of the flashcard set
+    
     #Home Page
     path('homepage/', views.home, name='home'), 
+    
+    
     #Folder
     path('folder/<slug:slug>/', views.folder_detail, name='folder_detail'),
     path('folder/', views.folder_list, name='folder_list'),

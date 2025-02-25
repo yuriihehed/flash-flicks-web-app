@@ -2,16 +2,14 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from .forms import FlashcardSetForm, FlashcardForm, FlashcardFormSet
-from .models import Flashcard, Folder, FlashcardSet
 from django.forms.models import modelformset_factory 
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
-from .models import UserProfile
-from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak
+from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak, FlashcardSet, UserProfile
+from django.db.models import Count
 import json
 from .models import Folder
 
@@ -34,7 +32,9 @@ def forgot_password(request):
     return render(request, 'forgot_password.html')
 
 def home(request):
-    folders = Folder.objects.all()
+    folders = Folder.objects.all().annotate(flashcardSet_count=Count("flashcard_sets"))
+    deck = FlashcardSet.objects.all().annotate(flashcard_count=Count("flashcards"))
+    
     if request.method == "POST":
         # Get folder name from form submission
         folder_name = request.POST.get("name", "").strip()
@@ -47,7 +47,7 @@ def home(request):
             messages.success(request, "Folder created successfully!")
 
         return redirect("homepage")
-    return render(request, 'home.html', {'folders': folders})
+    return render(request, 'home.html', {'folders': folders, "flashcard_sets": deck})
 
 def folder_list(request):
     """View for showing all folders"""
