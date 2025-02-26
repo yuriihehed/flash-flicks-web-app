@@ -36,6 +36,8 @@ urlpatterns = [
     path('folder/', views.folder_list, name='folder_list'),
     
     path('create-folder/', views.create_folder, name='create_folder'),
+    
+    path('flashcards/<int:set_id>/', views.flashcard_set_details, name='flashcard_set_details'),
 
 ]
 

@@ -1,0 +1,44 @@
+ <!-- Dynamic Sidebar -->
+ <div id="sidebar" class="text-white"
+ style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
+ <ul class="nav flex-column">
+     <li class="nav-item border-bottom border-dark">
+         <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
+             ➜
+         </button>
+     </li>
+     <li class="nav-item border-bottom border-dark">
+         <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button"
+             aria-expanded="false" aria-controls="classesCollapse">Classes</a>
+         <div class="collapse" id="classesCollapse">
+             <ul class="list-group list-group-flush">
+                 <li class="list-group-item">Class 101</li>
+                 <li class="list-group-item">Class 102</li>
+                 <button class="btn btn-primary" onclick="window.location.href='#'">Go to Classes</button>
+             </ul>
+         </div>
+     </li>
+     <li class="nav-item border-bottom border-dark">
+         <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse"
+             role="button" aria-expanded="false" aria-controls="flashcardsCollapse">Flashcards</a>
+         <div class="collapse" id="flashcardsCollapse">
+             <ul class="list-group list-group-flush">
+                 <li class="list-group-item">Flashcard 1</li>
+                 <li class="list-group-item">Flashcard 2</li>
+                 <button class="btn btn-primary" onclick="window.location.href='#'">Go to Flashcards</button>
+             </ul>
+         </div>
+     </li>
+     <li class="nav-item">
+         <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button"
+             aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+         <div class="collapse" id="foldersCollapse">
+             <ul class="list-group list-group-flush">
+                 <li class="list-group-item">Folder A</li>
+                 <li class="list-group-item">Folder B</li>
+                 <button class="btn btn-primary" onclick="window.location.href='#'">Go to Folders</button>
+             </ul>
+         </div>
+     </li>
+ </ul>
+</div>

@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Set Page{% endblock %}
+
+{% block container %}
+
+<!-- Completely override default structure -->
+<div class="d-flex" style="min-height: 100vh;">
+
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="text-white" style="width: 200px; min-height: 100vh; background-color:#005bb5;">
+        <ul class="nav flex-column">
+            <li class="nav-item border-bottom border-dark">
+                <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">☰</button>
+            </li>
+            <li class="nav-item border-bottom border-dark">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button">
+                    Classes
+                </a>
+            </li>
+            <li class="nav-item border-bottom border-dark">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse" role="button">
+                    Flashcards
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button">
+                    Folders
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-grow-1 main-content p-4">
+        {% block content %}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-center">{{ flashcard_set.title }}</h1>
+            <div>
+                <button type="button" class="btn btn-danger me-2"
+                    onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">Edit</button>
+            </div>
+        </div>
+        <!-- Learning Modes Section -->
+        <div class="three-box-container">
+            <div class="col-md-4">
+                <div class="box" id="learning-modes">
+                    <h2>Learning Modes</h2>
+                    <p>A personalized learning plan</p>
+                    <p>Under Construction</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="box" id="practice-test">
+                    <h2>Practice Test</h2>
+                    <p>Let’s test your knowledge</p>
+                    <p>Under Construction</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="box" id="flashcards-overview">
+                    <h2>Flashcards</h2>
+                    <p>Study terms and definitions</p>
+                    <p>Under Construction</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Large Flashcard Box -->
+        <div class="flashcard-area">
+            {% for term in terms%}
+            <div class="flashcard" id="card{{ term.id }}">
+                <div class="card-inner">
+                    <div class="front">
+                        <h2 contenteditable="false" class="card-title">Card {{ term.term }}</h2>
+                        <p contenteditable="false" class="card-term">Term for card {{ term.definition }}</p>
+                    </div>
+                    <div class="back">
+                        <h2 contenteditable="false" class="card-back-title">Definition:</h2>
+                        <p contenteditable="false" class="card-back-content">This is the back of the card.</p>
+                    </div>
+                </div>
+                <div class="top-buttons">
+                    <button class="oval-button star-btn" onclick="flashEffect(this)">&#9733;</button>
+                    <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="navigation">
+            <button id="prevBtn" class="nav-btn">&#8592;</button>
+            <span id="cardCounter">1 / {{ terms|length }}</span>
+            <button id="nextBtn" class="nav-btn">&#8594;</button>
+        </div>
+
+        <!-- Study Progress -->
+        <div class="study-progress mt-4">
+            <h2>Studying Progress:</h2>
+            <!-- You can add a progress bar or textual progress here -->
+            <p>Progress: 0%</p>
+        </div>
+
+        <!-- Search Terms & Definitions Section -->
+        <section id="search-terms">
+            <div class="search-container">
+                <label for="term-search">Search for a term or definition:</label>
+                <input type="text" id="term-search" placeholder="Search..." />
+            </div>
+        </section>
+
+        <!-- Terms and Definitions List -->
+        <div class="row table-container mt-3">
+            {% for term in terms %}
+            <div class="term-box">
+                <h3>{{ term.term }}</h3>
+                <p>{{ term.definition }}</p>
+                <!-- Buttons for star and edit -->
+                <div class="term-box-buttons">
+                    <button class="oval-button star-btn" onclick="flashEffect(this)">&#9733;</button>
+                    <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div> <!-- Closes `.container mt-4` -->
+    {% endblock %}
+</div> <!-- Closes `.main-content` -->
+
+</div> <!-- Closes `.d-flex` -->
+
+<!-- JavaScript: Sidebar Toggle -->
+<script>
+    document.getElementById("sidebarToggle").addEventListener("click", function () {
+        var sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("sidebar-collapsed");
+
+        var content = document.querySelector(".main-content");
+        content.classList.toggle("sidebar-collapsed");
+    });
+    // JavaScript for Flashcards
+    const cards = document.querySelectorAll('.flashcard');
+    let currentIndex = 0;
+
+    function updateCards() {
+        cards.forEach((card, index) => {
+            card.style.display = index === currentIndex ? 'block' : 'none';
+        });
+        document.getElementById('cardCounter').innerText = `${currentIndex + 1} / ${cards.length}`;
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+        currentIndex = Math.max(0, currentIndex - 1);
+        updateCards();
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        currentIndex = Math.min(cards.length - 1, currentIndex + 1);
+        updateCards();
+    });
+
+    cards.forEach(card => {
+        card.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('star-btn') && !card.classList.contains('editing')) {
+                this.classList.toggle('flipped');
+            }
+        });
+    });
+
+    function flashEffect(element) {
+        const card = element.closest('.flashcard');
+        card.classList.add('flash');
+        setTimeout(() => card.classList.remove('flash'), 500);
+    }
+
+    function toggleEdit(button, event) {
+        event.stopPropagation(); //fixed bug where card flips when clicking edit button
+
+        const card = button.closest('.flashcard');
+        const fields = card.querySelectorAll('.card-title, .card-term, .card-back-title, .card-back-content');
+
+        const isEditing = card.classList.contains('editing');
+
+        if (isEditing) {
+            // Save Mode
+            fields.forEach(el => {
+                el.contentEditable = "false";
+                el.classList.remove('editable');  // Remove red border
+            });
+            card.classList.remove('editing');  // Enable flipping
+            button.textContent = "Edit";
+        } else {
+            // Edit Mode
+            fields.forEach(el => {
+                el.contentEditable = "true";
+                el.classList.add('editable');  // Highlight with red border
+            });
+            card.classList.add('editing');  // Disable flipping
+            button.textContent = "Save";
+        }
+    }
+
+    updateCards();
+    // I havent implemented the search functionality yet
+    // I havent implemented the star functionality yet
+    // I havent implemented the edit functionality yet
+    // I havent implemented the progress bar yet
+    // Star effect for term boxes
+
+
+
+    // This isnt properly working 
+    window.flashEffectTerm = function (button) {
+        const termBox = button.closest('.term-box');
+        termBox.classList.add('flash');
+        setTimeout(() => termBox.classList.remove('flash'), 500);
+    };
+
+    // Toggle edit mode for term boxes
+    window.toggleEditTerm = function (button, event) {
+        event.stopPropagation();
+        const termBox = button.closest('.term-box');
+        const fields = termBox.querySelectorAll('.term-title, .term-definition');
+        const isEditing = termBox.classList.contains('editing');
+
+        if (isEditing) {
+            // Save mode: disable editing
+            fields.forEach(el => {
+                el.contentEditable = "false";
+                el.classList.remove('editable');
+            });
+            termBox.classList.remove('editing');
+            button.textContent = "Edit";
+        } else {
+            // Edit mode: enable editing
+            fields.forEach(el => {
+                el.contentEditable = "true";
+                el.classList.add('editable');
+            });
+            termBox.classList.add('editing');
+            button.textContent = "Save";
+        }
+    };
+
+</script>
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/SetPage/layout.css' %}">
+<link rel="stylesheet" href="{% static 'css/SetPage/setstyle.css' %}">
+{% endblock %}
+{% endblock %}
