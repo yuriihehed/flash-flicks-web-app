@@ -78,7 +78,8 @@ def folder_detail(request, slug):
             folder = get_object_or_404(Folder, slug=slug, user=request.user)
         
         # Get flashcard sets belonging to this folder
-        flashcard_sets = FlashcardSet.objects.filter(folder=folder)
+        flashcard_sets = FlashcardSet.objects.filter(folder=folder, user=request.user)
+
         
         context = {
             'folder': folder,
@@ -86,6 +87,7 @@ def folder_detail(request, slug):
             'folders': Folder.objects.filter(user=request.user)  # For sidebar
         }
         return render(request, 'folder_detail.html', context)
+    
     except Folder.DoesNotExist:
         messages.error(request, "Folder not found.")
         return redirect('folder_list')

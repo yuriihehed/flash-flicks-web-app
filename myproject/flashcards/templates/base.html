@@ -112,7 +112,7 @@
             <div class="d-flex align-items-center">
                 {% block landing_nav %}{% endblock %}
                 {% if user.is_authenticated %}
-                    <span class="navbar-brand me-3">{{ user.email }}</span>
+                    <span class="navbar-brand me-3">{{ user.first_name }}</span>
                 {% endif %}
     
                 <!-- Navbar Toggler  -->
