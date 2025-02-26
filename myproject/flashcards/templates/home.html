@@ -40,11 +40,14 @@
 
         <!-- Main Content Area -->
         <div class="d-flex flex-grow-1 pe-5 p-2">
+
+
             <!-- Main Content -->
             <div class="flex-grow-1 ps-5 p-2">
 
                 <!-- Welcome -->
                 <h2 class="welcome-message">Welcome, {{ user.username }}</h2>
+
 
                 <!-- Dashboard -->
                 <div class="row mb-3">
@@ -77,12 +80,17 @@
                     </div>
                 </div>
 
+
                 <!-- Action Buttons -->
                 <div class="mb-4 pt-3">
                     <a class="btn btn-secondary me-2" href='/create-flashcard-set'>+ Create New Study Set</a>
                     <a class="btn btn-secondary me-2" id="openModal">+ Create New Folder</a> <!-- Open Modal Button -->
                 </div>
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
                 <!-- Folders Section -->
                 <div class="mb-3">
                     <h3>Folders:</h3>
@@ -90,13 +98,14 @@
                         <!-- User Folders -->
                         {% for folder in user_folders %}
                         <div class="col-md-2">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">📁 {{ folder.name }}</h5>
-                                    <p class="card-text">Manage your folder.</p>
-                                    <a href="{% url 'folder_detail' folder.slug %}" class="btn btn-primary">Open</a>
+                            <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">📁 {{ folder.name }}</h5>
+                                        <p class="card-text">Manage your folder.</p>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                         {% empty %}
                         <p class="text-muted">You have no folders yet. Create one!</p>
