@@ -27,10 +27,13 @@
     <div class="setting">
         <label>Set study timer (Pomodoro):</label>
         <select id="timerSelect">
-            <option value="25-5">25 min study / 5 min break</option>
-            <option value="50-10">50 min study / 10 min break</option>
+            <option value="none">No Timer</option>
+            <option value="25">25 min study / 5 min break</option>
+            <option value="50">50 min study / 10 min break</option>
         </select>
     </div>
+
+    <button class="btn btn-primary" onclick="startTimerFromDropdown()">Apply Timer</button>
 
     <div class="setting">
         <label>Ultradian Rhythm</label>
@@ -296,6 +299,38 @@
             document.getElementById('roundLength').value = savedSettings.roundLength;
         }
     }
+</script>
+<!-- Timer Functionality -->
+<script>
+    function startTimerFromDropdown() {
+        const selectedValue = document.getElementById("timerSelect").value;
+        if (selectedValue > 0) {
+            startTimer(parseInt(selectedValue));
+        } else {
+            resetTimer();
+        }
+    }
+</script>
+
+<script>
+    function applyTimerSetting() {
+        let selectedTime = document.getElementById("timerSelect").value;
+        if (selectedTime === "none") {
+            localStorage.setItem("timerEnabled", "false");
+            resetTimer();
+        } else {
+            localStorage.setItem("timerEnabled", "true");
+            startTimer(parseInt(selectedTime));
+        }
+    }
+
+    // Load previously saved setting
+    document.addEventListener("DOMContentLoaded", function () {
+        let savedTime = localStorage.getItem("timerEnabled");
+        if (savedTime === "true") {
+            document.getElementById("timerSelect").value = localStorage.getItem("timeLeft") / 60 || "none";
+        }
+    });
 </script>
 
 {% endblock %}
