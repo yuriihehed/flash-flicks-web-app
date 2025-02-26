@@ -53,11 +53,25 @@ def home(request):
         return redirect("homepage")
     return render(request, 'home.html', {'folders': folders, "flashcard_sets": deck})
 
+
+# @login_required
+# def folder_list(request):
+#     """View for showing all folders"""
+#     folders = Folder.objects.filter(user=request.user)
+#     return render(request, 'folder.html', {'folders': folders})
+
+
 @login_required
 def folder_list(request):
-    """View for showing all folders"""
+    """View for showing all folders and flashcard sets in the 'General' folder"""
     folders = Folder.objects.filter(user=request.user)
-    return render(request, 'folder.html', {'folders': folders})
+    general_folder = Folder.objects.filter(user=request.user, name="General").first()
+    flashcard_sets = FlashcardSet.objects.filter(folder=general_folder) if general_folder else []
+
+    return render(request, 'folder.html', {
+        'folders': folders,
+        'flashcard_sets': flashcard_sets  # Now available in the template
+    })
 
 @login_required
 def folder_detail(request, slug):
@@ -133,18 +147,62 @@ def create_folder(request):
         # Log the error for debugging
         print(f"Folder creation error: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)})
+# @login_required
+# def create_flashcard_set(request):
+#     # We can also define the formset here if not defined in forms.py
+#     # FlashcardFormSet = modelformset_factory(Flashcard, form=FlashcardForm, extra=1, can_delete=True)
+
+#     if request.method == 'POST':
+#         set_form = FlashcardSetForm(request.POST, email=request.user.email)
+#         formset = FlashcardFormSet(request.POST, request.FILES, queryset=Flashcard.objects.none())
+
+#         if set_form.is_valid() and formset.is_valid():
+#             # Save the flashcard set
+#             flashcard_set = set_form.save()
+
+#             # Save each individual card
+#             valid_card_count = 0
+#             for form in formset:
+#                 # Check that the form has data (to avoid empty forms)
+#                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+#                     flashcard = form.save(commit=False)
+#                     flashcard.flashcard_set = flashcard_set
+#                     flashcard.save()
+#                     valid_card_count += 1
+#             if valid_card_count < 2:
+#                 # Optionally, add an error message and re-render the form
+#                 messages.error(request, "You must add at least two flashcards.")
+#                 # You might choose to delete the flashcard_set or not save it yet
+#                 return render(request, 'create_flashcard_set.html', {'set_form': set_form, 'formset': formset})
+
+#             # Redirect to some page, e.g., a list of all flashcard sets
+#             return redirect('flashcard_set_details', set_id=flashcard_set.id) # Placeholder
+#     else:
+#         set_form = FlashcardSetForm(email=request.user.email)
+#         # We pass an empty queryset, so we’re not editing existing cards
+#         formset = FlashcardFormSet(queryset=Flashcard.objects.none())
+
+#     context = {
+#         'set_form': set_form,
+#         'formset': formset
+#     }
+#     return render(request, 'create_flashcard_set.html', context)
+
 @login_required
 def create_flashcard_set(request):
-    # We can also define the formset here if not defined in forms.py
-    # FlashcardFormSet = modelformset_factory(Flashcard, form=FlashcardForm, extra=1, can_delete=True)
-
     if request.method == 'POST':
         set_form = FlashcardSetForm(request.POST, email=request.user.email)
         formset = FlashcardFormSet(request.POST, request.FILES, queryset=Flashcard.objects.none())
 
         if set_form.is_valid() and formset.is_valid():
-            # Save the flashcard set
-            flashcard_set = set_form.save()
+            # Create but don't save the flashcard set yet
+            flashcard_set = set_form.save(commit=False)
+            
+            # Set the user manually
+            flashcard_set.user = request.user
+            
+            # Now save the flashcard set with the user assigned
+            flashcard_set.save()
 
             # Save each individual card
             valid_card_count = 0
@@ -155,37 +213,86 @@ def create_flashcard_set(request):
                     flashcard.flashcard_set = flashcard_set
                     flashcard.save()
                     valid_card_count += 1
+                    
             if valid_card_count < 2:
-                # Optionally, add an error message and re-render the form
+                # If not enough valid cards, handle the error
+                flashcard_set.delete()  # Delete the flashcard set since it doesn't have enough cards
                 messages.error(request, "You must add at least two flashcards.")
-                # You might choose to delete the flashcard_set or not save it yet
                 return render(request, 'create_flashcard_set.html', {'set_form': set_form, 'formset': formset})
 
-            # Redirect to some page, e.g., a list of all flashcard sets
-            return redirect('flashcard_set_details', set_id=flashcard_set.id) # Placeholder
+            # Redirect to the detail view
+            return redirect('flashcard_set_details', set_id=flashcard_set.id)
     else:
         set_form = FlashcardSetForm(email=request.user.email)
-        # We pass an empty queryset, so we’re not editing existing cards
         formset = FlashcardFormSet(queryset=Flashcard.objects.none())
 
+    # Add the user's folders for sidebar display
+    user_folders = Folder.objects.filter(user=request.user)
+    
     context = {
         'set_form': set_form,
-        'formset': formset
+        'formset': formset,
+        'user_folders': user_folders
     }
     return render(request, 'create_flashcard_set.html', context)
 
+# def edit_flashcard_set(request, pk):
+#     # Retrieve the FlashcardSet instance by its primary key (pk)
+#     flashcard_set = get_object_or_404(FlashcardSet, pk=pk)
+
+#     if request.method == 'POST':
+#         # If the request method is POST, bind the form and formset to the POST data
+#         set_form = FlashcardSetForm(request.POST, instance=flashcard_set)
+#         formset = FlashcardFormSet(request.POST, request.FILES, queryset=flashcard_set.flashcards.all())
+
+#         # if its valid save the form and formset
+#         if set_form.is_valid() and formset.is_valid():
+#             set_form.save()
+
+#             # then save each individual card
+#             for form in formset:
+#                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+#                     flashcard = form.save(commit=False)
+#                     flashcard.flashcard_set = flashcard_set  # assign the foreign key
+#                     flashcard.save()
+                    
+#             # redirect to some page, e.g., a list of all flashcard sets
+#             return redirect('flashcard_set_details',set_id=flashcard_set.id)  # Placeholder
+#     else:
+#         # If the request method is GET, populate the form and formset with the existing data
+#         set_form = FlashcardSetForm(instance=flashcard_set)
+#         formset = FlashcardFormSet(queryset=flashcard_set.flashcards.all())
+        
+#     # Pass the form, formset, and flashcard set to the template context
+#     context = {
+#         'set_form': set_form,
+#         'formset': formset,
+#         'flashcard_set': flashcard_set
+#     }
+#     # Render the edit_flashcard_set.html template with the context
+#     return render(request, 'edit_flashcard_set.html', context)
+
+@login_required
 def edit_flashcard_set(request, pk):
     # Retrieve the FlashcardSet instance by its primary key (pk)
-    flashcard_set = get_object_or_404(FlashcardSet, pk=pk)
+    flashcard_set = get_object_or_404(FlashcardSet, pk=pk, user=request.user)  # Ensure user owns this set
 
     if request.method == 'POST':
         # If the request method is POST, bind the form and formset to the POST data
-        set_form = FlashcardSetForm(request.POST, instance=flashcard_set)
+        set_form = FlashcardSetForm(request.POST, instance=flashcard_set, email=request.user.email)
         formset = FlashcardFormSet(request.POST, request.FILES, queryset=flashcard_set.flashcards.all())
 
         # if its valid save the form and formset
         if set_form.is_valid() and formset.is_valid():
-            set_form.save()
+            # Save the set, ensuring user is set
+            flashcard_set = set_form.save(commit=False)
+            flashcard_set.user = request.user  # Make sure user is set
+            flashcard_set.save()
+
+            # Process deleted cards
+            for form in formset.deleted_forms:
+                if form.instance.pk:
+                    form.instance.delete()
 
             # then save each individual card
             for form in formset:
@@ -194,22 +301,25 @@ def edit_flashcard_set(request, pk):
                     flashcard.flashcard_set = flashcard_set  # assign the foreign key
                     flashcard.save()
                     
-            # redirect to some page, e.g., a list of all flashcard sets
-            return redirect('flashcard_set_details',set_id=flashcard_set.id)  # Placeholder
+            # redirect to the detail view
+            return redirect('flashcard_set_details', set_id=flashcard_set.id)
     else:
         # If the request method is GET, populate the form and formset with the existing data
-        set_form = FlashcardSetForm(instance=flashcard_set)
+        set_form = FlashcardSetForm(instance=flashcard_set, email=request.user.email)
         formset = FlashcardFormSet(queryset=flashcard_set.flashcards.all())
+    
+    # Get user folders for sidebar
+    user_folders = Folder.objects.filter(user=request.user)
         
     # Pass the form, formset, and flashcard set to the template context
     context = {
         'set_form': set_form,
         'formset': formset,
-        'flashcard_set': flashcard_set
+        'flashcard_set': flashcard_set,
+        'user_folders': user_folders
     }
     # Render the edit_flashcard_set.html template with the context
     return render(request, 'edit_flashcard_set.html', context)
-
 
 User = get_user_model()
 

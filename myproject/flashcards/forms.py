@@ -40,15 +40,14 @@ class FlashcardSetForm(forms.ModelForm):
                 'placeholder': "Add a description.....",
                 'style': "border: 1px solid #ccc; padding: 1rem; width: 100%;"
             }),
-        }
+        }  
     def __init__(self, *args, **kwargs):
         email = kwargs.pop('email', None)  # Get the email from kwargs
         super().__init__(*args, **kwargs)
         
         if email:  # Filter folders by email instead of user
             self.fields['folder'].queryset = Folder.objects.filter(user__email=email)
-    
-        
+
 # The form manages creating/updating a single Flashcard object and its fields in the database
 class FlashcardForm(forms.ModelForm):
     class Meta:
