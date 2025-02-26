@@ -11,6 +11,7 @@
     <!-- Content Below Header -->
     <div class="d-flex flex-grow-1">
         <!-- <link rel="stylesheet" href="css/styles.css"> -->
+        
         <!-- Dynamic Sidebar -->
         <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
             <ul class="nav flex-column">
@@ -37,7 +38,6 @@
                 </li>
             </ul>
         </div>
-
         <!-- Main Content Area -->
         <div class="d-flex flex-grow-1 pe-5 p-2">
 
@@ -84,13 +84,9 @@
                 <!-- Action Buttons -->
                 <div class="mb-4 pt-3">
                     <a class="btn btn-secondary me-2" href='/create-flashcard-set'>+ Create New Study Set</a>
-                    <a class="btn btn-secondary me-2" id="openModal">+ Create New Folder</a> <!-- Open Modal Button -->
+                    <a class="btn btn-secondary me-2" id="openModalMain">+ Create New Folder</a>
                 </div>
 
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/main
                 <!-- Folders Section -->
                 <div class="mb-3">
                     <h3>Folders:</h3>
@@ -140,6 +136,21 @@
     </div>
 </div>
 
+<!--  ______________________________________________-->
+<!-- Popup Modal -->
+<div id="folderModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Create a New Folder</h2>
+        <form method="POST" id="folderForm">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Enter folder name" required>
+            <button type="submit">Create</button>
+        </form>
+        <div id="responseMessage"></div>
+    </div>
+</div>
+
 <!-- Modal and Form Submission JavaScript -->
 <script>
     var folderCreateUrl = "{% url 'create_folder' %}";
@@ -148,7 +159,7 @@
 <link rel="stylesheet" href="{% static 'css/modal.css' %}">
 <script src="{% static 'js/folder.js' %}"></script>
 
-<!-- Sidebar Toggle JavaScript -->
+<!-- Sidebar Toggle JavaScript ______________________________________________-->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     var sidebar = document.getElementById("sidebar");
@@ -168,5 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
 </script>
+
 {% endblock %}

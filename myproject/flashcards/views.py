@@ -14,7 +14,7 @@ import json
 from .models import Folder
 from django.views.decorators.http import require_POST
 from django.utils.text import slugify
-
+from django.contrib.auth.decorators import login_required
 
 
 def landing_page(request):
@@ -34,6 +34,7 @@ def edit_learn_mode(request):
 def forgot_password(request):
     return render(request, 'forgot_password.html')
 
+@login_required
 def home(request):
     folders = Folder.objects.all().annotate(flashcardSet_count=Count("flashcard_sets"))
     deck = FlashcardSet.objects.all().annotate(flashcard_count=Count("flashcards"))
@@ -52,12 +53,13 @@ def home(request):
         return redirect("homepage")
     return render(request, 'home.html', {'folders': folders, "flashcard_sets": deck})
 
-
+@login_required
 def folder_list(request):
     """View for showing all folders"""
     folders = Folder.objects.filter(user=request.user)
     return render(request, 'folder.html', {'folders': folders})
 
+@login_required
 def folder_detail(request, slug):
     """View for showing a specific folder and its contents"""
     if not slug:
