@@ -91,58 +91,6 @@ def folder_detail(request, slug):
     except Folder.DoesNotExist:
         messages.error(request, "Folder not found.")
         return redirect('folder_list')
-    
-# def folder_list(request):
-#     general_folder, created = Folder.objects.get_or_create(
-#         name="General",
-#         user=request.user,
-#         defaults={'slug': 'general'}
-#     )
-#     """View for showing all folders"""
-
-#     folders = Folder.objects.filter(user=request.user)
-#     return render(request, 'folder.html', {'folders': folders})
-
-# def folder_detail(request, slug):
-#     """View for showing a specific folder and its contents"""
-#     if not slug or slug == 'general':
-#         # Get or create the general folder
-#         folder, created = Folder.objects.get_or_create(
-#             name="General",
-#             user=request.user,
-#             defaults={'slug': 'general'}
-#         )
-#     else:
-#         try:
-#             folder = get_object_or_404(Folder, slug=slug, user=request.user)
-#         except Folder.DoesNotExist:
-#             messages.error(request, "Folder not found.")
-#             return redirect('folder_list')
-#     # if not slug:
-#     #     return redirect('folder_list')
-    
-#     # try:
-#     #     # Handle the 'general' folder case
-#     #     if slug == 'general':
-#     #         # You might need to create a general folder if it doesn't exist
-#     #         folder, created = Folder.objects.get_or_create(
-#     #             name="General", 
-#     #             user=request.user,
-#     #             defaults={'slug': 'general'}
-#     #         )
-#     #     else:
-#     #         folder = get_object_or_404(Folder, slug=slug, user=request.user)
-        
-#         # Get flashcard sets belonging to this folder
-#         flashcard_sets = FlashcardSet.objects.filter(folder=folder)
-        
-#         context = {
-#             'folder': folder,
-#             'flashcard_sets': flashcard_sets,
-#             'folders': Folder.objects.filter(user=request.user)  # For sidebar
-#         }
-#         return render(request, 'folder_detail.html', context)
-
 
 @require_POST
 def create_folder(request):
