@@ -96,13 +96,27 @@
         transition: width 0.3s ease-in-out;
     }
     .sidebar-collapsed {
-        width: 80px !important; /* Keep only the toggle button visible */
+        width: 45px !important; /* Keep only the toggle button visible */
         overflow: hidden;
     }
-    .card {
-        transition: background-color 0.3s ease-in-out;  /* Smooth transition */
-    }
+  
+.card {
+  transition: background-color 0.3s ease-in-out;  /* Smooth transition */
+}
 
-    .card:hover {
-        background-color: lightgray !important;  /* Change background to light gray on hover */
-    }
+.card:hover {
+  background-color: lightgray !important;  /* Change background to light gray on hover */
+}
+.folder-item {
+  position: relative;  
+  cursor: pointer;  
+}
+  
+.folder-item a {
+  display: block;  
+  width: 100%;  
+}
+
+.folder-item:hover {
+  background-color: lightgray;
+}
