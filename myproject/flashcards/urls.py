@@ -22,6 +22,8 @@ urlpatterns = [
     path('folder/<slug:slug>/', views.folder, name='folder'),
     path('folder/', views.folder, name='folder'),
     path('create-folder/', views.create_folder, name='create_folder'),
+    
+    path('flashcards/<int:set_id>/', views.flashcard_set_details, name='flashcard_set_details'),
 
 ]
 

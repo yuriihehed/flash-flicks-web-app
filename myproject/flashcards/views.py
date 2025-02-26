@@ -73,15 +73,22 @@ def create_flashcard_set(request):
             flashcard_set = set_form.save()
 
             # Save each individual card
+            valid_card_count = 0
             for form in formset:
                 # Check that the form has data (to avoid empty forms)
                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                     flashcard = form.save(commit=False)
                     flashcard.flashcard_set = flashcard_set
                     flashcard.save()
+                    valid_card_count += 1
+            if valid_card_count < 3:
+                # Optionally, add an error message and re-render the form
+                messages.error(request, "You must add at least three flashcards.")
+                # You might choose to delete the flashcard_set or not save it yet
+                return render(request, 'create_flashcard_set.html', {'set_form': set_form, 'formset': formset})
 
             # Redirect to some page, e.g., a list of all flashcard sets
-            return redirect('flashcard_sets_list') # Placeholder
+            return redirect('flashcard_set_details', set_id=flashcard_set.id) # Placeholder
     else:
         set_form = FlashcardSetForm()
         # We pass an empty queryset, so we’re not editing existing cards
@@ -109,10 +116,12 @@ def edit_flashcard_set(request, pk):
             # then save each individual card
             for form in formset:
                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                    form.save()
+                    flashcard = form.save(commit=False)
+                    flashcard.flashcard_set = flashcard_set  # assign the foreign key
+                    flashcard.save()
                     
             # redirect to some page, e.g., a list of all flashcard sets
-            return redirect('flashcard_sets_list')  # Placeholder
+            return redirect('flashcard_set_details',set_id=flashcard_set.id)  # Placeholder
     else:
         # If the request method is GET, populate the form and formset with the existing data
         set_form = FlashcardSetForm(instance=flashcard_set)
@@ -175,3 +184,12 @@ def login_page(request):
             messages.error(request, "Invalid email or password.")
 
     return render(request, "login.html")
+
+def flashcard_set_details(request, set_id):
+    flashcard_set = get_object_or_404(FlashcardSet, id=set_id)
+    terms = flashcard_set.flashcards.all()  # if you used related_name='flashcards'
+    context = {
+        'flashcard_set': flashcard_set,
+        'terms': terms,
+    }
+    return render(request, 'set_page.html', context)
