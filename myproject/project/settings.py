@@ -135,4 +135,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # FOR CUSTOM USER MODEL (for login page)
 AUTH_USER_MODEL = 'flashcards.CustomUser'
 
+# Redirect users to the login page after logging out
+LOGOUT_REDIRECT_URL = '/login/'
+
 
