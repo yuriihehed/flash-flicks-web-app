@@ -2,24 +2,27 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from .forms import FlashcardSetForm, FlashcardForm, FlashcardFormSet
-from .models import Flashcard, Folder, FlashcardSet
 from django.forms.models import modelformset_factory 
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
-from .models import UserProfile
-from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak
+from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak, FlashcardSet, UserProfile
+from django.db.models import Count
 import json
+from .models import Folder
+from django.views.decorators.http import require_POST
+from django.utils.text import slugify
+from django.contrib.auth.decorators import login_required
 
 
 def landing_page(request):
-   return render(request, 'landing.html')
+    ensure_superuser()
+    return render(request, 'landing.html')
 
 def base_page(request):
-   return render(request, 'base.html')
+    return render(request, 'base.html')
 
 def studypage(request):
     cards = range(1, 7)  # Example card range
@@ -31,34 +34,155 @@ def edit_learn_mode(request):
 def forgot_password(request):
     return render(request, 'forgot_password.html')
 
+@login_required
 def home(request):
-    return render(request, 'home.html')
-
-def create_folder(request):
+    folders = Folder.objects.all().annotate(flashcardSet_count=Count("flashcard_sets"))
+    deck = FlashcardSet.objects.all().annotate(flashcard_count=Count("flashcards"))
+    
     if request.method == "POST":
-        folder_name = request.POST.get("name", "")
-        if folder_name:
-            folder = Folder.objects.create(name=folder_name)
-            return JsonResponse({"success": True, "folder_name": folder.name})
-        return JsonResponse({"success": False})
+        # Get folder name from form submission
+        folder_name = request.POST.get("name", "").strip()
 
-    return render(request, "create_folder.html") 
-
-def folder(request, slug=None):
-    # Get the first folder if no slug is provided
-    if slug is None:
-        folder = Folder.objects.first()
-        if folder:
-            return redirect('folder', slug=folder.slug)  # Redirect to the first folder's page
+        if not folder_name:
+            messages.error(request, "Folder name cannot be empty.")
         else:
-            # If no folders exist, create a general folder representation
-            return render(request, 'folder.html', {'folder': None, 'flashcards': []})
+            # Create the folder
+            Folder.objects.create(user=request.user, name=folder_name)
+            messages.success(request, "Folder created successfully!")
 
-    # If slug is provided, get the specified folder
-    folder = get_object_or_404(Folder, slug=slug)
-    flashcards = Flashcard.objects.filter(flashcard_set__folder=folder)  # Get flashcards via FlashcardSet
-    return render(request, 'folder.html', {'folder': folder, 'flashcards': flashcards})
+        return redirect("homepage")
+    return render(request, 'home.html', {'folders': folders, "flashcard_sets": deck})
 
+@login_required
+def folder_list(request):
+    """View for showing all folders"""
+    folders = Folder.objects.filter(user=request.user)
+    return render(request, 'folder.html', {'folders': folders})
+
+@login_required
+def folder_detail(request, slug):
+    """View for showing a specific folder and its contents"""
+    if not slug:
+        return redirect('folder_list')
+    
+    try:
+        # Handle the 'general' folder case
+        if slug == 'general':
+            # You might need to create a general folder if it doesn't exist
+            folder, created = Folder.objects.get_or_create(
+                name="General", 
+                user=request.user,
+                defaults={'slug': 'general'}
+            )
+        else:
+            folder = get_object_or_404(Folder, slug=slug, user=request.user)
+        
+        # Get flashcard sets belonging to this folder
+        flashcard_sets = FlashcardSet.objects.filter(folder=folder)
+        
+        context = {
+            'folder': folder,
+            'flashcard_sets': flashcard_sets,
+            'folders': Folder.objects.filter(user=request.user)  # For sidebar
+        }
+        return render(request, 'folder_detail.html', context)
+    except Folder.DoesNotExist:
+        messages.error(request, "Folder not found.")
+        return redirect('folder_list')
+    
+# def folder_list(request):
+#     general_folder, created = Folder.objects.get_or_create(
+#         name="General",
+#         user=request.user,
+#         defaults={'slug': 'general'}
+#     )
+#     """View for showing all folders"""
+
+#     folders = Folder.objects.filter(user=request.user)
+#     return render(request, 'folder.html', {'folders': folders})
+
+# def folder_detail(request, slug):
+#     """View for showing a specific folder and its contents"""
+#     if not slug or slug == 'general':
+#         # Get or create the general folder
+#         folder, created = Folder.objects.get_or_create(
+#             name="General",
+#             user=request.user,
+#             defaults={'slug': 'general'}
+#         )
+#     else:
+#         try:
+#             folder = get_object_or_404(Folder, slug=slug, user=request.user)
+#         except Folder.DoesNotExist:
+#             messages.error(request, "Folder not found.")
+#             return redirect('folder_list')
+#     # if not slug:
+#     #     return redirect('folder_list')
+    
+#     # try:
+#     #     # Handle the 'general' folder case
+#     #     if slug == 'general':
+#     #         # You might need to create a general folder if it doesn't exist
+#     #         folder, created = Folder.objects.get_or_create(
+#     #             name="General", 
+#     #             user=request.user,
+#     #             defaults={'slug': 'general'}
+#     #         )
+#     #     else:
+#     #         folder = get_object_or_404(Folder, slug=slug, user=request.user)
+        
+#         # Get flashcard sets belonging to this folder
+#         flashcard_sets = FlashcardSet.objects.filter(folder=folder)
+        
+#         context = {
+#             'folder': folder,
+#             'flashcard_sets': flashcard_sets,
+#             'folders': Folder.objects.filter(user=request.user)  # For sidebar
+#         }
+#         return render(request, 'folder_detail.html', context)
+
+
+@require_POST
+def create_folder(request):
+    """View for creating a new folder via AJAX"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Authentication required'})
+    
+    try:
+        name = request.POST.get('name', '').strip()
+        
+        # Validate folder name
+        if not name:
+            return JsonResponse({'success': False, 'error': 'Folder name is required'})
+        
+        # Generate a slug from the name
+        base_slug = slugify(name)
+        slug = base_slug
+        
+        # If slug already exists, make it unique
+        counter = 1
+        while Folder.objects.filter(slug=slug, user=request.user).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+        
+        # Create the folder
+        folder = Folder.objects.create(
+            name=name,
+            slug=slug,
+            user=request.user
+        )
+        
+        return JsonResponse({
+            'success': True, 
+            'folder_name': folder.name,
+            'folder_slug': folder.slug,
+            'redirect_url': f'/folder/{folder.slug}/'  # Include redirect URL if needed
+        })
+        
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Folder creation error: {str(e)}")
+        return JsonResponse({'success': False, 'error': str(e)})
 
 def create_flashcard_set(request):
     # We can also define the formset here if not defined in forms.py
@@ -179,7 +303,7 @@ def login_page(request):
 
         if user:
             login(request, user)
-            return redirect("homepage")  # Redirect to home/dashboard
+            return redirect("home")
         else:
             messages.error(request, "Invalid email or password.")
 
@@ -193,3 +317,42 @@ def flashcard_set_details(request, set_id):
         'terms': terms,
     }
     return render(request, 'set_page.html', context)
+def ensure_superuser():
+    User = get_user_model()
+    admin_email = "admin@hotmail.com"  
+    admin_password = "Password"  
+
+    if not User.objects.filter(email=admin_email).exists():
+        superuser = User(email=admin_email, is_staff=True, is_superuser=True)
+        superuser.set_password(admin_password)
+        superuser.save()
+        print(f"Superuser {admin_email} created automatically.")
+    else:
+        print(f"Superuser {admin_email} already exists.")
+
+def learning_page(request):
+    return render(request, 'learning.html')
+
+def flashcard_set_details(request, set_id):
+    flashcard_set = get_object_or_404(FlashcardSet, id=set_id)
+    terms = flashcard_set.flashcards.all()  # if you used related_name='flashcards'
+    context = {
+        'flashcard_set': flashcard_set,
+        'terms': terms,
+    }
+    return render(request, 'set_page.html', context)
+def ensure_superuser():
+    User = get_user_model()
+    admin_email = "admin@hotmail.com"  
+    admin_password = "Password"  
+
+    if not User.objects.filter(email=admin_email).exists():
+        superuser = User(email=admin_email, is_staff=True, is_superuser=True)
+        superuser.set_password(admin_password)
+        superuser.save()
+        print(f"Superuser {admin_email} created automatically.")
+    else:
+        print(f"Superuser {admin_email} already exists.")
+
+def learning_page(request):
+    return render(request, 'learning.html')

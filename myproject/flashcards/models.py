@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify 
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 # Custom user model
@@ -35,6 +36,29 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
     
+
+@receiver(post_save, sender=CustomUser)
+
+def create_default_folder(sender, instance, created, **kwargs):
+    if created:
+        base_slug = "general"
+        slug = base_slug
+        count = 1
+
+        while Folder.objects.filter(slug=slug).exists():
+            slug = f"{base_slug}-{count}"
+            count += 1
+
+        try:
+            Folder.objects.create(
+                user=instance,
+                name="General",
+                slug=slug
+            )
+        except IntegrityError:
+            print("Could not create unique folder slug")
+
+
 # Folder model for grouping decks 
 class Folder(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="folders")

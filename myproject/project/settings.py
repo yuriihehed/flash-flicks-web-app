@@ -64,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'flashcards.context_processors.folder_context',
             ],
         },
     },
@@ -133,5 +134,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # FOR CUSTOM USER MODEL (for login page)
 AUTH_USER_MODEL = 'flashcards.CustomUser'
+
+# Redirect users to the login page after logging out
+LOGOUT_REDIRECT_URL = '/login/'
 
 

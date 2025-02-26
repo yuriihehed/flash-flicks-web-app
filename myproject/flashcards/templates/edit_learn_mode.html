@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="edit-learn-mode-container">
-    <h2>Edit Flashcards:</h2>
+    <h2 style="color: white;">Edit Flashcards:</h2>
     
     <div class="setting">
         <label>Study only starred items:</label>
@@ -27,8 +27,8 @@
     <div class="setting">
         <label>Set study timer (Pomodoro):</label>
         <select id="timerSelect">
-            <option>25 min study / 5 min break</option>
-            <option>50 min study / 10 min break</option>
+            <option value="25-5">25 min study / 5 min break</option>
+            <option value="50-10">50 min study / 10 min break</option>
         </select>
     </div>
 
@@ -68,22 +68,16 @@
     <div class="setting">
         <label>Length of rounds:</label>
         <select id="roundLength">
-            <option value="1">1 Round</option>
-            <option value="2">2 Rounds</option>
-            <option value="3">3 Rounds</option>
-            <option value="4">4 Rounds</option>
-            <option value="5">5 Rounds</option>
-            <option value="6">6 Rounds</option>
-            <option value="7">7 Rounds</option>
-            <option value="8">8 Rounds</option>
-            <option value="9">9 Rounds</option>
-            <option value="10">10 Rounds</option>
+            {% for i in "12345678910"|make_list %}
+            <option value="{{ i }}">{{ i }} Round{{ i|pluralize }}</option>
+            {% endfor %}
         </select>
     </div>
 
     <hr>
 
     <button class="btn btn-primary" onclick="saveSettings()">Save Updates</button>
+    <a href="javascript:history.back()" class="btn btn-light w-100 mt-2">Go Back</a>
 </div>
 
 <!-- Notification Popup -->
@@ -219,9 +213,32 @@
         opacity: 0;
         transform: translateY(-20px);
     }
+
+    .btn-light {
+    background-color: white;
+    color: #050977;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    width: 100%;
+    transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-light:hover {
+    background-color: #007bff;
+    color: white;
+    }
+
 </style>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Load saved settings when the page loads
+        loadSettings();
+    });
+
     function saveSettings() {
         const starred = document.getElementById('starredToggle').checked;
         const shuffle = document.getElementById('shuffleToggle').checked;
@@ -231,7 +248,18 @@
         const definitionAnswer = document.getElementById('definitionToggle').checked;
         const roundLength = document.getElementById('roundLength').value;
 
-        console.log({
+        // Save settings to localStorage
+        localStorage.setItem("studySettings", JSON.stringify({
+            starred,
+            shuffle,
+            timer,
+            ultradian,
+            termAnswer,
+            definitionAnswer,
+            roundLength
+        }));
+
+        console.log("Settings saved:", {
             starred,
             shuffle,
             timer,
@@ -252,6 +280,22 @@
                 notification.classList.remove('show', 'hide');
             }, 500);
         }, 3000);
+    } 
+    
+    function loadSettings() {
+        // Load saved settings from localStorage
+        const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
+
+        if (savedSettings) {
+            document.getElementById('starredToggle').checked = savedSettings.starred;
+            document.getElementById('shuffleToggle').checked = savedSettings.shuffle;
+            document.getElementById('timerSelect').value = savedSettings.timer;
+            document.getElementById('ultradianToggle').checked = savedSettings.ultradian;
+            document.getElementById('termToggle').checked = savedSettings.termAnswer;
+            document.getElementById('definitionToggle').checked = savedSettings.definitionAnswer;
+            document.getElementById('roundLength').value = savedSettings.roundLength;
+        }
     }
 </script>
+
 {% endblock %}
