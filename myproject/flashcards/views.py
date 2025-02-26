@@ -18,10 +18,11 @@ from django.utils.text import slugify
 
 
 def landing_page(request):
-   return render(request, 'landing.html')
+    ensure_superuser()
+    return render(request, 'landing.html')
 
 def base_page(request):
-   return render(request, 'base.html')
+    return render(request, 'base.html')
 
 def studypage(request):
     cards = range(1, 7)  # Example card range
@@ -260,3 +261,16 @@ def login_page(request):
             messages.error(request, "Invalid email or password.")
 
     return render(request, "login.html")
+
+def ensure_superuser():
+    User = get_user_model()
+    admin_email = "admin@hotmail.com"  
+    admin_password = "Password"  
+
+    if not User.objects.filter(email=admin_email).exists():
+        superuser = User(email=admin_email, is_staff=True, is_superuser=True)
+        superuser.set_password(admin_password)
+        superuser.save()
+        print(f"Superuser {admin_email} created automatically.")
+    else:
+        print(f"Superuser {admin_email} already exists.")

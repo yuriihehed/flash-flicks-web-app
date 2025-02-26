@@ -96,7 +96,7 @@
         transition: width 0.3s ease-in-out;
     }
     .sidebar-collapsed {
-        width: 65px !important; /* Keep only the toggle button visible */
+        width: 80px !important; /* Keep only the toggle button visible */
         overflow: hidden;
     }
     .card {
