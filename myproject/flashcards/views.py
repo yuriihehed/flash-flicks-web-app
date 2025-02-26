@@ -189,7 +189,7 @@ def create_flashcard_set(request):
     # FlashcardFormSet = modelformset_factory(Flashcard, form=FlashcardForm, extra=1, can_delete=True)
 
     if request.method == 'POST':
-        set_form = FlashcardSetForm(request.POST)
+        set_form = FlashcardSetForm(request.POST, email=request.user.email)
         formset = FlashcardFormSet(request.POST, request.FILES, queryset=Flashcard.objects.none())
 
         if set_form.is_valid() and formset.is_valid():
@@ -214,7 +214,7 @@ def create_flashcard_set(request):
             # Redirect to some page, e.g., a list of all flashcard sets
             return redirect('flashcard_set_details', set_id=flashcard_set.id) # Placeholder
     else:
-        set_form = FlashcardSetForm()
+        set_form = FlashcardSetForm(email=request.user.email)
         # We pass an empty queryset, so we’re not editing existing cards
         formset = FlashcardFormSet(queryset=Flashcard.objects.none())
 
