@@ -29,13 +29,13 @@
                     <ul class="list-group list-group-flush">
                         <!-- User Folders -->
                         {% for folder in user_folders %}
-                        <li class="list-group-item">
-                            <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{
-                                folder.name }}</a>
-                        </li>
-                        {% empty %}
-                        <li class="list-group-item text-muted">No folders created yet.</li>
-                        {% endfor %}
+                            <li class="list-group-item folder-item">
+                                <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item text-muted">No folders created yet.</li>
+                            {% endfor %}
+                            <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
                         <!-- <button class="btn btn-primary" id="openModal">+ Create New Folder</button> -->
                     </ul>
                 </div>
