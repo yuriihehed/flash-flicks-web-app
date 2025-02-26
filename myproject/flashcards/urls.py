@@ -24,6 +24,8 @@ urlpatterns = [
     path('create-flashcard-set', views.create_flashcard_set, name='create_flashcard_set'), # need the homepage to function properly first
     path('edit-flashcard-set/<int:pk>/', views.edit_flashcard_set, name='edit_flashcard_set'), # for the edit page of the flashcard set
     path('logout/', logout_view, name='logout'), #logout
+    path('learning-styles/', views.learning_page, name='learning'),
+    
     
     #Home Page
     path('homepage/', views.home, name='home'), 
@@ -36,6 +38,9 @@ urlpatterns = [
     path('create-folder/', views.create_folder, name='create_folder'),
 
 ]
+
+#if settings.DEBUG:path('learning-styles/', views.learning_page, name='learning')
+  #  urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
