@@ -89,6 +89,7 @@ def folder_detail(request, slug):
     except Folder.DoesNotExist:
         messages.error(request, "Folder not found.")
         return redirect('folder_list')
+    
 # def folder_list(request):
 #     general_folder, created = Folder.objects.get_or_create(
 #         name="General",
