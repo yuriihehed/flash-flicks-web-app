@@ -1,0 +1,124 @@
+/* setstyle.css 
+What does it do? 
+This file contains all the flashcard-specific styles: 
+the container, the 3D flip effect (via the .card-inner and .flipped class), 
+front/back styling, top-right buttons, and the navigation styling 
+(prev/next buttons, counter).
+*/
+
+/* Flashcard Container: center the cards */
+.flashcard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+/* Each flashcard: set perspective for 3D flip */
+.flashcard {
+  position: relative;
+  width: 800px; /* Adjust as needed */
+  height: 450px; /* Adjust as needed */
+  perspective: 1000px;
+  display: none; /* Only the current card will be visible via .show */
+}
+
+/* Inner wrapper that actually flips */
+.card-inner {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+/* The flipped class triggers the rotate */
+.flashcard.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Front & Back faces */
+.front,
+.back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.front {
+  background-color: #99c2ff;
+}
+
+.back {
+  background-color: #66a3ff;
+  transform: rotateY(180deg);
+}
+
+/* Top-right buttons */
+.top-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 5px;
+}
+
+.oval-button {
+  background-color: #ccc;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+.oval-button:hover {
+  background-color: #aaa;
+}
+
+/* Navigation bar (prev, next, counter) */
+.navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ccc;
+  border-radius: 60px;
+  padding: 5px 20px;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.nav-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+/* Star flash effect */
+.flash {
+  animation: flash 0.5s ease-in-out;
+}
+
+@keyframes flash {
+  0% { box-shadow: 0 0 20px 10px rgb(243, 230, 159); }
+  50% { box-shadow: 0 0 30px 20px rgb(237, 190, 163); }
+  100% { box-shadow: none; }
+}
+
+/* Editable style for "Edit" mode */
+.editable {
+  border: 2px dashed #ff0000;
+}
+
+/* Make sure the current card is visible (JS sets display) */
+.flashcard.show {
+  display: block;
+}
+
