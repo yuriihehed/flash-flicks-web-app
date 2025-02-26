@@ -13,7 +13,7 @@
         <!-- <link rel="stylesheet" href="css/styles.css"> -->
         
         <!-- Dynamic Sidebar -->
-        <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
+        <div id="sidebar" class="text-white" style="min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
             <ul class="nav flex-column">
                 <li class="nav-item border-bottom border-dark">
                     <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
@@ -26,7 +26,7 @@
                         <ul class="list-group list-group-flush">                    
                             <!-- User Folders -->
                             {% for folder in user_folders %}
-                            <li class="list-group-item">
+                            <li class="list-group-item folder-item">
                                 <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
                             </li>
                             {% empty %}
@@ -120,7 +120,7 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ flashcard.title }}</h5>
-                                        <p class="card-text">Contains {{ folder.flashcard_count }} Sets</p>
+                                        <p class="card-text">Contains {{ flashcard.flashcard_count }} Sets</p>
                                     </div>
                                 </div>
                             </a>
