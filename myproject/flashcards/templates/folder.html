@@ -23,12 +23,13 @@
                 </li>
                 <li class="nav-item border-bottom border-dark">
                     <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+
                     <div class="collapse show" id="foldersCollapse">
                         <ul class="list-group list-group-flush">                    
                             <!-- User Folders -->
                             {% for folder in user_folders %}
                             <li class="list-group-item">
-                                <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
+                                <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.first_name }}</a>
                             </li>
                             {% empty %}
                             <li class="list-group-item text-muted">No folders created yet.</li>
@@ -73,7 +74,27 @@
                         {% endfor %}
                     </div>
                 </div>
-
+                <!-- Flashcards Sets Section -->
+                <div class="mb-3">
+                    <h3>Flashcards Sets:</h3>
+                    <div class="d-flex flex-wrap gap-3">
+                        {% for flashcard in flashcard_sets %}
+                        <div class="col-md-2">
+                            <!-- Link to Flashcards set Page -->
+                            <a href="{% url 'flashcard_set_details' flashcard.id %}" class="text-decoration-none">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ flashcard.title }}</h5>
+                                        <p class="card-text">Contains {{ flashcard.flashcards.count }} Flashcards</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% empty %}
+                        <p>No flashcard sets found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
