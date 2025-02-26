@@ -138,7 +138,7 @@
                         <a class="nav-link active" href="/learning-styles">Explore Flashcard Learning Styles</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/settings">Settings</a>
+                        <a class="nav-link active" href="{% url 'edit_learn_mode' %}">Settings</a>
                     </li>
                     <!-- LOGOUT BUTTON-->
                     {% if user.is_authenticated %}

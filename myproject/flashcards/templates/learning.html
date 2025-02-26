@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Flashcard Study Methods - Flash Flicks{% endblock %}
+
+{% block container %}
+<div class="custom-container"></div> 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flashcard Study Methods</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        .card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .study-method-title {
+            text-align: center;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .blue-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        .blue-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Find the Best Flashcard Study Method for You</h1>
+    <p class="text-center">Not all study techniques are created equal! Explore different approaches and choose the one that matches your learning style.</p>
+
+    <div class="row">
+        <div class="col-md-6 mt-3">
+            <div class="card">
+               {# <img src="{% static 'images/Memory.jpg' %}" alt="Memory Palaces & Visualization"> #}
+
+                <div class="card-body text-center">
+                    <h5 class="study-method-title">Memory Palaces & Visualization</h5>
+                    <p>Memory palaces involve associating information with specific locations in a familiar space. This technique is used by memory champions for complex memorization tasks.</p>
+                    <p>Best for: Visual learners and those needing to memorize large amounts of information.</p>
+                    <a href="settings_memory_palace.html" class="btn blue-button">Learn In A Flash</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <div class="card">
+                {# <img src="{% static 'images/Leitner System.jpg' %}" alt="Leitner System"> #}
+
+                <div class="card-body text-center">
+                    <h5 class="study-method-title">Leitner System</h5>
+                    <p>The Leitner System enhances retention by sorting flashcards into different "boxes" based on how well you remember them.</p>
+                    <p>Best for: Learners who struggle with time management and need a structured, efficiency-driven study method.</p>
+                    <a href="settings_leitner.html" class="btn blue-button">Learn In A Flash</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <div class="card">
+                {# <img src="{% static 'images/Spaced Repetition.jpg' %}" alt="Spaced Repetition"> #}
+
+                <div class="card-body text-center">
+                    <h5 class="study-method-title">Spaced Repetition (SRS)</h5>
+                    <p>Spaced repetition is a scientifically proven technique that involves reviewing flashcards at increasing intervals over time.</p>
+                    <p>Best for: Students preparing for long-term knowledge retention.</p>
+                    <a href="settings_srs.html" class="btn blue-button">Learn In A Flash</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <div class="card">
+                {# <img src="{% static 'images/peer quiz.jpg' %}" alt="Peer Quizzing"> #}
+
+                <div class="card-body text-center">
+                    <h5 class="study-method-title">Peer Quizzing</h5>
+                    <p>Studying with friends makes learning more interactive and engaging.</p>
+                    <p>Best for: Social learners who retain information better through discussion and active engagement.</p>
+                    <a href="settings_peer_quizzing.html" class="btn blue-button">Learn In A Flash</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <div class="card">
+                {# <img src="{% static 'images/Traditional Self-Testing.jpg' %}" alt="Traditional Self-Testing"> #}
+
+                <div class="card-body text-center">
+                    <h5 class="study-method-title">Traditional Self-Testing</h5>
+                    <p>This method is the most straightforward way to use flashcards.</p>
+                    <p>Best for: Students who prefer structured repetition and direct recall.</p>
+                    <a href="settings_self_testing.html" class="btn blue-button">Learn In A Flash</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <div class="card">
+                {# <img src="{% static 'images/Writing & Speaking Responses.jpg' %}" alt="Writing & Speaking Responses"> #}
+
+                <div class="card-body text-center">
+                    <h5 class="study-method-title">Writing & Speaking Responses</h5>
+                    <p>Writing answers forces you to structure thoughts, while speaking them out loud enhances auditory learning.</p>
+                    <p>Best for: Learners who retain information better through expression.</p>
+                    <a href="settings_writing_speaking.html" class="btn blue-button">Learn In A Flash</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}
