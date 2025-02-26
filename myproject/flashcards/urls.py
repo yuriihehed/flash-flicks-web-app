@@ -4,6 +4,13 @@ from django.contrib.auth.views import LoginView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.urls import path
+
+def logout_view(request):
+    logout(request)
+    return redirect('/login/')
 
 urlpatterns = [
     path('', views.landing_page, name='landing_page'),  
@@ -16,6 +23,7 @@ urlpatterns = [
     
     path('create-flashcard-set', views.create_flashcard_set, name='create_flashcard_set'), # need the homepage to function properly first
     path('edit-flashcard-set/<int:pk>/', views.edit_flashcard_set, name='edit_flashcard_set'), # for the edit page of the flashcard set
+    path('logout/', logout_view, name='logout'), #logout
     
     #Home Page
     path('homepage/', views.home, name='home'), 

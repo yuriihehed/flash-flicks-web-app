@@ -38,13 +38,26 @@ class CustomUser(AbstractUser):
     
 
 @receiver(post_save, sender=CustomUser)
+
 def create_default_folder(sender, instance, created, **kwargs):
-    if created:  # Only when a new user is created
-        Folder.objects.create(
-            user=instance,
-            name="General",
-            slug="general"
-        )
+    if created:
+        base_slug = "general"
+        slug = base_slug
+        count = 1
+
+        while Folder.objects.filter(slug=slug).exists():
+            slug = f"{base_slug}-{count}"
+            count += 1
+
+        try:
+            Folder.objects.create(
+                user=instance,
+                name="General",
+                slug=slug
+            )
+        except IntegrityError:
+            print("Could not create unique folder slug")
+
 
 # Folder model for grouping decks 
 class Folder(models.Model):

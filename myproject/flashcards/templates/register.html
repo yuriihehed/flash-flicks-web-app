@@ -1,4 +1,11 @@
 {% extends "base.html" %}
+{% block landing_nav %}
+    {% if not user.is_authenticated %}
+    <a href="/login" class="btn btn-primary" style="margin-right: 1px;">Login</a>
+    <a href="/register" class="btn btn-success" style="margin-left: 1px;">Sign Up</a>
+    {% endif %}
+{% endblock %}
+
 {% load static %}
 
 {% block title %}Register{% endblock %}
@@ -6,11 +13,18 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6 bg-black text-light d-flex flex-column justify-content-center align-items-center position-relative overflow-hidden p-5 shadow-lg">
-        <h2 class="mb-4 text-center" style="color: #FFFFFF;">Welcome to FlashFlicks, your favorite studying space.</h2>
+        <h2 class="mb-4 text-center" style="color: #FFFFFF;">You’re one step away from the full FlashFlicks experience.<br> Let’s get you set up!</h2>
         <img src="{% static 'images/thunder.gif' %}" alt="Thunder Animation" class="img-fluid mb-4" style="width: 280px; height: auto;" />
     </div>
     <div class="col-md-6 bg-white text-dark d-flex flex-column justify-content-center align-items-center position-relative overflow-hidden p-5 shadow-lg">
         <h2 class="text-center mb-4">Register</h2>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger text-center w-100">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
         <form method="post" action="{% url 'register' %}">
             {% csrf_token %}
             <div class="mb-3">
@@ -22,8 +36,8 @@
                 <input type="password" id="password" name="password" class="form-control" placeholder="Please enter your password" required>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label1">Password:</label>
-                <input type="password" id="confirm" name="confirm" class="form-control" placeholder="Please Confirm your password" required>
+                <label for="confirm" class="form-label1">Confirm Password:</label>
+                <input type="password" id="confirm" name="confirm" class="form-control" placeholder="Please confirm your password" required>
             </div>
             
             <button type="submit" class="btn btn-dark w-100 mb-3">Sign up</button>
