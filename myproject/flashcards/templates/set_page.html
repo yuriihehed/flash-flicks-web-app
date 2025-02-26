@@ -9,26 +9,33 @@
 <div class="d-flex" style="min-height: 100vh;">
 
 
-    <!-- Sidebar -->
-    <div id="sidebar" class="text-white" style="width: 200px; min-height: 100vh; background-color:#005bb5;">
+    <!-- Dynamic Sidebar -->
+    <div id="sidebar" class="text-white"
+        style="min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
         <ul class="nav flex-column">
             <li class="nav-item border-bottom border-dark">
-                <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">☰</button>
+                <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
+                    ➞
+                </button>
             </li>
             <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button">
-                    Classes
-                </a>
-            </li>
-            <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse" role="button">
-                    Flashcards
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button">
-                    Folders
-                </a>
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button"
+                    aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+                <!-- <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="/folder" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a> -->
+
+                <div class="collapse show" id="foldersCollapse">
+                    <ul class="list-group list-group-flush">
+                        <!-- User Folders -->
+                        {% for folder in user_folders %}
+                        <li class="list-group-item folder-item">
+                            <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-muted">No folders created yet.</li>
+                        {% endfor %}
+                        <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
+                    </ul>
+                </div>
             </li>
         </ul>
     </div>
@@ -75,11 +82,11 @@
                 <div class="card-inner">
                     <div class="front">
                         <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
-                        
+
                     </div>
                     <div class="back">
                         <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
-                        
+
                     </div>
                 </div>
                 <div class="top-buttons">
