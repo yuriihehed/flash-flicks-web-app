@@ -265,6 +265,7 @@ User = get_user_model()
 
 def register(request):
     if request.method == "POST":
+        name = request.POST.get("name") 
         email = request.POST.get("email")
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm")
@@ -282,7 +283,7 @@ def register(request):
             return render(request, "register.html")
 
     
-        user = User(email=email)
+        user = User(email=email, first_name=name)
         user.set_password(password)
         user.save()
 

@@ -9,6 +9,7 @@ from django.dispatch import receiver
 # Custom user model
 class CustomUser(AbstractUser):
     """Extends Django's built-in User model to use email instead of username."""
+    first_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     
     # Explicitly remove the username field
