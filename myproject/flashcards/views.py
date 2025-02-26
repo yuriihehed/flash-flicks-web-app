@@ -36,8 +36,11 @@ def forgot_password(request):
 
 @login_required
 def home(request):
-    folders = Folder.objects.all().annotate(flashcardSet_count=Count("flashcard_sets"))
-    deck = FlashcardSet.objects.all().annotate(flashcard_count=Count("flashcards"))
+    # Get only the current user's folders
+    folders = Folder.objects.filter(user=request.user).annotate(flashcardSet_count=Count("flashcard_sets"))
+    
+    # Get only the current user's flashcard sets
+    deck = FlashcardSet.objects.filter(user=request.user).annotate(flashcard_count=Count("flashcards"))
     
     if request.method == "POST":
         # Get folder name from form submission
@@ -51,15 +54,15 @@ def home(request):
             messages.success(request, "Folder created successfully!")
 
         return redirect("homepage")
-    return render(request, 'home.html', {'folders': folders, "flashcard_sets": deck})
-
-
-# @login_required
-# def folder_list(request):
-#     """View for showing all folders"""
-#     folders = Folder.objects.filter(user=request.user)
-#     return render(request, 'folder.html', {'folders': folders})
-
+    
+    # Add user_folders to context for sidebar
+    user_folders = Folder.objects.filter(user=request.user)
+    
+    return render(request, 'home.html', {
+        'folders': folders, 
+        "flashcard_sets": deck,
+        "user_folders": user_folders  # This is needed for the sidebar
+    })
 
 @login_required
 def folder_list(request):
