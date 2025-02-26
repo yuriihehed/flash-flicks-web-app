@@ -116,7 +116,7 @@
                         {% for flashcard in flashcard_sets %}
                         <div class="col-md-2">
                             <!-- Link to Flashcards set Page -->
-                            <a href="{% url 'register' %}" class="text-decoration-none">
+                            <a href="{% url 'flashcard_set_details' flashcard.id %}" class="text-decoration-none">
                                 <div class="card">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ flashcard.title }}</h5>

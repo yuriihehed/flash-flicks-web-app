@@ -74,12 +74,12 @@
             <div class="flashcard" id="card{{ term.id }}">
                 <div class="card-inner">
                     <div class="front">
-                        <h2 contenteditable="false" class="card-title">Card {{ term.term }}</h2>
-                        <p contenteditable="false" class="card-term">Term for card {{ term.definition }}</p>
+                        <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
+                        
                     </div>
                     <div class="back">
-                        <h2 contenteditable="false" class="card-back-title">Definition:</h2>
-                        <p contenteditable="false" class="card-back-content">This is the back of the card.</p>
+                        <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
+                        
                     </div>
                 </div>
                 <div class="top-buttons">
