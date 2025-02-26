@@ -37,14 +37,14 @@ class CustomUser(AbstractUser):
         return self.email
     
 
-@receiver(post_save, sender=CustomUser)
-def create_default_folder(sender, instance, created, **kwargs):
-    if created:  # Only when a new user is created
-        Folder.objects.create(
-            user=instance,
-            name="General",
-            slug="general"
-        )
+# @receiver(post_save, sender=CustomUser)
+# def create_default_folder(sender, instance, created, **kwargs):
+#     if created:  # Only when a new user is created
+#         Folder.objects.create(
+#             user=instance,
+#             name="General",
+#             slug="general"
+#         )
 
 # Folder model for grouping decks 
 class Folder(models.Model):
