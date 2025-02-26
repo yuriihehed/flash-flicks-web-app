@@ -312,3 +312,6 @@ def ensure_superuser():
         print(f"Superuser {admin_email} created automatically.")
     else:
         print(f"Superuser {admin_email} already exists.")
+
+def learning_page(request):
+    return render(request, 'learning.html')
