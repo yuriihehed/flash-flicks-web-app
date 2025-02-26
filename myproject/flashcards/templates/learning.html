@@ -44,8 +44,8 @@
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 15px 30px;
+            font-size: 18px;
             border-radius: 5px;
         }
 
@@ -63,81 +63,73 @@
     <div class="row">
         <div class="col-md-6 mt-3">
             <div class="card">
-               {# <img src="{% static 'images/Memory.jpg' %}" alt="Memory Palaces & Visualization"> #}
-
                 <div class="card-body text-center">
                     <h5 class="study-method-title">Memory Palaces & Visualization</h5>
                     <p>Memory palaces involve associating information with specific locations in a familiar space. This technique is used by memory champions for complex memorization tasks.</p>
-                    <p>Best for: Visual learners and those needing to memorize large amounts of information.</p>
-                    <a href="settings_memory_palace.html" class="btn blue-button">Learn In A Flash</a>
+                    <p>To use this method, visualize a familiar place and place key information in specific locations. As you mentally walk through the place, recall each piece of information at the designated spot.</p>
+                    <p><strong>Best for:</strong> Visual learners and those needing to memorize large amounts of information.</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 mt-3">
             <div class="card">
-                {# <img src="{% static 'images/Leitner System.jpg' %}" alt="Leitner System"> #}
-
                 <div class="card-body text-center">
                     <h5 class="study-method-title">Leitner System</h5>
                     <p>The Leitner System enhances retention by sorting flashcards into different "boxes" based on how well you remember them.</p>
-                    <p>Best for: Learners who struggle with time management and need a structured, efficiency-driven study method.</p>
-                    <a href="settings_leitner.html" class="btn blue-button">Learn In A Flash</a>
+                    <p>Start with all cards in Box 1. If you recall a card correctly, move it to the next box. If incorrect, return it to Box 1. Review lower-numbered boxes more frequently than higher ones.</p>
+                    <p><strong>Best for:</strong> Learners who struggle with time management and need a structured, efficiency-driven study method.</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 mt-3">
             <div class="card">
-                {# <img src="{% static 'images/Spaced Repetition.jpg' %}" alt="Spaced Repetition"> #}
-
                 <div class="card-body text-center">
                     <h5 class="study-method-title">Spaced Repetition (SRS)</h5>
                     <p>Spaced repetition is a scientifically proven technique that involves reviewing flashcards at increasing intervals over time.</p>
-                    <p>Best for: Students preparing for long-term knowledge retention.</p>
-                    <a href="settings_srs.html" class="btn blue-button">Learn In A Flash</a>
+                    <p>Use software like Anki to automatically schedule reviews based on performance, ensuring you study material just before forgetting it.</p>
+                    <p><strong>Best for:</strong> Students preparing for long-term knowledge retention.</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 mt-3">
             <div class="card">
-                {# <img src="{% static 'images/peer quiz.jpg' %}" alt="Peer Quizzing"> #}
-
                 <div class="card-body text-center">
                     <h5 class="study-method-title">Peer Quizzing</h5>
                     <p>Studying with friends makes learning more interactive and engaging.</p>
-                    <p>Best for: Social learners who retain information better through discussion and active engagement.</p>
-                    <a href="settings_peer_quizzing.html" class="btn blue-button">Learn In A Flash</a>
+                    <p>Ask each other questions from your flashcards and discuss the answers. Explaining concepts aloud can strengthen understanding and retention.</p>
+                    <p><strong>Best for:</strong> Social learners who retain information better through discussion and active engagement.</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 mt-3">
             <div class="card">
-                {# <img src="{% static 'images/Traditional Self-Testing.jpg' %}" alt="Traditional Self-Testing"> #}
-
                 <div class="card-body text-center">
                     <h5 class="study-method-title">Traditional Self-Testing</h5>
                     <p>This method is the most straightforward way to use flashcards.</p>
-                    <p>Best for: Students who prefer structured repetition and direct recall.</p>
-                    <a href="settings_self_testing.html" class="btn blue-button">Learn In A Flash</a>
+                    <p>Read the front of the card, try to recall the answer, then check the back. Repeat until you've mastered all cards.</p>
+                    <p><strong>Best for:</strong> Students who prefer structured repetition and direct recall.</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 mt-3">
             <div class="card">
-                {# <img src="{% static 'images/Writing & Speaking Responses.jpg' %}" alt="Writing & Speaking Responses"> #}
-
                 <div class="card-body text-center">
                     <h5 class="study-method-title">Writing & Speaking Responses</h5>
                     <p>Writing answers forces you to structure thoughts, while speaking them out loud enhances auditory learning.</p>
-                    <p>Best for: Learners who retain information better through expression.</p>
-                    <a href="settings_writing_speaking.html" class="btn blue-button">Learn In A Flash</a>
+                    <p>Write or say responses to flashcard prompts rather than just thinking about them. This strengthens recall and comprehension.</p>
+                    <p><strong>Best for:</strong> Learners who retain information better through expression.</p>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'edit_learn_mode' %}" class="btn blue-button">Learn In A Flash</a>
     </div>
 </div>
 
