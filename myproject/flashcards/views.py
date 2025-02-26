@@ -185,7 +185,7 @@ def create_folder(request):
         # Log the error for debugging
         print(f"Folder creation error: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)})
-
+@login_required
 def create_flashcard_set(request):
     # We can also define the formset here if not defined in forms.py
     # FlashcardFormSet = modelformset_factory(Flashcard, form=FlashcardForm, extra=1, can_delete=True)
@@ -207,9 +207,9 @@ def create_flashcard_set(request):
                     flashcard.flashcard_set = flashcard_set
                     flashcard.save()
                     valid_card_count += 1
-            if valid_card_count < 3:
+            if valid_card_count < 2:
                 # Optionally, add an error message and re-render the form
-                messages.error(request, "You must add at least three flashcards.")
+                messages.error(request, "You must add at least two flashcards.")
                 # You might choose to delete the flashcard_set or not save it yet
                 return render(request, 'create_flashcard_set.html', {'set_form': set_form, 'formset': formset})
 
