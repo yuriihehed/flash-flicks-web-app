@@ -5,88 +5,37 @@
 {% block container %}
 {% include 'partials/folder_modal.html' %}
 <div class="custom-container"></div>
-<style>
-    .toggle-btn {
-
-    background-color: transparent;
-    border: none;
-    font-size: 24px;
-    color: white;
-    cursor: pointer;
-    transition: transform 0.3s ease-in-out; /* Smooth movement */
-    }
-    .sidebar-collapsed .toggle-btn {
-        transform: rotate(180deg); /* Flip arrow */
-        left: 5px; /* Move it slightly inward when collapsed */
-    }
-    #sidebar {
-        transition: width 0.3s ease-in-out;
-    }
-    .sidebar-collapsed {
-        width: 65px !important; /* Keep only the toggle button visible */
-        overflow: hidden;
-    }
-    .card {
-        transition: background-color 0.3s ease-in-out;  /* Smooth transition */
-    }
-
-    .card:hover {
-        background-color: lightgray !important;  /* Change background to light gray on hover */
-    }
-    
-</style>
 <!-- Wrapper -->
 <div class="d-flex flex-column " style="min-height: 100vh;">
 
     <!-- Content Below Header -->
     <div class="d-flex flex-grow-1">
-        
+        <!-- <link rel="stylesheet" href="css/styles.css"> -->
         <!-- Dynamic Sidebar -->
         <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
             <ul class="nav flex-column">
                 <li class="nav-item border-bottom border-dark">
                     <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
-                        ➜
+                        ➞
                     </button>
-                </li>   
-                <li class="nav-item border-bottom border-dark">
-                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button" aria-expanded="false" aria-controls="classesCollapse">Classes</a>
-                    <div class="collapse" id="classesCollapse">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Class 101</li>
-                            <li class="list-group-item">Class 102</li>
-                            <button class="btn btn-primary" onclick="window.location.href='#'">Go to Classes</button>
-                        </ul>
-                    </div>
                 </li>
                 <li class="nav-item border-bottom border-dark">
-                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse" role="button" aria-expanded="false" aria-controls="flashcardsCollapse">Flashcards</a>
-                    <div class="collapse" id="flashcardsCollapse">
-                        <ul class="list-group list-group-flush">
-                            {% for flashcard in flashcard_sets %}
-                                <li class="list-group-item">{{ flashcard.title }}</li>
+                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+                    <div class="collapse show" id="foldersCollapse">
+                        <ul class="list-group list-group-flush">                    
+                            <!-- User Folders -->
+                            {% for folder in user_folders %}
+                            <li class="list-group-item">
+                                <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
+                            </li>
                             {% empty %}
-                                <li class="list-group-item text-muted">No sets available</li>
-                            {% endfor %}  
-                            <button class="btn btn-primary" onclick="window.location.href='#'">Go to Flashcards</button>
+                            <li class="list-group-item text-muted">No folders created yet.</li>
+                            {% endfor %}
+                            <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
+
                         </ul>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse"> Folders</a>
-                    <div class="collapse" id="foldersCollapse">
-                        <ul class="list-group list-group-flush">
-                            {% for folder in folders %}
-                                <li class="list-group-item"> {{ folder.name }}</li>
-                            {% empty %}
-                                <li class="list-group-item text-muted">No folders available</li>
-                            {% endfor %}    
-                            <button class="btn btn-primary" onclick="window.location.href='#'"> Go to Folders</button>
-                        </ul>
-                    </div>
-                </li>
-            </li>   
-        
             </ul>
         </div>
 
@@ -94,6 +43,7 @@
         <div class="d-flex flex-grow-1 pe-5 p-2">
             <!-- Main Content -->
             <div class="flex-grow-1 ps-5 p-2">
+
 
                 <!-- Welcome -->
                 <h2 class="welcome-message">Welcome, {{ user.username }}</h2>
@@ -134,25 +84,23 @@
                 <!-- <a class="btn btn-secondary me-2" href="{% url 'create_folder' %}">+ Create New Folder</a> -->
                 <a class="btn btn-secondary me-2" id="openModal">+ Create New Folder</a> <!-- Open Modal Button -->
                 </div>
-
                 <!-- Folders Section -->
                 <div class="mb-3">
                     <h3>Folders:</h3>
                     <div class="d-flex flex-wrap gap-3">
-                        {% for folder in folders %}
+                        <!-- User Folders -->
+                        {% for folder in user_folders %}
                         <div class="col-md-2">
-                            <!-- Link to Folder Page -->
-                            <a href="{% url 'login' %}" class="text-decoration-none">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ folder.name }}</h5>
-                                        <p class="card-text">Contains {{ folder.flashcardSet_count }} Sets</p>
-                                    </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">📁 {{ folder.name }}</h5>
+                                    <p class="card-text">Manage your folder.</p>
+                                    <a href="{% url 'folder_detail' folder.slug %}" class="btn btn-primary">Open</a>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                         {% empty %}
-                        <p>No folders found.</p>
+                        <p class="text-muted">You have no folders yet. Create one!</p>
                         {% endfor %}
                     </div>
                 </div>
@@ -209,25 +157,24 @@
 
 <!-- Sidebar Toggle JavaScript ______________________________________________-->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    var sidebar = document.getElementById("sidebar");
-    var toggleBtn = document.getElementById("sidebarToggle");
-
-    // Ensure sidebar starts collapsed
-    sidebar.classList.add("sidebar-collapsed");
-
-    toggleBtn.addEventListener("click", function () {
-        sidebar.classList.toggle("sidebar-collapsed");
-        sidebar.classList.toggle("sidebar-expanded");
-
-        if (sidebar.classList.contains("sidebar-collapsed")) {
-            toggleBtn.innerHTML = "➜"; // Arrow pointing right (collapsed)
-        } else {
-            toggleBtn.innerHTML = "➜"; // Arrow pointing left (expanded)
-        }
+    document.addEventListener("DOMContentLoaded", function () {
+        var sidebar = document.getElementById("sidebar");
+        var toggleBtn = document.getElementById("sidebarToggle");
+    
+        // Ensure sidebar starts collapsed
+        sidebar.classList.add("sidebar-collapsed");
+    
+        toggleBtn.addEventListener("click", function () {
+            sidebar.classList.toggle("sidebar-collapsed");
+            sidebar.classList.toggle("sidebar-expanded");
+    
+            if (sidebar.classList.contains("sidebar-collapsed")) {
+                toggleBtn.innerHTML = "➞"; // Arrow pointing right (collapsed)
+            } else {
+                toggleBtn.innerHTML = "➞"; // Arrow pointing left (expanded)
+            }
+        });
     });
-});
-
+    
 </script>
-
 {% endblock %}

@@ -8,74 +8,31 @@
 <link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'css/custom.css' %}" rel="stylesheet">
 
-<style>
-    /* Sidebar transition styles */
-    #sidebar {
-        transition: width 0.3s ease-in-out;
-    }
-
-    .sidebar-collapsed {
-        width: 40px !important;
-        /* Collapsed width */
-        overflow: hidden;
-    }
-
-    .hamburger-btn {
-        color: white;
-        background-color: transparent;
-        border: none;
-        font-size: 24px;
-    }
-</style>
-
 <!-- Wrapper for full-height layout with sidebar on left -->
 <div class="d-flex" style="min-height: 100vh;">
 
     <!-- SIDEBAR NAVIGATION (Left Side) -->
-    <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5;">
+     <!-- Dynamic Sidebar -->
+     <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
         <ul class="nav flex-column">
             <li class="nav-item border-bottom border-dark">
-                <button id="sidebarToggle" class="btn hamburger-btn mx-auto my-2">☰</button>
+                <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
+                    ➞
+                </button>
             </li>
             <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#classesCollapse" role="button"
-                    aria-expanded="false" aria-controls="classesCollapse">
-                    Classes
-                </a>
-                <div class="collapse" id="classesCollapse">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Class 101</li>
-                        <li class="list-group-item">Class 102</li>
-                        <button class="btn btn-primary" onclick="window.location.href='#'">Go to Classes</button>
-                    </ul>
-                </div>
-            </li>
-            <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#flashcardsCollapse" role="button"
-                    aria-expanded="false" aria-controls="flashcardsCollapse">
-                    Flashcards
-                </a>
-                <div class="collapse" id="flashcardsCollapse">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Flashcard 1</li>
-                        <li class="list-group-item">Flashcard 2</li>
-                        <button class="btn btn-primary" onclick="window.location.href='#'">Go to Flashcards</button>
-                    </ul>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button"
-                    aria-expanded="false" aria-controls="foldersCollapse">
-                    Folders
-                </a>
-                <div class="collapse" id="foldersCollapse">
-                    <ul class="list-group list-group-flush">
-                        {% for folder in folders %}
-                            <li class="list-group-item">{{ folder.name }}</li>
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+                <div class="collapse show" id="foldersCollapse">
+                    <ul class="list-group list-group-flush">                    
+                        <!-- User Folders -->
+                        {% for folder in user_folders %}
+                        <li class="list-group-item">
+                            <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
+                        </li>
                         {% empty %}
-                            <li class="list-group-item text-muted">No folders available</li>
-                        {% endfor %} 
-                        <button class="btn btn-primary" onclick="window.location.href='#'">Go to Folders</button>
+                        <li class="list-group-item text-muted">No folders created yet.</li>
+                        {% endfor %}
+                        <!-- <button class="btn btn-primary" id="openModal">+ Create New Folder</button> -->
                     </ul>
                 </div>
             </li>
@@ -123,11 +80,6 @@
 
 <!-- JavaScript: Sidebar Toggle and Dynamic Add Card Functionality -->
 <script>
-    // Sidebar Toggle
-    document.getElementById("sidebarToggle").addEventListener("click", function () {
-        var sidebar = document.getElementById("sidebar");
-        sidebar.classList.toggle("sidebar-collapsed");
-    });
 
     // "ADD A CARD" Button: Add new card form dynamically
     function addCard() {
@@ -153,5 +105,27 @@
     document.getElementById('add-card-btn').addEventListener('click', addCard);
     document.getElementById('add-card-btn2').addEventListener('click', addCard);
 </script>
+<!-- Sidebar Toggle JavaScript ______________________________________________-->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var sidebar = document.getElementById("sidebar");
+        var toggleBtn = document.getElementById("sidebarToggle");
+    
+        // Ensure sidebar starts collapsed
+        sidebar.classList.add("sidebar-collapsed");
+    
+        toggleBtn.addEventListener("click", function () {
+            sidebar.classList.toggle("sidebar-collapsed");
+            sidebar.classList.toggle("sidebar-expanded");
+    
+            if (sidebar.classList.contains("sidebar-collapsed")) {
+                toggleBtn.innerHTML = "➞"; // Arrow pointing right (collapsed)
+            } else {
+                toggleBtn.innerHTML = "➞"; // Arrow pointing left (expanded)
+            }
+        });
+    });
+    
+    </script>
 
 {% endblock %}

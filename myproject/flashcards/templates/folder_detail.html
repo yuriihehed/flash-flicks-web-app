@@ -10,7 +10,33 @@
     <!-- Content section -->
     <div class="d-flex flex-grow-1">
         <!-- Sidebar code (same as home.html) -->
-        
+        <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
+            <ul class="nav flex-column">
+                <li class="nav-item border-bottom border-dark">
+                    <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
+                        ➞
+                    </button>
+                </li>
+                <li class="nav-item border-bottom border-dark">
+                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+                    <div class="collapse show" id="foldersCollapse">
+                        <ul class="list-group list-group-flush">                    
+                            <!-- User Folders -->
+                            {% for folder in user_folders %}
+                            <li class="list-group-item">
+                                <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item text-muted">No folders created yet.</li>
+                            {% endfor %}
+                            <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
+
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
         <!-- Main content -->
         <div class="flex-grow-1 ps-5 p-2">
             <h2>{{ folder.name }}</h2>
@@ -52,4 +78,34 @@
 <link rel="stylesheet" href="{% static 'css/modal.css' %}">
 <script src="{% static 'js/folder.js' %}"></script>
 
+<!-- Modal and Form Submission JavaScript -->
+<script>
+    var folderCreateUrl = "{% url 'create_folder' %}";
+    var csrfToken = "{{ csrf_token }}";
+</script>
+<link rel="stylesheet" href="{% static 'css/modal.css' %}">
+<script src="{% static 'js/folder.js' %}"></script>
+
+<!-- Sidebar Toggle JavaScript ______________________________________________-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var sidebar = document.getElementById("sidebar");
+    var toggleBtn = document.getElementById("sidebarToggle");
+
+    // Ensure sidebar starts collapsed
+    sidebar.classList.add("sidebar-collapsed");
+
+    toggleBtn.addEventListener("click", function () {
+        sidebar.classList.toggle("sidebar-collapsed");
+        sidebar.classList.toggle("sidebar-expanded");
+
+        if (sidebar.classList.contains("sidebar-collapsed")) {
+            toggleBtn.innerHTML = "➞"; // Arrow pointing right (collapsed)
+        } else {
+            toggleBtn.innerHTML = "➞"; // Arrow pointing left (expanded)
+        }
+    });
+});
+
+</script>
 {% endblock %}

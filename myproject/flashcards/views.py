@@ -52,26 +52,45 @@ def home(request):
     return render(request, 'home.html', {'folders': folders, "flashcard_sets": deck})
 
 def folder_list(request):
+    general_folder, created = Folder.objects.get_or_create(
+        name="General",
+        user=request.user,
+        defaults={'slug': 'general'}
+    )
     """View for showing all folders"""
+
     folders = Folder.objects.filter(user=request.user)
     return render(request, 'folder.html', {'folders': folders})
 
 def folder_detail(request, slug):
     """View for showing a specific folder and its contents"""
-    if not slug:
-        return redirect('folder_list')
-    
-    try:
-        # Handle the 'general' folder case
-        if slug == 'general':
-            # You might need to create a general folder if it doesn't exist
-            folder, created = Folder.objects.get_or_create(
-                name="General", 
-                user=request.user,
-                defaults={'slug': 'general'}
-            )
-        else:
+    if not slug or slug == 'general':
+        # Get or create the general folder
+        folder, created = Folder.objects.get_or_create(
+            name="General",
+            user=request.user,
+            defaults={'slug': 'general'}
+        )
+    else:
+        try:
             folder = get_object_or_404(Folder, slug=slug, user=request.user)
+        except Folder.DoesNotExist:
+            messages.error(request, "Folder not found.")
+            return redirect('folder_list')
+    # if not slug:
+    #     return redirect('folder_list')
+    
+    # try:
+    #     # Handle the 'general' folder case
+    #     if slug == 'general':
+    #         # You might need to create a general folder if it doesn't exist
+    #         folder, created = Folder.objects.get_or_create(
+    #             name="General", 
+    #             user=request.user,
+    #             defaults={'slug': 'general'}
+    #         )
+    #     else:
+    #         folder = get_object_or_404(Folder, slug=slug, user=request.user)
         
         # Get flashcard sets belonging to this folder
         flashcard_sets = FlashcardSet.objects.filter(folder=folder)
@@ -82,9 +101,6 @@ def folder_detail(request, slug):
             'folders': Folder.objects.filter(user=request.user)  # For sidebar
         }
         return render(request, 'folder_detail.html', context)
-    except Folder.DoesNotExist:
-        messages.error(request, "Folder not found.")
-        return redirect('folder_list')
 
 
 @require_POST
@@ -128,29 +144,6 @@ def create_folder(request):
         # Log the error for debugging
         print(f"Folder creation error: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)})
-    
-
-# def create_folder(request):
-#     """AJAX view for creating a new folder"""
-#     if request.method == "POST" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-#         name = request.POST.get('name')
-        
-#         if name:
-#             # Create a new folder
-#             folder = Folder.objects.create(
-#                 name=name,
-#                 user=request.user,
-#                 # Leave parent blank for now, or get it from form if needed
-#             )
-            
-#             return JsonResponse({
-#                 'success': True,
-#                 'folder_name': folder.name,
-#                 'folder_slug': folder.slug
-#             })
-        
-#     return JsonResponse({'success': False})
-
 
 def create_flashcard_set(request):
     # We can also define the formset here if not defined in forms.py

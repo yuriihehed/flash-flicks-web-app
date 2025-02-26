@@ -79,3 +79,30 @@
     padding: 10px;
     border-radius: 4px;
   }
+  .toggle-btn {
+
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out; /* Smooth movement */
+    }
+    .sidebar-collapsed .toggle-btn {
+        transform: rotate(180deg); /* Flip arrow */
+        left: 5px; /* Move it slightly inward when collapsed */
+    }
+    #sidebar {
+        transition: width 0.3s ease-in-out;
+    }
+    .sidebar-collapsed {
+        width: 65px !important; /* Keep only the toggle button visible */
+        overflow: hidden;
+    }
+    .card {
+        transition: background-color 0.3s ease-in-out;  /* Smooth transition */
+    }
+
+    .card:hover {
+        background-color: lightgray !important;  /* Change background to light gray on hover */
+    }

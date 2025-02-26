@@ -6,36 +6,7 @@
 {% block container %}
 {% include 'partials/folder_modal.html' %}
 <div class="custom-container"></div>
-<style>
-    .toggle-btn {
-
-    background-color: transparent;
-    border: none;
-    font-size: 24px;
-    color: white;
-    cursor: pointer;
-    transition: transform 0.3s ease-in-out; /* Smooth movement */
-    }
-    .sidebar-collapsed .toggle-btn {
-        transform: rotate(180deg); /* Flip arrow */
-        left: 5px; /* Move it slightly inward when collapsed */
-    }
-    #sidebar {
-        transition: width 0.3s ease-in-out;
-    }
-    .sidebar-collapsed {
-        width: 65px !important; /* Keep only the toggle button visible */
-        overflow: hidden;
-    }
-    .card {
-        transition: background-color 0.3s ease-in-out;  /* Smooth transition */
-    }
-
-    .card:hover {
-        background-color: lightgray !important;  /* Change background to light gray on hover */
-    }
-    
-</style>
+<!-- <link rel="stylesheet" href="css/styles.css"> -->
 <!-- Wrapper -->
 <div class="d-flex flex-column " style="min-height: 100vh;">
 
@@ -47,7 +18,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item border-bottom border-dark">
                     <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
-                        ➜
+                        ➞
                     </button>
                 </li>
                 <li class="nav-item border-bottom border-dark">
@@ -146,9 +117,9 @@ document.addEventListener("DOMContentLoaded", function () {
         sidebar.classList.toggle("sidebar-expanded");
 
         if (sidebar.classList.contains("sidebar-collapsed")) {
-            toggleBtn.innerHTML = "➜"; // Arrow pointing right (collapsed)
+            toggleBtn.innerHTML = "➞"; // Arrow pointing right (collapsed)
         } else {
-            toggleBtn.innerHTML = "➜"; // Arrow pointing left (expanded)
+            toggleBtn.innerHTML = "➞"; // Arrow pointing left (expanded)
         }
     });
 });
