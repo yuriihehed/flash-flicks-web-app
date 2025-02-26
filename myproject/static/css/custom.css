@@ -1,120 +1,145 @@
 :root {
-    --bs-primary: #0d6efd;  /* Your custom blue */
-    --bs-primary-light: #cfe2ff;
-    --bs-primary-dark: #052c65;
+  --bs-primary: #0d6efd;
+  /* Your custom blue */
+  --bs-primary-light: #cfe2ff;
+  --bs-primary-dark: #052c65;
 }
 
 .btn-primary {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
 }
 
 .btn-primary:hover {
-    background-color: var(--bs-primary-dark);
-    border-color: var(--bs-primary-dark);
+  background-color: var(--bs-primary-dark);
+  border-color: var(--bs-primary-dark);
 }
 
 .bg-primary {
-    background-color: var(--bs-primary) !important;
+  background-color: var(--bs-primary) !important;
 }
 
 .text-primary {
-    color: var(--bs-primary) !important;
+  color: var(--bs-primary) !important;
 }
+
 .sidebar-collapsed {
-    width: 60px !important;
-  }
-  
+  width: 60px !important;
+}
+
 .sidebar-expanded {
-    width: 200px !important;
-  }
+  width: 200px !important;
+}
 
-  .sidebar-collapsed {
-    width: 60px !important;
-    transition: width 0.3s ease-in-out;
-  }
-  
-  .sidebar-expanded {
-    width: 200px !important;
-    transition: width 0.3s ease-in-out;
-  }
-  
-  .sidebar-collapsed .nav-link, 
-  .sidebar-collapsed .list-group-item, 
-  .sidebar-collapsed #openModal {
-    display: none;
-  }
-  
-  #folderModal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-  }
-  
-  .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
-  }
-  
-  .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  #responseMessage {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 4px;
-  }
-  .toggle-btn {
+.sidebar-collapsed {
+  width: 60px !important;
+  transition: width 0.3s ease-in-out;
+}
 
-    background-color: transparent;
-    border: none;
-    font-size: 24px;
-    color: white;
-    cursor: pointer;
-    transition: transform 0.3s ease-in-out; /* Smooth movement */
-    }
-    .sidebar-collapsed .toggle-btn {
-        transform: rotate(180deg); /* Flip arrow */
-        left: 5px; /* Move it slightly inward when collapsed */
-    }
-    #sidebar {
-        transition: width 0.3s ease-in-out;
-    }
-    .sidebar-collapsed {
-        width: 45px !important; /* Keep only the toggle button visible */
-        overflow: hidden;
-    }
-  
+.sidebar-expanded {
+  width: 200px !important;
+  transition: width 0.3s ease-in-out;
+}
+
+.sidebar-collapsed .nav-link,
+.sidebar-collapsed .list-group-item,
+.sidebar-collapsed #openModal {
+  display: none;
+}
+
+#folderModal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#responseMessage {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 4px;
+}
+/* for the error messages */
+.alert {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.toggle-btn {
+
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  /* Smooth movement */
+}
+
+.sidebar-collapsed .toggle-btn {
+  transform: rotate(180deg);
+  /* Flip arrow */
+  left: 5px;
+  /* Move it slightly inward when collapsed */
+}
+
+#sidebar {
+  transition: width 0.3s ease-in-out;
+}
+
+.sidebar-collapsed {
+  width: 45px !important;
+  /* Keep only the toggle button visible */
+  overflow: hidden;
+}
+
 .card {
-  transition: background-color 0.3s ease-in-out;  /* Smooth transition */
+  transition: background-color 0.3s ease-in-out;
+  /* Smooth transition */
 }
 
 .card:hover {
-  background-color: lightgray !important;  /* Change background to light gray on hover */
+  background-color: lightgray !important;
+  /* Change background to light gray on hover */
 }
+
 .folder-item {
-  position: relative;  
-  cursor: pointer;  
+  position: relative;
+  cursor: pointer;
 }
-  
+
 .folder-item a {
-  display: block;  
-  width: 100%;  
+  display: block;
+  width: 100%;
 }
 
 .folder-item:hover {

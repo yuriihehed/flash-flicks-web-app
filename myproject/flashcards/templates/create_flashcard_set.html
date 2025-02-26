@@ -12,8 +12,9 @@
 <div class="d-flex" style="min-height: 100vh;">
 
     <!-- SIDEBAR NAVIGATION (Left Side) -->
-     <!-- Dynamic Sidebar -->
-     <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
+    <!-- Dynamic Sidebar -->
+    <div id="sidebar" class="text-white"
+        style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
         <ul class="nav flex-column">
             <li class="nav-item border-bottom border-dark">
                 <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
@@ -21,13 +22,15 @@
                 </button>
             </li>
             <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
+                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button"
+                    aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
                 <div class="collapse show" id="foldersCollapse">
-                    <ul class="list-group list-group-flush">                    
+                    <ul class="list-group list-group-flush">
                         <!-- User Folders -->
                         {% for folder in user_folders %}
                         <li class="list-group-item">
-                            <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
+                            <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{
+                                folder.name }}</a>
                         </li>
                         {% empty %}
                         <li class="list-group-item text-muted">No folders created yet.</li>
@@ -51,6 +54,18 @@
                 <button type="submit" form="create-flashcard-form" class="btn btn-primary">Create</button>
             </div>
         </div>
+
+        <!-- Error Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
 
         <form id="create-flashcard-form" method="POST" enctype="multipart/form-data"
             style="display: flex; flex-direction: column; gap: 1rem;">
@@ -110,14 +125,14 @@
     document.addEventListener("DOMContentLoaded", function () {
         var sidebar = document.getElementById("sidebar");
         var toggleBtn = document.getElementById("sidebarToggle");
-    
+
         // Ensure sidebar starts collapsed
         sidebar.classList.add("sidebar-collapsed");
-    
+
         toggleBtn.addEventListener("click", function () {
             sidebar.classList.toggle("sidebar-collapsed");
             sidebar.classList.toggle("sidebar-expanded");
-    
+
             if (sidebar.classList.contains("sidebar-collapsed")) {
                 toggleBtn.innerHTML = "➞"; // Arrow pointing right (collapsed)
             } else {
@@ -125,7 +140,7 @@
             }
         });
     });
-    
-    </script>
+
+</script>
 
 {% endblock %}
