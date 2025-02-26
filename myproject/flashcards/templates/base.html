@@ -100,22 +100,31 @@
 <body>
 <main>
     <nav class="navbar navbar-dark bg-dark" aria-label="First navbar example">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">FlashFlicks</a> <!-- Can be replaced with the logo-->
-            <!-- Allow Login & Sign Up buttons only on Landing Page -->
-            <div class="d-flex ms-auto">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="/">FlashFlicks 
+                <span id="timer-container" style="display: none;">
+                    <span id="timer-display" class="badge bg-primary ms-2">00:00</span>
+                    <button class="btn btn-warning btn-sm me-2" id="pause-btn" onclick="stopTimer()" style="display: none;">Pause</button>
+                    <button class="btn btn-danger btn-sm" id="reset-btn" onclick="resetTimer()" style="display: none;">Reset</button>
+                </span>
+            </a>
+    
+            <div class="d-flex align-items-center">
                 {% block landing_nav %}{% endblock %}
                 {% if user.is_authenticated %}
-                <span class="navbar-brand" style="margin-right: 10px;">{{ user.email }}</span>
+                    <span class="navbar-brand me-3">{{ user.email }}</span>
                 {% endif %}
+    
+                <!-- Navbar Toggler  -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample01"
+                        aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
             </div>
-            <!-- Navbar Toggler -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample01"
-                    aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        </div>
 
             <div class="collapse navbar-collapse" id="navbarsExample01">
+                   <div class="nav-container px-3">  
                 <ul class="navbar-nav me-auto mb-2">
                     <li class="nav-item">
                         {% if user.is_authenticated %}
@@ -224,6 +233,161 @@
         const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
         localStorage.setItem('theme', newTheme);
         setTheme(newTheme);
+    });
+</script>
+<!-- Timer Script -->
+<script>
+    let timerInterval;
+    let timeLeft = localStorage.getItem("timeLeft") ? parseInt(localStorage.getItem("timeLeft")) : 0;
+    let isRunning = localStorage.getItem("isRunning") === "true";
+    let timerEnabled = localStorage.getItem("timerEnabled") === "true";
+    let ultradianEnabled = localStorage.getItem("ultradianEnabled") === "true";
+    let isBreakTime = localStorage.getItem("isBreakTime") === "true";
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById("timer-display").textContent =
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer(duration) {
+        clearInterval(timerInterval);
+        timeLeft = duration * 60;
+        isRunning = true;
+        localStorage.setItem("isRunning", "true");
+        localStorage.setItem("timerEnabled", "true");
+        localStorage.setItem("timeLeft", timeLeft);
+        updateTimerDisplay();
+        showTimerUI();
+        updatePauseButton();
+
+        timerInterval = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                localStorage.setItem("timeLeft", timeLeft);
+                updateTimerDisplay();
+            } else {
+                clearInterval(timerInterval);
+                isRunning = false;
+                localStorage.setItem("isRunning", "false");
+
+                if (ultradianEnabled) {
+                    showUltradianPopup();
+                } else {
+                    showNotification("Time's up! Take a break.");
+                    hideTimerUI();
+                }
+            }
+        }, 1000);
+    }
+
+    function showUltradianPopup() {
+        isBreakTime = !isBreakTime;
+        localStorage.setItem("isBreakTime", isBreakTime);
+
+        const popupMessage = isBreakTime
+            ? "✅ 90-minute study session is over! Take your 30-minute break."
+            : "✅ 30-minute break is over! Resume your 90-minute study session.";
+
+        showNotification(popupMessage);
+
+        setTimeout(() => {
+            startTimer(isBreakTime ? 30 : 90);
+        }, 5000);
+    }
+
+    function stopTimer() {
+        if (isRunning) {
+            clearInterval(timerInterval);
+            isRunning = false;
+            localStorage.setItem("isRunning", "false");
+            updatePauseButton();
+            showNotification("Timer paused.");
+        } else {
+            startTimer(timeLeft / 60);
+        }
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        timeLeft = 0;
+        isRunning = false;
+        localStorage.setItem("timeLeft", "0");
+        localStorage.setItem("isRunning", "false");
+        localStorage.setItem("timerEnabled", "false");
+        localStorage.setItem("isBreakTime", "false");
+        updatePauseButton();
+        updateTimerDisplay();
+        hideTimerUI();
+        showNotification("Timer reset.");
+    }
+
+    function showTimerUI() {
+        document.getElementById("timer-container").style.display = "inline-block";
+        document.getElementById("pause-btn").style.display = "inline-block";
+        document.getElementById("reset-btn").style.display = "inline-block";
+    }
+
+    function hideTimerUI() {
+        document.getElementById("timer-container").style.display = "none";
+        document.getElementById("pause-btn").style.display = "none";
+        document.getElementById("reset-btn").style.display = "none";
+    }
+
+    function showNotification(message) {
+        const notification = document.createElement("div");
+        notification.classList.add("notification");
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.add("fade");
+            setTimeout(() => {
+                notification.remove();
+            }, 500);
+        }, 3000);
+    }
+
+    function updatePauseButton() {
+        const pauseBtn = document.getElementById("pause-btn");
+        pauseBtn.textContent = isRunning ? "Pause" : "Resume";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (ultradianEnabled) {
+            showUltradianPopup();
+        }
+
+        if (timerEnabled) {
+            showTimerUI();
+            if (isRunning) {
+                startTimer(timeLeft / 60);
+            } else {
+                updateTimerDisplay();
+            }
+        } else {
+            hideTimerUI();
+        }
+    });
+
+    document.getElementById("ultradianToggle").addEventListener("change", function () {
+        localStorage.setItem("ultradianEnabled", this.checked);
+        if (this.checked) {
+            showUltradianPopup();
+        } else {
+            resetTimer();
+        }
+    });
+
+    document.getElementById("pause-btn").addEventListener("click", function (event) {
+        event.preventDefault();
+        stopTimer();
+    });
+
+    document.getElementById("reset-btn").addEventListener("click", function (event) {
+        event.preventDefault();
+        resetTimer();
     });
 </script>
 
