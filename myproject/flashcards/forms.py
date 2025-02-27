@@ -72,7 +72,7 @@ FlashcardFormSet = modelformset_factory (
     Flashcard, 
     form=FlashcardForm, 
     extra=3,  # how many blank forms are displayed
-    can_delete=True # can delete existing forms (a checkbox is displayed on each form to allow removal of the card if needed)
+    #can_delete=True # can delete existing forms (a checkbox is displayed on each form to allow removal of the card if needed)
 )
 
         
