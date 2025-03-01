@@ -1,139 +1,154 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Flashcard Study Methods - Flash Flicks{% endblock %}
 
-{% block container %}
-<div class="custom-container"></div> 
+{% block title %}
+Learning Styles - Flash Flicks
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Flashcard Study Methods</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style>
-        .card {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/learning_styles.css' %}">
+{% endblock %}
 
-        .card-body {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+{% block content %}
+<!-- HERO SECTION -->
+<section id="hero" class="hero section dark-background">
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="Hero Background" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">Learning Styles</h1>
+        <p class="text-white-75">
+            Not all study techniques are created equal. Discover different approaches 
+            to find one that matches your style!
+        </p>
+    </div>
+</section>
 
-        .card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-
-        .study-method-title {
-            text-align: center;
-            font-weight: bold;
-            color: #007bff;
-        }
-
-        .blue-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 5px;
-        }
-
-        .blue-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Find the Best Flashcard Study Method for You</h1>
-    <p class="text-center">Not all study techniques are created equal! Explore different approaches and choose the one that matches your learning style.</p>
-
-    <div class="row">
-        <div class="col-md-6 mt-3">
-            <div class="card">
-                <div class="card-body text-center">
-                    <h5 class="study-method-title">Memory Palaces & Visualization</h5>
-                    <p>Memory palaces involve associating information with specific locations in a familiar space. This technique is used by memory champions for complex memorization tasks.</p>
-                    <p>To use this method, visualize a familiar place and place key information in specific locations. As you mentally walk through the place, recall each piece of information at the designated spot.</p>
-                    <p><strong>Best for:</strong> Visual learners and those needing to memorize large amounts of information.</p>
+<!-- DASHBOARD SECTION -->
+<section class="dashboard section py-5 light-background">
+    <div class="container">
+        <h2 class="text-center mb-4">Explore Popular Study Methods</h2>
+        
+        <div class="row">
+            <!-- Memory Palaces & Visualization -->
+            <div class="col-lg-6 mt-4">
+                <div class="card shadow-sm p-4">
+                    <h5 class="study-method-title">Memory Palaces &amp; Visualization</h5>
+                    <p>
+                        Memory palaces involve associating information with 
+                        specific locations in a familiar space—used by memory 
+                        champions for complex memorization tasks.
+                    </p>
+                    <p>
+                        To use this method, visualize a familiar place and 
+                        place key information at specific spots. As you mentally 
+                        walk through it, recall each piece at the assigned location.
+                    </p>
+                    <p><strong>Best for:</strong> Visual learners and those needing 
+                        to memorize large amounts of information.
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6 mt-3">
-            <div class="card">
-                <div class="card-body text-center">
+            <!-- Leitner System -->
+            <div class="col-lg-6 mt-4">
+                <div class="card shadow-sm p-4">
                     <h5 class="study-method-title">Leitner System</h5>
-                    <p>The Leitner System enhances retention by sorting flashcards into different "boxes" based on how well you remember them.</p>
-                    <p>Start with all cards in Box 1. If you recall a card correctly, move it to the next box. If incorrect, return it to Box 1. Review lower-numbered boxes more frequently than higher ones.</p>
-                    <p><strong>Best for:</strong> Learners who struggle with time management and need a structured, efficiency-driven study method.</p>
+                    <p>
+                        The Leitner System sorts flashcards into "boxes" based on 
+                        how well you remember each card. Cards you recall correctly 
+                        move to a higher box, and mistakes return to Box 1.
+                    </p>
+                    <p>
+                        Review lower-numbered boxes more frequently than higher ones, 
+                        ensuring you spend more time on the cards you find most difficult.
+                    </p>
+                    <p><strong>Best for:</strong> Learners who want a simple, 
+                        time-efficient method.
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6 mt-3">
-            <div class="card">
-                <div class="card-body text-center">
+            <!-- Spaced Repetition -->
+            <div class="col-lg-6 mt-4">
+                <div class="card shadow-sm p-4">
                     <h5 class="study-method-title">Spaced Repetition (SRS)</h5>
-                    <p>Spaced repetition is a scientifically proven technique that involves reviewing flashcards at increasing intervals over time.</p>
-                    <p>Use software like Anki to automatically schedule reviews based on performance, ensuring you study material just before forgetting it.</p>
-                    <p><strong>Best for:</strong> Students preparing for long-term knowledge retention.</p>
+                    <p>
+                        Spaced repetition involves reviewing flashcards at 
+                        increasing intervals over time, proven by research to 
+                        enhance long-term memory.
+                    </p>
+                    <p>
+                        Tools like Anki schedule reviews automatically, ensuring 
+                        you study just before forgetting—reinforcing knowledge 
+                        efficiently.
+                    </p>
+                    <p><strong>Best for:</strong> Students aiming for 
+                        long-term retention.
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6 mt-3">
-            <div class="card">
-                <div class="card-body text-center">
+            <!-- Peer Quizzing -->
+            <div class="col-lg-6 mt-4">
+                <div class="card shadow-sm p-4">
                     <h5 class="study-method-title">Peer Quizzing</h5>
-                    <p>Studying with friends makes learning more interactive and engaging.</p>
-                    <p>Ask each other questions from your flashcards and discuss the answers. Explaining concepts aloud can strengthen understanding and retention.</p>
-                    <p><strong>Best for:</strong> Social learners who retain information better through discussion and active engagement.</p>
+                    <p>
+                        Studying with friends brings interactive and engaging 
+                        elements into learning. Ask each other questions and 
+                        discuss the answers to deepen understanding.
+                    </p>
+                    <p>
+                        Explaining concepts aloud can strengthen retention and 
+                        highlight areas that need further review.
+                    </p>
+                    <p><strong>Best for:</strong> Social learners who thrive 
+                        on discussion and active engagement.
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6 mt-3">
-            <div class="card">
-                <div class="card-body text-center">
+            <!-- Traditional Self-Testing -->
+            <div class="col-lg-6 mt-4">
+                <div class="card shadow-sm p-4">
                     <h5 class="study-method-title">Traditional Self-Testing</h5>
-                    <p>This method is the most straightforward way to use flashcards.</p>
-                    <p>Read the front of the card, try to recall the answer, then check the back. Repeat until you've mastered all cards.</p>
-                    <p><strong>Best for:</strong> Students who prefer structured repetition and direct recall.</p>
+                    <p>
+                        A straightforward approach: read the front of the flashcard, 
+                        try to recall the answer, and check the back. Repeat until 
+                        you've mastered all the cards.
+                    </p>
+                    <p>
+                        This simple method is effective for reinforcing recall 
+                        through direct repetition.
+                    </p>
+                    <p><strong>Best for:</strong> Students preferring a direct, 
+                        structured study approach.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Writing & Speaking Responses -->
+            <div class="col-lg-6 mt-4">
+                <div class="card shadow-sm p-4">
+                    <h5 class="study-method-title">Writing &amp; Speaking Responses</h5>
+                    <p>
+                        Writing your answers forces you to structure your thoughts, 
+                        while speaking them aloud can enhance auditory learning.
+                    </p>
+                    <p>
+                        Consistently expressing responses in words (written or spoken) 
+                        strengthens understanding and retention.
+                    </p>
+                    <p><strong>Best for:</strong> Learners who retain information 
+                        better by articulating concepts.
+                    </p>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6 mt-3">
-            <div class="card">
-                <div class="card-body text-center">
-                    <h5 class="study-method-title">Writing & Speaking Responses</h5>
-                    <p>Writing answers forces you to structure thoughts, while speaking them out loud enhances auditory learning.</p>
-                    <p>Write or say responses to flashcard prompts rather than just thinking about them. This strengthens recall and comprehension.</p>
-                    <p><strong>Best for:</strong> Learners who retain information better through expression.</p>
-                </div>
-            </div>
+        <div class="text-center mt-5">
+            <a href="{% url 'edit_learn_mode' %}" class="btn btn-primary btn-lg">
+                Learn In A Flash
+            </a>
         </div>
     </div>
-
-    <div class="text-center mt-4">
-        <a href="{% url 'edit_learn_mode' %}" class="btn blue-button">Learn In A Flash</a>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</section>
 {% endblock %}

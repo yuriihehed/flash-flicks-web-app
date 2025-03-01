@@ -1,395 +1,61 @@
-<!doctype html>
+{% load static %}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <title>{% block title %}Navbar Template{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FlashFlicks{% endblock %}</title>
 
-    {% load static %}
-    <!-- Bootstrap CSS -->
-    <link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="{% static 'admin/css/styles.css' %}" rel="stylesheet">
-    <!-- custom css for create flashcards -->
-    <link href="{% static 'css/create_flashcards_custom.css' %}" rel="stylesheet">
-    <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
-    <!-- Bootstrap Icons-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-    <!-- Google fonts-->
-    <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
-    <!-- SimpleLightbox plugin CSS-->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css" rel="stylesheet" />
-    <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="{% static 'admin/css/styles.css' %}" rel="stylesheet" />
-    <!-- Custom CSS -->
+    <!-- Favicons -->
+    <link href="{% static 'img/favicon.png' %}" rel="icon">
+    <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/aos/aos.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+    <!-- Main CSS Files -->
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
     <link href="{% static 'css/custom.css' %}" rel="stylesheet">
-    <!-- ___________________________________ Move it to Custom CSS ________________________________________-->
-    <style>
-        /* Theme-specific styles */
-        /* Light Mode Styles */
-        /* Light Mode Styles */
-        body.light-mode {
-            background-color: #dbe6f6;
-            color: #212529;
-        }
-        body.light-mode .navbar {
-            background-color: #005bb5 !important;
-            color: #ffffff !important; /* Ensures text remains readable */
-            background-color: #005bb5 !important;
-            color: #ffffff !important; /* Ensures text remains readable */
-        }
-        body.light-mode h1, body.light-mode h2, body.light-mode h3, body.light-mode p {
-            color: #212529; /* Ensure dark text for readability */
-        }
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
 
-        /* Dark Mode Styles */
-        body.light-mode h1, body.light-mode h2, body.light-mode h3, body.light-mode p {
-            color: #212529; /* Ensure dark text for readability */
-        }
 
-        /* Dark Mode Styles */
-        body.dark-mode {
-            background-color: #002244;
-            color: #f8f9fa; /* Light text for contrast */
-            color: #f8f9fa; /* Light text for contrast */
-        }
-        body.dark-mode .navbar {
-            background-color: #021627 !important;
-        }
-        body.dark-mode .bg-light {
-            background-color: #0845a1 !important;
-            color: #f8f9fa;
-        }
-        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode p {
-            color: #f8f9fa; /* Ensures all text is readable */
-        }
-
-        #theme-toggle {
-            margin-left: 1rem;
-            padding: 0.375rem 0.75rem;
-            border: 1px solid rgba(215, 215, 215, 0.885);
-            background: transparent;
-            color: white;
-            border-radius: 4px;
-        }
-
-        #theme-toggle:hover {
-            background: rgba(10, 62, 173, 0.1);
-        }
-
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            user-select: none;
-        }
-
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
-        }
-    </style>
-    <!-- ___________________________________ Move it to Custom CSS ________________________________________-->
     {% block extra_css %}{% endblock %}
 </head>
-<body>
-<main>
-    <nav class="navbar navbar-dark bg-dark" aria-label="First navbar example">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="/">FlashFlicks 
-                <span id="timer-container" style="display: none;">
-                    <span id="timer-display" class="badge bg-primary ms-2">00:00</span>
-                    <button class="btn btn-warning btn-sm me-2" id="pause-btn" onclick="stopTimer()" style="display: none;">Pause</button>
-                    <button class="btn btn-danger btn-sm" id="reset-btn" onclick="resetTimer()" style="display: none;">Reset</button>
-                </span>
-            </a>
-    
-            <div class="d-flex align-items-center">
-                {% block landing_nav %}{% endblock %}
-                {% if user.is_authenticated %}
-                    <span class="navbar-brand me-3">{{ user.first_name }}</span>
-                {% endif %}
-    
-                <!-- Navbar Toggler  -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample01"
-                        aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-        </div>
 
-            <div class="collapse navbar-collapse" id="navbarsExample01">
-                   <div class="nav-container px-3">  
-                <ul class="navbar-nav me-auto mb-2">
-                    <li class="nav-item">
-                        {% if user.is_authenticated %}
-                        <a class="nav-link active" href="/homepage">Home</a>
-                        {% else %}
-                        <a class="nav-link disabled" href="#" aria-disabled="true">Home</a>
-                        {% endif %}
-                    </li>
-                    <li class="nav-item">
-                        {% if user.is_authenticated %}
-                        <a class="nav-link active" href="/folder">Folders</a>
-                        {% else %}
-                        <a class="nav-link disabled" href="#" aria-disabled="true">Folders</a>
-                         {% endif %}
-                        <!-- <a class="nav-link active" href="/folder">Folders</a> -->
-                    </li>
-                    <!-- Removing this until next version
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/class-name>">Folders</a> -->  <!-- Need to change the link -->
-                    <!--
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="dropdown01"
-                       data-bs-toggle="dropdown" aria-expanded="false">Explore</a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdown01">
-                        <li><a class="dropdown-item" href="/progress">View Progress</a></li> --> <!--
-                                <li><a class="dropdown-item" href="/learning-styles">Explore Flashcard Learning Styles</a></li>
-                            </ul>
-                        </li> -->
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/learning-styles">Explore Flashcard Learning Styles</a>
-                    </li>
-                    <li class="nav-item">
-                        {% if user.is_authenticated %}
-                        <a class="nav-link active" href="/edit-learn-mode">Settings</a>
-                        {% else %}
-                        <a class="nav-link disabled" href="#" aria-disabled="true">Settings</a>
-                        {% endif %}
-                    </li>
-                    <!-- LOGOUT BUTTON-->
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a>
-                    </li>
-                    {% endif %}
-                </ul>
-                <!--
-                <form class="d-flex">
-                    <input class="form-control me-2" type="text" placeholder="Search">
-                </form>
-                <button id="theme-toggle" type="button">
-                    <span class="light-mode-icon">🌞</span>
-                    <span class="dark-mode-icon" style="display: none;">🌙</span>
-                </button>  -->
-                {% block header_content %}{% endblock %}
-            </div>
-        </div>
-    </nav>
-    {% block container %}
-    <div class="container">
-        <div class="bg-light p-5 rounded">
-            <div class="col-sm-8 mx-auto">
-                {% block content %}
-                <h1>This is base.html </h1>
-                <p>We can extend this to keep the same formatting on all pages</p>
-                <p>At the smallest breakpoint, the collapse plugin is used to hide the links and show a menu button to toggle the collapsed content.</p>
-                <p>
-                    <a class="btn btn-primary" href="#" role="button">View navbar docs &raquo;</a>
-                </p>
-                {% endblock %}
-            </div>
-        </div>
-    </div>
-    {% endblock %}
-</main>
+<body class="index-page">
 
-<!-- Bootstrap Bundle with Popper -->
-<script src="{% static 'bootstrap/bootstrap.bundle.min.js' %}"></script>
-{% block extra_js %}{% endblock %}
-<!-- Theme Toggle Script -->
-<script>
-    const themeToggle = document.getElementById('theme-toggle');
-    const lightIcon = document.querySelector('.light-mode-icon');
-    const darkIcon = document.querySelector('.dark-mode-icon');
+    <!-- Navbar -->
+    {% include 'partials/navbar.html' %}
 
-    function setTheme(theme) {
-        if (theme === 'dark') {
-            document.body.classList.remove('light-mode');
-            document.body.classList.add('dark-mode');
-            lightIcon.style.display = 'none';
-            darkIcon.style.display = 'inline';
-        } else {
-            document.body.classList.remove('dark-mode');
-            document.body.classList.add('light-mode');
-            lightIcon.style.display = 'inline';
-            darkIcon.style.display = 'none';
-        }
-    }
+    <!-- Page Content -->
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
 
-    // Initialize theme from localStorage
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
+    <!-- Footer -->
+    {% include 'partials/footer.html' %}
 
-    // Theme toggle handler
-    themeToggle.addEventListener('click', () => {
-        const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
-        localStorage.setItem('theme', newTheme);
-        setTheme(newTheme);
-    });
-</script>
-<!-- Timer Script -->
-<script>
-    let timerInterval;
-    let timeLeft = localStorage.getItem("timeLeft") ? parseInt(localStorage.getItem("timeLeft")) : 0;
-    let isRunning = localStorage.getItem("isRunning") === "true";
-    let timerEnabled = localStorage.getItem("timerEnabled") === "true";
-    let ultradianEnabled = localStorage.getItem("ultradianEnabled") === "true";
-    let isBreakTime = localStorage.getItem("isBreakTime") === "true";
+    <!-- Vendor JS Files -->
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'vendor/aos/aos.js' %}"></script>
+    <script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
+    <script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
 
-    function updateTimerDisplay() {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        document.getElementById("timer-display").textContent =
-            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
+    <!-- Main JS File -->
+    <script src="{% static 'js/main.js' %}"></script>
 
-    function startTimer(duration) {
-        clearInterval(timerInterval);
-        timeLeft = duration * 60;
-        isRunning = true;
-        localStorage.setItem("isRunning", "true");
-        localStorage.setItem("timerEnabled", "true");
-        localStorage.setItem("timeLeft", timeLeft);
-        updateTimerDisplay();
-        showTimerUI();
-        updatePauseButton();
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}?v=2">
 
-        timerInterval = setInterval(() => {
-            if (timeLeft > 0) {
-                timeLeft--;
-                localStorage.setItem("timeLeft", timeLeft);
-                updateTimerDisplay();
-            } else {
-                clearInterval(timerInterval);
-                isRunning = false;
-                localStorage.setItem("isRunning", "false");
 
-                if (ultradianEnabled) {
-                    showUltradianPopup();
-                } else {
-                    showNotification("Time's up! Take a break.");
-                    hideTimerUI();
-                }
-            }
-        }, 1000);
-    }
-
-    function showUltradianPopup() {
-        isBreakTime = !isBreakTime;
-        localStorage.setItem("isBreakTime", isBreakTime);
-
-        const popupMessage = isBreakTime
-            ? "✅ 90-minute study session is over! Take your 30-minute break."
-            : "✅ 30-minute break is over! Resume your 90-minute study session.";
-
-        showNotification(popupMessage);
-
-        setTimeout(() => {
-            startTimer(isBreakTime ? 30 : 90);
-        }, 5000);
-    }
-
-    function stopTimer() {
-        if (isRunning) {
-            clearInterval(timerInterval);
-            isRunning = false;
-            localStorage.setItem("isRunning", "false");
-            updatePauseButton();
-            showNotification("Timer paused.");
-        } else {
-            startTimer(timeLeft / 60);
-        }
-    }
-
-    function resetTimer() {
-        clearInterval(timerInterval);
-        timeLeft = 0;
-        isRunning = false;
-        localStorage.setItem("timeLeft", "0");
-        localStorage.setItem("isRunning", "false");
-        localStorage.setItem("timerEnabled", "false");
-        localStorage.setItem("isBreakTime", "false");
-        updatePauseButton();
-        updateTimerDisplay();
-        hideTimerUI();
-        showNotification("Timer reset.");
-    }
-
-    function showTimerUI() {
-        document.getElementById("timer-container").style.display = "inline-block";
-        document.getElementById("pause-btn").style.display = "inline-block";
-        document.getElementById("reset-btn").style.display = "inline-block";
-    }
-
-    function hideTimerUI() {
-        document.getElementById("timer-container").style.display = "none";
-        document.getElementById("pause-btn").style.display = "none";
-        document.getElementById("reset-btn").style.display = "none";
-    }
-
-    function showNotification(message) {
-        const notification = document.createElement("div");
-        notification.classList.add("notification");
-        notification.textContent = message;
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.classList.add("fade");
-            setTimeout(() => {
-                notification.remove();
-            }, 500);
-        }, 3000);
-    }
-
-    function updatePauseButton() {
-        const pauseBtn = document.getElementById("pause-btn");
-        pauseBtn.textContent = isRunning ? "Pause" : "Resume";
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        if (ultradianEnabled) {
-            showUltradianPopup();
-        }
-
-        if (timerEnabled) {
-            showTimerUI();
-            if (isRunning) {
-                startTimer(timeLeft / 60);
-            } else {
-                updateTimerDisplay();
-            }
-        } else {
-            hideTimerUI();
-        }
-    });
-
-    document.getElementById("ultradianToggle").addEventListener("change", function () {
-        localStorage.setItem("ultradianEnabled", this.checked);
-        if (this.checked) {
-            showUltradianPopup();
-        } else {
-            resetTimer();
-        }
-    });
-
-    document.getElementById("pause-btn").addEventListener("click", function (event) {
-        event.preventDefault();
-        stopTimer();
-    });
-
-    document.getElementById("reset-btn").addEventListener("click", function (event) {
-        event.preventDefault();
-        resetTimer();
-    });
-</script>
-
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

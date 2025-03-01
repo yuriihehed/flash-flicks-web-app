@@ -1,4 +1,3 @@
-<!-- folder_detail.html -->
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{{ folder.name }} - Folder{% endblock %}
@@ -6,106 +5,90 @@
 {% block container %}
 {% include 'partials/folder_modal.html' %}
 
-<div class="d-flex flex-column" style="min-height: 100vh;">
-    <!-- Content section -->
-    <div class="d-flex flex-grow-1">
-        <!-- Sidebar code (same as home.html) -->
-        <div id="sidebar" class="text-white" style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
-            <ul class="nav flex-column">
-                <li class="nav-item border-bottom border-dark">
-                    <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
-                        ➞
-                    </button>
-                </li>
-                <li class="nav-item border-bottom border-dark">
-                    <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
-                    <div class="collapse show" id="foldersCollapse">
-                        <ul class="list-group list-group-flush">                    
-                            <!-- User Folders -->
-                            {% for folder in user_folders %}
-                            <li class="list-group-item">
-                                <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
-                            </li>
-                            {% empty %}
-                            <li class="list-group-item text-muted">No folders created yet.</li>
-                            {% endfor %}
-                            <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
+<div class="container-fluid p-0" style="min-height: 100vh;">
+  <div class="row no-gutters">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="col-md-2 bg-primary text-white p-3" style="transition: width 0.3s ease-in-out;">
+      <button id="sidebarToggle" class="btn btn-light d-block mb-3">➞</button>
+      <h5 class="mb-3">Folders</h5>
+      <ul class="nav flex-column">
+        {% for folder in user_folders %}
+        <li class="nav-item mb-2">
+          <a href="{% url 'folder_detail' folder.slug %}" class="nav-link text-white">
+            📁 {{ folder.name }}
+          </a>
+        </li>
+        {% empty %}
+        <li class="nav-item text-muted">No folders created yet.</li>
+        {% endfor %}
+      </ul>
+      <button class="btn btn-secondary mt-3" id="openModal">+ Create New Folder</button>
+    </aside>
 
-                        </ul>
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Main content -->
-        <div class="flex-grow-1 ps-5 p-2">
-            <h2>{{ folder.name }}</h2>
-            
-            <!-- Action buttons -->
-            <div class="mb-4">
-                <a class="btn btn-secondary me-2" href='/create-flashcard-set?folder={{ folder.id }}'>+ Create New Study Set</a>
-                <!-- <a class="btn btn-secondary me-2" id="openModalMain">+ Create New Folder</a> -->
+    <!-- Main Content -->
+    <main class="col-md-10 p-4">
+      <h2>{{ folder.name }}</h2>
+      
+      <!-- Action Buttons -->
+      <div class="mb-4">
+        <a class="btn btn-secondary" href="/create-flashcard-set?folder={{ folder.id }}">
+          + Create New Study Set
+        </a>
+      </div>
+      
+      <!-- Study Sets Section -->
+      <section class="mb-3">
+        <h3>Study Sets:</h3>
+        <div class="row">
+          {% for set in flashcard_sets %}
+          <div class="col-md-4 mb-3">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">{{ set.title }}</h5>
+                <p class="card-text">{{ set.description|truncatechars:50 }}</p>
+                <a href="{% url 'flashcard_set_details' set.id %}" class="btn btn-primary">Study</a>
+              </div>
             </div>
-            
-            <!-- Flashcard sets in this folder -->
-            <div class="mb-3">
-                <h3>Study Sets:</h3>
-                <div class="d-flex flex-wrap gap-3">
-                    {% for set in flashcard_sets %}
-                    <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ set.title }}</h5>
-                                <p class="card-text">{{ set.description|truncatechars:50 }}</p>
-                                <a href="{% url 'flashcard_set_details' set.id %}" class="btn btn-primary">Study</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <p>No study sets in this folder yet.</p>
-                    {% endfor %}
-                </div>
-            </div>
+          </div>
+          {% empty %}
+          <div class="col-12">
+            <p>No study sets in this folder yet.</p>
+          </div>
+          {% endfor %}
         </div>
-    </div>
+      </section>
+    </main>
+  </div>
 </div>
 
-<!-- Include the modal and scripts (same as home.html) -->
-<script>
-    var folderCreateUrl = "{% url 'create_folder' %}";
-    var csrfToken = "{{ csrf_token }}";
-</script>
+<!-- Include Modal CSS/JS (once only) -->
 <link rel="stylesheet" href="{% static 'css/modal.css' %}">
 <script src="{% static 'js/folder.js' %}"></script>
 
-<!-- Modal and Form Submission JavaScript -->
-<script>
-    var folderCreateUrl = "{% url 'create_folder' %}";
-    var csrfToken = "{{ csrf_token }}";
-</script>
-<link rel="stylesheet" href="{% static 'css/modal.css' %}">
-<script src="{% static 'js/folder.js' %}"></script>
-
-<!-- Sidebar Toggle JavaScript ______________________________________________-->
+<!-- Sidebar Toggle Script -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    var sidebar = document.getElementById("sidebar");
-    var toggleBtn = document.getElementById("sidebarToggle");
+  var sidebar = document.getElementById("sidebar");
+  var toggleBtn = document.getElementById("sidebarToggle");
 
-    // Ensure sidebar starts collapsed
-    sidebar.classList.add("sidebar-collapsed");
+  // Optionally start with the sidebar collapsed (adjust width as needed)
+  sidebar.classList.add("sidebar-collapsed");
+  sidebar.style.width = "50px";
+  toggleBtn.innerHTML = "➞";
 
-    toggleBtn.addEventListener("click", function () {
-        sidebar.classList.toggle("sidebar-collapsed");
-        sidebar.classList.toggle("sidebar-expanded");
-
-        if (sidebar.classList.contains("sidebar-collapsed")) {
-            toggleBtn.innerHTML = "➞"; // Arrow pointing right (collapsed)
-        } else {
-            toggleBtn.innerHTML = "➞"; // Arrow pointing left (expanded)
-        }
-    });
+  toggleBtn.addEventListener("click", function () {
+    if (sidebar.classList.contains("sidebar-collapsed")) {
+      // Expand sidebar
+      sidebar.classList.remove("sidebar-collapsed");
+      sidebar.style.width = "200px";
+      toggleBtn.innerHTML = "⬅";
+    } else {
+      // Collapse sidebar
+      sidebar.classList.add("sidebar-collapsed");
+      sidebar.style.width = "50px";
+      toggleBtn.innerHTML = "➞";
+    }
+  });
 });
-
 </script>
 {% endblock %}

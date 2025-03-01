@@ -1,7 +1,3 @@
-# Virtual environment
-venv/
-.env
-*.venv
 .envrc
 
 # Python Compiled Files

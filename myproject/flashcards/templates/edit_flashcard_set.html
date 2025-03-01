@@ -1,123 +1,91 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Edit Flashcard Set{% endblock %}
+{% block title %}
+Edit Flashcard Set
+{% endblock %}
 
-{% include 'partials/folder_modal.html' %}
-{% block container %}
-<!-- Include external CSS (Bootstrap and custom) -->
-<link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
-<link href="{% static 'css/custom.css' %}" rel="stylesheet">
+{% block content %}
 
-
-<!-- Wrapper for full-height layout with sidebar on left -->
-<div class="d-flex" style="min-height: 100vh;">
-    <!-- SIDEBAR NAVIGATION (Left Side) -->
-
-    <!-- Dynamic Sidebar -->
-    <div id="sidebar" class="text-white"
-        style="min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
-        <ul class="nav flex-column">
-            <li class="nav-item border-bottom border-dark">
-                <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
-                    ➞
-                </button>
-            </li>
-            <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button"
-                    aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
-                <!-- <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="/folder" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a> -->
-
-                <div class="collapse show" id="foldersCollapse">
-                    <ul class="list-group list-group-flush">
-                        <!-- User Folders -->
-                        {% for folder in user_folders %}
-                        <li class="list-group-item folder-item">
-                            <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{folder.name }}</a>
-                        </li>
-                        {% empty %}
-                        <li class="list-group-item text-muted">No folders created yet.</li>
-                        {% endfor %}
-                        <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
-                    </ul>
-                </div>
-            </li>
-        </ul>
+<!-- HERO SECTION (Dark Background) -->
+<section id="hero" class="hero section dark-background position-relative">
+    <!-- Example hero background image; update path as needed -->
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">Edit Flashcard Set</h1>
+        <p class="text-white-75">Modify your flashcards below.</p>
     </div>
+</section>
 
+<!-- MAIN EDIT SECTION (Light Background) -->
+<section class="py-5 light-background">
+    <div class="container">
 
-    <!-- MAIN CONTENT AREA (Right Side) -->
-    <div class="flex-grow-1 p-4">
-        <!-- Centered Page Title with Buttons -->
+        {# Include a partial if needed; remove if you don’t use it #}
+        {% include 'partials/folder_modal.html' %}
+
+        <!-- Header / Buttons -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-center">Edit Flashcard Set</h1>
+            <h2 class="mb-0">Edit Flashcard Set</h2>
             <div>
                 <button type="button" class="btn btn-danger me-2"
-                    onclick="window.location.href='{% url 'home' %}'">Cancel</button>
-                <button type="submit" form="edit-flashcard-form" class="btn btn-primary">Save Changes</button>
+                        onclick="window.location.href='{% url 'home' %}'">Cancel</button>
+                <button type="submit" form="edit-flashcard-form" class="btn btn-primary">
+                    Save Changes
+                </button>
             </div>
         </div>
 
-        <form id="edit-flashcard-form" method="POST" enctype="multipart/form-data"
-            style="display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Edit Form -->
+        <form id="edit-flashcard-form" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ set_form.as_p }}
             {{ formset.management_form }}
 
             <div id="cards-container">
                 {% for form in formset %}
-                <div class="card-form mb-3 border p-3">
-                    <h5>Card {{ forloop.counter }}</h5>
-                    {{ form.as_p }}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Card {{ forloop.counter }}</h5>
+                        {{ form.as_p }}
+                    </div>
                 </div>
                 {% endfor %}
             </div>
 
-            <div id="empty-form" style="display: none;">
+            <!-- Hidden empty form for adding new cards -->
+            <div id="empty-form" class="d-none">
                 {{ formset.empty_form.as_p }}
             </div>
 
-            <button type="button" id="add-card-btn" class="btn btn-secondary w-100 mb-3">+ Add a card</button>
-            <!-- Save Button -->
-            <button type="submit" form="edit-flashcard-form" class="btn btn-primary">Save Changes</button>
+            <button type="button" id="add-card-btn" class="btn btn-secondary w-100 mb-3">
+                + Add a card
+            </button>
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
         </form>
-    </div>
-</div>
 
+    </div> <!-- End .container -->
+</section>
+
+<!-- Inline JavaScript for dynamic card addition -->
 <script>
-    document.getElementById("add-card-btn").addEventListener("click", function () {
-        var container = document.getElementById('cards-container');
-        var totalFormsInput = document.querySelector('[name="form-TOTAL_FORMS"]');
-        var totalForms = parseInt(totalFormsInput.value);
-        var emptyFormHtml = document.getElementById('empty-form').innerHTML;
-        var newFormHtml = emptyFormHtml.replace(/__prefix__/g, totalForms);
-        var newFormDiv = document.createElement('div');
-        newFormDiv.className = 'card-form mb-3 border p-3';
-        newFormDiv.innerHTML = `<h5>Card ${totalForms + 1}</h5>` + newFormHtml;
-        container.appendChild(newFormDiv);
-        totalFormsInput.value = totalForms + 1;
-    });
+document.getElementById("add-card-btn").addEventListener("click", function () {
+    var container = document.getElementById('cards-container');
+    var totalFormsInput = document.querySelector('[name="form-TOTAL_FORMS"]');
+    var totalForms = parseInt(totalFormsInput.value);
+    var emptyFormHtml = document.getElementById('empty-form').innerHTML;
+    var newFormHtml = emptyFormHtml.replace(/__prefix__/g, totalForms);
+    var newFormDiv = document.createElement('div');
+    newFormDiv.className = 'card mb-3';
+    newFormDiv.innerHTML = `
+        <div class="card-body">
+            <h5 class="card-title">Card ${totalForms + 1}</h5>
+            ${newFormHtml}
+        </div>
+    `;
+    container.appendChild(newFormDiv);
+    totalFormsInput.value = totalForms + 1;
+});
 </script>
-<!-- Sidebar Toggle JavaScript ______________________________________________-->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var sidebar = document.getElementById("sidebar");
-        var toggleBtn = document.getElementById("sidebarToggle");
 
-        // Ensure sidebar starts collapsed
-        sidebar.classList.add("sidebar-collapsed");
-
-        toggleBtn.addEventListener("click", function () {
-            sidebar.classList.toggle("sidebar-collapsed");
-            sidebar.classList.toggle("sidebar-expanded");
-
-            if (sidebar.classList.contains("sidebar-collapsed")) {
-                toggleBtn.innerHTML = "➞"; // Arrow pointing right (collapsed)
-            } else {
-                toggleBtn.innerHTML = "➞"; // Arrow pointing left (expanded)
-            }
-        });
-    });
-
-</script>
 {% endblock %}

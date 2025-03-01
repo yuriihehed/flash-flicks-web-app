@@ -1,147 +1,78 @@
-<!--create flashcard set template -->
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Create Flashcard Set{% endblock %}
+{% block title %}Create Flashcard Set - FlashFlicks{% endblock %}
 
-{% block container %}
-<!-- Include external CSS (Bootstrap and custom) -->
-<link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
-<link href="{% static 'css/custom.css' %}" rel="stylesheet">
+{% block content %}
 
-<!-- Wrapper for full-height layout with sidebar on left -->
-<div class="d-flex" style="min-height: 100vh;">
+<!-- Hero Section -->
+<section id="hero" class="hero section dark-background">
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">Create a New Flashcard Set</h1>
+        <p class="text-white-75">Organize your study materials and enhance your learning experience.</p>
+    </div>
+</section>
 
-    <!-- SIDEBAR NAVIGATION (Left Side) -->
-    <!-- Dynamic Sidebar -->
-    <div id="sidebar" class="text-white"
-        style="width: 150px; min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
-        <ul class="nav flex-column">
-            <li class="nav-item border-bottom border-dark">
-                <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
-                    ➞
-                </button>
-            </li>
-            <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button"
-                    aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
-                <div class="collapse show" id="foldersCollapse">
-                    <ul class="list-group list-group-flush">
-                        <!-- User Folders -->
-                        {% for folder in user_folders %}
-                            <li class="list-group-item folder-item">
-                                <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
-                            </li>
-                            {% empty %}
-                            <li class="list-group-item text-muted">No folders created yet.</li>
+<!-- Create Flashcard Set Section -->
+<section class="dashboard section light-background py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm p-4">
+                    <h3 class="text-center mb-4">Flashcard Set Details</h3>
+                    
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                                    {{ message }}
+                                </div>
                             {% endfor %}
-                            <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
-                        <!-- <button class="btn btn-primary" id="openModal">+ Create New Folder</button> -->
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </div>
-    <!-- END SIDEBAR NAVIGATION -->
+                        </div>
+                    {% endif %}
+                    
+                    <form id="create-flashcard-form" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ set_form.as_p }}
+                        {{ formset.management_form }}
 
-    <!-- MAIN CONTENT AREA (Right Side) -->
-    <div class="flex-grow-1 p-4">
-        <!-- Centered Page Title with Buttons -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-center">Create Flashcard Set</h1>
-            <div>
-                <button type="button" class="btn btn-danger me-2"
-                    onclick="window.location.href='{% url 'home' %}'">Cancel</button>
-                <button type="submit" form="create-flashcard-form" class="btn btn-primary">Create</button>
+                        <div id="cards-container">
+                            {% for form in formset %}
+                            <div class="card-form mb-3 border p-3">
+                                <h5>{{ forloop.counter }}</h5>
+                                {{ form.as_p }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div id="empty-form" style="display: none;">
+                            {{ formset.empty_form.as_p }}
+                        </div>
+
+                        <button type="button" id="add-card-btn" class="btn btn-secondary w-100 mb-3">+ Add a Card</button>
+                        <button type="submit" class="btn btn-primary w-100">Create Flashcard Set</button>
+                    </form>
+                </div>
             </div>
         </div>
-        
-        <!--- Error message -->
-        {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-
-        <form id="create-flashcard-form" method="POST" enctype="multipart/form-data"
-            style="display: flex; flex-direction: column; gap: 1rem;">
-            {% csrf_token %}
-            {{ set_form.as_p }}
-            {{ formset.management_form }}
-
-            <div id="cards-container">
-                {% for form in formset %}
-                <div class="card-form mb-3 border p-3">
-                    <h5>{{ forloop.counter }}</h5>
-                    {{ form.as_p }}
-                </div>
-                {% endfor %}
-            </div>
-            <div id="empty-form" style="display: none;">
-                {{ formset.empty_form.as_p }}
-            </div>
-
-            <button type="button" id="add-card-btn" class="btn btn-secondary w-100 mb-3">+ Add a card</button>
-            <!-- Save Button -->
-            <button type="submit" form="create-flashcard-form" class="btn btn-primary">Create</button>
-        </form>
     </div>
-    <!-- END MAIN CONTENT AREA -->
-</div>
+</section>
 
-<!-- JavaScript: Sidebar Toggle and Dynamic Add Card Functionality -->
 <script>
-
-    // "ADD A CARD" Button: Add new card form dynamically
     function addCard() {
-        // Get the container for the cards
         var container = document.getElementById('cards-container');
-        // Get the current total forms count from the management form
         var totalFormsInput = document.querySelector('[name="form-TOTAL_FORMS"]');
         var totalForms = parseInt(totalFormsInput.value);
-        // Get the empty form template HTML
         var emptyFormHtml = document.getElementById('empty-form').innerHTML;
-        // Replace __prefix__ placeholder with the current totalForms value
         var newFormHtml = emptyFormHtml.replace(/__prefix__/g, totalForms);
-        // Create a new div to hold the new form
         var newFormDiv = document.createElement('div');
         newFormDiv.className = 'card-form mb-3 border p-3';
         newFormDiv.innerHTML = `<h5> ${totalForms + 1}</h5>` + newFormHtml;
-        // Append the new form to the container
         container.appendChild(newFormDiv);
-        // Increment the TOTAL_FORMS count so Django knows about the new form
         totalFormsInput.value = totalForms + 1;
     }
-    // "ADD A CARD" Button: Add new card form dynamically
     document.getElementById('add-card-btn').addEventListener('click', addCard);
-    document.getElementById('add-card-btn2').addEventListener('click', addCard);
-</script>
-<!-- Sidebar Toggle JavaScript ______________________________________________-->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var sidebar = document.getElementById("sidebar");
-        var toggleBtn = document.getElementById("sidebarToggle");
-
-        // Ensure sidebar starts collapsed
-        sidebar.classList.add("sidebar-collapsed");
-
-        toggleBtn.addEventListener("click", function () {
-            sidebar.classList.toggle("sidebar-collapsed");
-            sidebar.classList.toggle("sidebar-expanded");
-
-            if (sidebar.classList.contains("sidebar-collapsed")) {
-                toggleBtn.innerHTML = "➞"; // Arrow pointing right (collapsed)
-            } else {
-                toggleBtn.innerHTML = "➞"; // Arrow pointing left (expanded)
-            }
-        });
-    });
-
 </script>
 
 {% endblock %}

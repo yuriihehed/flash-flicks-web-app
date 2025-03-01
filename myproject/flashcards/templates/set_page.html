@@ -1,258 +1,313 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Set Page{% endblock %}
+{% block title %}
+Set Page
+{% endblock %}
 
-{% block container %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/set_page.css' %}">
+{% endblock %}
 
-<!-- Completely override default structure -->
-<div class="d-flex" style="min-height: 100vh;">
+{% block content %}
 
-
-    <!-- Dynamic Sidebar -->
-    <div id="sidebar" class="text-white"
-        style="min-height: 100vh; background-color:#005bb5; transition: width 0.3s ease-in-out;">
-        <ul class="nav flex-column">
-            <li class="nav-item border-bottom border-dark">
-                <button id="sidebarToggle" class="btn toggle-btn mx-auto my-2">
-                    ➞
-                </button>
-            </li>
-            <li class="nav-item border-bottom border-dark">
-                <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="#foldersCollapse" role="button"
-                    aria-expanded="false" aria-controls="foldersCollapse">Folders</a>
-                <!-- <a class="nav-link text-white ms-4" data-bs-toggle="collapse" href="/folder" role="button" aria-expanded="false" aria-controls="foldersCollapse">Folders</a> -->
-
-                <div class="collapse show" id="foldersCollapse">
-                    <ul class="list-group list-group-flush">
-                        <!-- User Folders -->
-                        {% for folder in user_folders %}
-                        <li class="list-group-item folder-item">
-                            <a href="{% url 'folder_detail' folder.slug %}" class="text-decoration-none">📁 {{ folder.name }}</a>
-                        </li>
-                        {% empty %}
-                        <li class="list-group-item text-muted">No folders created yet.</li>
-                        {% endfor %}
-                        <button class="btn btn-primary" id="openModal">+ Create New Folder</button>
-                    </ul>
-                </div>
-            </li>
-        </ul>
+<!-- HERO SECTION (Dark Background) -->
+<section id="hero" class="hero section dark-background position-relative">
+    <!-- Example hero background image -->
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">{{ flashcard_set.title }}</h1>
+        <p class="text-white-75">
+            Manage your terms and definitions in style!
+        </p>
+        <button type="button" class="btn btn-danger" 
+        onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">
+            Edit Flashcard Set
+        </button>
     </div>
+</section>
 
-    <!-- Main Content -->
-    <div class="flex-grow-1 main-content p-4">
-        {% block content %}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-center">{{ flashcard_set.title }}</h1>
-            <div>
-                <button type="button" class="btn btn-danger me-2"
-                    onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">Edit</button>
-            </div>
-        </div>
-        <!-- Learning Modes Section 
-        <div class="three-box-container">
-            <div class="col-md-4">
-                <div class="box" id="learning-modes">
-                    <h2>Learning Modes</h2>
-                    <p>A personalized learning plan</p>
-                    <p>Under Construction</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="box" id="practice-test">
-                    <h2>Practice Test</h2>
-                    <p>Let’s test your knowledge</p>
-                    <p>Under Construction</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="box" id="flashcards-overview">
-                    <h2>Flashcards</h2>
-                    <p>Study terms and definitions</p>
-                    <p>Under Construction</p>
-                </div>
-            </div>
-        </div> -->
-
-        <!-- Large Flashcard Box -->
-        <div class="flashcard-area">
-            {% for term in terms%}
-            <div class="flashcard" id="card{{ term.id }}">
-                <div class="card-inner">
-                    <div class="front">
-                        <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
-
+<!-- MAIN SET SECTION (Light Background) -->
+        <section class="set-section py-5 light-background">
+            <div class="container">
+               
+                
+            <!-- Flashcard Display Section -->
+            <div class="flashcard-area d-flex justify-content-center">
+                {% for term in terms %}
+                <div class="flashcard" id="card{{ term.id }}" {% if not forloop.first %}style="display: none;"{% endif %}>
+                    <div class="card-inner">
+                        <!-- Front -->
+                        <div class="front">
+                            <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
+                        </div>
+                        <!-- Back -->
+                        <div class="back">
+                            <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
+                        </div>
                     </div>
-                    <div class="back">
-                        <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
+                    <!-- Edit and Star Buttons -->
+                    <div class="top-buttons">
+                        <button class="oval-button star-btn" onclick="flashEffect(this)">&#9733;</button>
+                        <button class="oval-button edit-btn">Edit</button>
 
                     </div>
                 </div>
-                <div class="top-buttons">
-                    <button class="oval-button star-btn" onclick="flashEffect(this)">&#9733;</button>
-                    <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-        <div class="navigation">
-            <button id="prevBtn" class="nav-btn">&#8592;</button>
+
+        <!-- Navigation -->
+        <div class="navigation mt-3">
+            <button id="prevBtn" class="nav-btn">⬅</button>
             <span id="cardCounter">1 / {{ terms|length }}</span>
-            <button id="nextBtn" class="nav-btn">&#8594;</button>
+            <button id="nextBtn" class="nav-btn">➡</button>
         </div>
 
-        <!-- Study Progress 
-        <div class="study-progress mt-4">
-            <h2>Studying Progress:</h2>
-            <p>Progress: 0%</p>
-        </div>-->
+        <!-- Learn/Not Learned Buttons -->
+        <div class="learning-buttons text-center mt-3">
+            <button id="learned-btn" class="btn btn-success">✅ Yes (Learned)</button>
+            <button id="not-learned-btn" class="btn btn-danger">❌ No (Not Learned)</button>
+        </div>
+        <br>
 
-        <!-- Search Terms & Definitions Section 
-        <section id="search-terms">
-            <div class="search-container">
-                <label for="term-search">Search for a term or definition:</label>
-                <input type="text" id="term-search" placeholder="Search..." />
-            </div>
-        </section>-->
+    
+
 
         <!-- Terms and Definitions List -->
-        <div class="row table-container mt-3">
-            {% for term in terms %}
-            <div class="term-box">
-                <h3>{{ term.term }}</h3>
-                <p>{{ term.definition }}</p>
-                <!-- Buttons for star and edit 
-                <div class="term-box-buttons">
-                    <button class="oval-button star-btn" onclick="flashEffect(this)">&#9733;</button>
-                    <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
-                </div>-->
-            </div>
-            {% endfor %}
+        {% for term in terms %}
+        <div class="term-box" data-flashcard-id="{{ term.id }}">
+            <h3>{{ term.term }}</h3>
+            <p>{{ term.definition }}</p>
+            <p class="learned-status">
+                Status: 
+                {% if term.is_learned %}
+                    <span class="text-success fw-bold">Learned ✅</span>
+                {% else %}
+                    <span class="text-danger fw-bold">Not Learned ❌</span>
+                {% endif %}
+            </p>
         </div>
-    </div> <!-- Closes `.container mt-4` -->
-    {% endblock %}
-</div> <!-- Closes `.main-content` -->
+        {% endfor %}
 
-</div> <!-- Closes `.d-flex` -->
 
-<!-- JavaScript: Sidebar Toggle -->
+        
+
+
+        
+    </div> <!-- end .container -->
+</section>
+
+
+
+<!-- Inline Scripts for Flashcard Logic -->
 <script>
-    document.getElementById("sidebarToggle").addEventListener("click", function () {
-        var sidebar = document.getElementById("sidebar");
-        sidebar.classList.toggle("sidebar-collapsed");
-
-        var content = document.querySelector(".main-content");
-        content.classList.toggle("sidebar-collapsed");
-    });
-    // JavaScript for Flashcards
-    const cards = document.querySelectorAll('.flashcard');
+window.onload = function () {
+    // Select all flashcards and buttons
+    const cards = document.querySelectorAll(".flashcard");
     let currentIndex = 0;
+    const totalCards = cards.length;
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const cardCounter = document.getElementById("cardCounter");
+    const learnedBtn = document.getElementById("learned-btn");
+    const notLearnedBtn = document.getElementById("not-learned-btn");
 
+    // Function to update which flashcard is visible
     function updateCards() {
         cards.forEach((card, index) => {
-            card.style.display = index === currentIndex ? 'block' : 'none';
+            card.style.display = index === currentIndex ? "block" : "none";
         });
-        document.getElementById('cardCounter').innerText = `${currentIndex + 1} / ${cards.length}`;
+
+        // Update counter display
+        cardCounter.innerText = `${currentIndex + 1} / ${totalCards}`;
+
+        // Get current flashcard ID
+        const currentFlashcardId = cards[currentIndex].id.replace("card", "");
+
+        // Update buttons' data attributes
+        learnedBtn.setAttribute("data-flashcard-id", currentFlashcardId);
+        notLearnedBtn.setAttribute("data-flashcard-id", currentFlashcardId);
     }
 
-    document.getElementById('prevBtn').addEventListener('click', () => {
+    // Event listeners for navigation
+    prevBtn.addEventListener("click", () => {
         currentIndex = Math.max(0, currentIndex - 1);
         updateCards();
     });
 
-    document.getElementById('nextBtn').addEventListener('click', () => {
-        currentIndex = Math.min(cards.length - 1, currentIndex + 1);
+    nextBtn.addEventListener("click", () => {
+        currentIndex = Math.min(totalCards - 1, currentIndex + 1);
         updateCards();
     });
+    function flashEffect(button) {
+    const card = button.closest('.flashcard');
+    card.classList.add('flash');
+    
+    setTimeout(() => card.classList.remove('flash'), 500);
 
-    cards.forEach(card => {
-        card.addEventListener('click', function (e) {
-            if (!e.target.classList.contains('star-btn') && !card.classList.contains('editing')) {
-                this.classList.toggle('flipped');
+    // Toggle star state
+    button.classList.toggle("starred");
+
+    // Optional: Save starred state (Requires backend)
+    saveFlashcardStar(card);
+}
+
+// Optional: Save Starred State (Requires Django backend)
+function saveFlashcardStar(card) {
+    const flashcardId = card.id.replace("card", "");
+
+    fetch(`/update_flashcard_star/${flashcardId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),
+        },
+        body: JSON.stringify({
+            starred: card.querySelector(".star-btn").classList.contains("starred"),
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("⭐ Flashcard starred state updated!");
+        } else {
+            console.error("❌ Error starring flashcard:", data.error);
+        }
+    })
+    .catch(error => console.error("❌ API Error:", error));
+}
+
+
+// Optional: Function to Save Edits (requires Django backend update)
+function saveFlashcardEdits(card) {
+    const flashcardId = card.id.replace("card", "");
+    const term = card.querySelector('.card-title').innerText;
+    const definition = card.querySelector('.card-term').innerText;
+
+    fetch(`/update_flashcard/${flashcardId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),
+        },
+        body: JSON.stringify({
+            term: term,
+            definition: definition,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("✅ Flashcard updated successfully!");
+        } else {
+            console.error("❌ Error updating flashcard:", data.error);
+        }
+    })
+    .catch(error => console.error("❌ API Error:", error));
+}
+
+
+
+
+    // Function to mark a flashcard as Learned / Not Learned
+    function markLearned(learned) {
+        const flashcardId = learnedBtn.getAttribute("data-flashcard-id");
+
+        if (!flashcardId) {
+            console.error("❌ Flashcard ID is missing!");
+            return;
+        }
+
+        fetch(`/update_flashcard_status/${flashcardId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({ learned: learned }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log(`✅ Flashcard ${flashcardId} marked as ${learned ? "Learned" : "Not Learned"}`);
+            } else {
+                console.error("❌ Error updating status:", data.error);
             }
-        });
-    });
-
-    function flashEffect(element) {
-        const card = element.closest('.flashcard');
-        card.classList.add('flash');
-        setTimeout(() => card.classList.remove('flash'), 500);
+        })
+        .catch(error => console.error("❌ API Error:", error));
     }
 
-    function toggleEdit(button, event) {
-        event.stopPropagation(); //fixed bug where card flips when clicking edit button
+    // Attach event listeners to buttons
+    learnedBtn.addEventListener("click", () => markLearned(true));
+    notLearnedBtn.addEventListener("click", () => markLearned(false));
 
-        const card = button.closest('.flashcard');
-        const fields = card.querySelectorAll('.card-title, .card-term, .card-back-title, .card-back-content');
+    // Function to get CSRF token
 
-        const isEditing = card.classList.contains('editing');
-
-        if (isEditing) {
-            // Save Mode
-            fields.forEach(el => {
-                el.contentEditable = "false";
-                el.classList.remove('editable');  // Remove red border
-            });
-            card.classList.remove('editing');  // Enable flipping
-            button.textContent = "Edit";
-        } else {
-            // Edit Mode
-            fields.forEach(el => {
-                el.contentEditable = "true";
-                el.classList.add('editable');  // Highlight with red border
-            });
-            card.classList.add('editing');  // Disable flipping
-            button.textContent = "Save";
-        }
-    }
-
+    // Initialize display
     updateCards();
-    // I havent implemented the search functionality yet
-    // I havent implemented the star functionality yet
-    // I havent implemented the edit functionality yet
-    // I havent implemented the progress bar yet
-    // Star effect for term boxes
+    function getCSRFToken() {
+    return document.querySelector("[name=csrfmiddlewaretoken]").value;
+}
 
+function toggleEdit(button) {
+    const card = button.closest(".flashcard");
+    const termId = card.id.replace("card", ""); // Extract the term ID
+    const termField = card.querySelector(".card-title");
+    const definitionField = card.querySelector(".card-term");
+    const isEditing = card.classList.contains("editing");
 
+    if (isEditing) {
+        // Save Mode
+        termField.contentEditable = "false";
+        definitionField.contentEditable = "false";
+        button.textContent = "Edit";
 
-    // This isnt properly working 
-    window.flashEffectTerm = function (button) {
-        const termBox = button.closest('.term-box');
-        termBox.classList.add('flash');
-        setTimeout(() => termBox.classList.remove('flash'), 500);
-    };
+        // Get updated values
+        const updatedTerm = termField.innerText.trim();
+        const updatedDefinition = definitionField.innerText.trim();
 
-    // Toggle edit mode for term boxes
-    window.toggleEditTerm = function (button, event) {
-        event.stopPropagation();
-        const termBox = button.closest('.term-box');
-        const fields = termBox.querySelectorAll('.term-title, .term-definition');
-        const isEditing = termBox.classList.contains('editing');
+        // Send data to server to update the backend
+        fetch(`/update_flashcard/${termId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({
+                term: updatedTerm,
+                definition: updatedDefinition
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the term-box at the bottom dynamically
+                const termBox = document.querySelector(`.term-box[data-flashcard-id='${termId}']`);
+                if (termBox) {
+                    termBox.querySelector("h3").textContent = updatedTerm;
+                    termBox.querySelector("p").textContent = updatedDefinition;
+                }
+            } else {
+                alert("Error saving changes. Please try again.");
+            }
+        })
+        .catch(error => console.error("Error:", error));
 
-        if (isEditing) {
-            // Save mode: disable editing
-            fields.forEach(el => {
-                el.contentEditable = "false";
-                el.classList.remove('editable');
-            });
-            termBox.classList.remove('editing');
-            button.textContent = "Edit";
-        } else {
-            // Edit mode: enable editing
-            fields.forEach(el => {
-                el.contentEditable = "true";
-                el.classList.add('editable');
-            });
-            termBox.classList.add('editing');
-            button.textContent = "Save";
-        }
-    };
+    } else {
+        // Edit Mode
+        termField.contentEditable = "true";
+        definitionField.contentEditable = "true";
+        button.textContent = "Save";
+    }
+
+    card.classList.toggle("editing");
+}
+
+console.log("✅ JavaScript Loaded!");
+
+};
+
 
 </script>
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/SetPage/layout.css' %}">
-<link rel="stylesheet" href="{% static 'css/SetPage/setstyle.css' %}">
-{% endblock %}
 {% endblock %}
