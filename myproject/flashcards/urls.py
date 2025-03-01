@@ -6,7 +6,11 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.contrib.auth import logout
 from django.shortcuts import redirect
+from django.contrib.auth.views import LogoutView
+from django.urls import path, reverse_lazy
 from django.urls import path
+from .views import update_flashcard  # <-- Add this line
+from .views import update_flashcard_status
 
 def logout_view(request):
     logout(request)
@@ -22,10 +26,12 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     
     path('create-flashcard-set', views.create_flashcard_set, name='create_flashcard_set'), # need the homepage to function properly first
-    path('edit-flashcard-set/<int:pk>/', views.edit_flashcard_set, name='edit_flashcard_set'), # for the edit page of the flashcard set
-    path('logout/', logout_view, name='logout'), #logout
+    path('edit-flashcard-set/<int:pk>/', views.edit_flashcard_set, name='edit_flashcard_set'),
+    path('logout/', LogoutView.as_view(next_page=reverse_lazy('landing_page')), name='logout'),
     path('learning-styles/', views.learning_page, name='learning'),
     
+    #flashcards
+    path('update_flashcard/<int:flashcard_id>/', update_flashcard, name='update_flashcard'),
     
     #Home Page
     path('homepage/', views.home, name='home'), 
@@ -38,6 +44,17 @@ urlpatterns = [
     path('create-folder/', views.create_folder, name='create_folder'),
     
     path('flashcards/<int:set_id>/', views.flashcard_set_details, name='flashcard_set_details'),
+
+    #Calender
+    
+    path('calendar/', views.calendar_view, name='calendar'),
+    path('get-events/', views.get_events, name='get-events'),
+    path('add-event/', views.add_event, name='add-event'),
+    path('update-event/', views.update_event, name='update-event'),
+    path('delete-event/', views.delete_event, name='delete-event'),
+
+    path('update_flashcard_status/<int:flashcard_id>/', update_flashcard_status, name='update_flashcard_status'),
+
 
 ]
 

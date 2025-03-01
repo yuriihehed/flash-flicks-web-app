@@ -1,0 +1,33 @@
+/* Hero background (optional if your base CSS covers it) */
+.hero-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+/* Overriding text color if needed for the hero */
+.hero.section.dark-background {
+    position: relative;
+    background: #141414; /* fallback if hero image fails */
+    padding: 100px 0 80px; 
+}
+
+/* Title style within the cards */
+.study-method-title {
+    text-align: center;
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* Card styling */
+.card {
+    border: none;
+    border-radius: 10px;
+}
+.card-text {
+    margin-top: 10px;
+}

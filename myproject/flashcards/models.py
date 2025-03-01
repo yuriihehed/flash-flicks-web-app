@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.utils.text import slugify 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings  # ✅ This ensures we use the correct user model
+
 
 
 # Custom user model
@@ -96,22 +98,27 @@ class FlashcardSet(models.Model):
 
 # The flashcard model holds the question and answer for the flashcard
 class Flashcard(models.Model):
-    # flashcard_set: a foreign key referencing the flashcard set the flashcard belongs to
-    # on_delete=models.CASCADE: when the flashcard set is deleted, delete the flashcard
-    # related_name='flashcards': lets you access cards with flashcard_set.flashcards.all()
     flashcard_set = models.ForeignKey(
         FlashcardSet, 
         on_delete=models.CASCADE, 
         related_name='flashcards',
         default=None
     )
-    term = models.CharField(max_length=200, default="")  # required text for flashcard
-    definition = models.TextField()  # required text for flashcard
-    image = models.ImageField(upload_to='images/', blank=True, null=True)  # optional image for flashcard (can be blank)
-    is_favorite = models.BooleanField(default=False)  # Starred flashcards
-    
+    term = models.CharField(max_length=200, default="")  
+    definition = models.TextField()  
+    image = models.ImageField(upload_to='images/', blank=True, null=True)  
+    is_favorite = models.BooleanField(default=False)  
+    learned_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="learned_flashcards", blank=True)
+
+    def has_been_learned(self, user):
+        """Checks if the flashcard has been marked as learned by the given user."""
+        is_learned = self.learned_by.filter(id=user.id).exists()
+        print(f"🔍 Checking learned status for {self.term}: {user.email} -> {is_learned}")  # Debugging
+        return is_learned
+
     def __str__(self):
-        return f"{self.term}: {self.definition}"  # flashcard term and answer
+        return f"{self.term}: {self.definition}"
+  # flashcard term and answer
     
 # User profile model
 class UserProfile(models.Model):
@@ -153,6 +160,29 @@ class StudyStreak(models.Model):
     def __str__(self):
         return f'{self.user.username}\'s study streak'  # User's study streak
     
+
+#Calender
+
+from django.db import models
+
+class Event(models.Model):
+    title = models.CharField(max_length=200)
+    class_name = models.CharField(max_length=100, blank=True, null=True)
+    date = models.DateField()    # Used as the first occurrence
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
     
+    # Recurring event fields
+    is_recurring = models.BooleanField(default=False)  
+    recurring_type = models.CharField(
+        max_length=20,
+        choices=[('daily', 'Daily'), ('weekly', 'Weekly'), ('monthly', 'Monthly')],
+        blank=True,
+        null=True
+    )
+
+    def __str__(self):
+        return f"{self.title} - {self.class_name} ({self.start_time} - {self.end_time})"
+
 
     

@@ -138,4 +138,18 @@ AUTH_USER_MODEL = 'flashcards.CustomUser'
 # Redirect users to the login page after logging out
 LOGOUT_REDIRECT_URL = '/login/'
 
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Ensure this is correctly set for production
+
+
 

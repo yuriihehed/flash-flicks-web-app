@@ -1,0 +1,77 @@
+/* Background Styling */
+.login-container {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #1f2568 0%, #7386a8 100%);
+    display: flex;
+    padding: 40px;
+}
+
+/* The Box Around the Form */
+.login-box {
+    width: 900px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Left Side (Text + Image) */
+.login-left {
+    background: #000000;
+    width: 50%;
+    padding: 40px;
+}
+.thunder-image {
+    max-width: 70%;
+    height: auto;
+}
+
+/* Right Side (Form) */
+.login-form-container {
+    width: 50%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Form Inputs */
+.form-control {
+    border: 2px solid #2d3a53;
+    font-size: 1rem;
+    padding: 12px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0px 0px 10px rgba(0, 123, 255, 0.5);
+}
+
+/* Buttons */
+.btn-primary {
+    background: #406c9c;
+    border: none;
+    font-size: 1.1rem;
+    padding: 12px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .login-box {
+        flex-direction: column;
+        width: 90%;
+    }
+    .login-left {
+        width: 100%;
+        padding: 30px;
+    }
+    .login-form-container {
+        width: 100%;
+    }
+}

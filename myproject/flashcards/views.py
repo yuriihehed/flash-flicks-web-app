@@ -15,6 +15,10 @@ from .models import Folder
 from django.views.decorators.http import require_POST
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from .models import Event
+from datetime import datetime, timedelta
+from .models import Flashcard
 
 
 def landing_page(request):
@@ -324,6 +328,33 @@ def edit_flashcard_set(request, pk):
     # Render the edit_flashcard_set.html template with the context
     return render(request, 'edit_flashcard_set.html', context)
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Flashcard
+
+@csrf_exempt  # Only use if CSRF token is not available
+def update_flashcard(request, term_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            term = data.get("term", "").strip()
+            definition = data.get("definition", "").strip()
+
+            flashcard = Flashcard.objects.get(id=term_id)
+            flashcard.term = term
+            flashcard.definition = definition
+            flashcard.save()
+
+            return JsonResponse({"success": True})
+        except Flashcard.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Flashcard not found"})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    
+    return JsonResponse({"success": False, "error": "Invalid request"})
+
+
 User = get_user_model()
 
 def register(request):
@@ -373,14 +404,8 @@ def login_page(request):
 
     return render(request, "login.html")
 
-def flashcard_set_details(request, set_id):
-    flashcard_set = get_object_or_404(FlashcardSet, id=set_id)
-    terms = flashcard_set.flashcards.all()  # if you used related_name='flashcards'
-    context = {
-        'flashcard_set': flashcard_set,
-        'terms': terms,
-    }
-    return render(request, 'set_page.html', context)
+
+
 def ensure_superuser():
     User = get_user_model()
     admin_email = "admin@hotmail.com"  
@@ -397,14 +422,28 @@ def ensure_superuser():
 def learning_page(request):
     return render(request, 'learning.html')
 
+@login_required
 def flashcard_set_details(request, set_id):
     flashcard_set = get_object_or_404(FlashcardSet, id=set_id)
-    terms = flashcard_set.flashcards.all()  # if you used related_name='flashcards'
-    context = {
+    terms = flashcard_set.flashcards.all()
+
+    for term in terms:
+        term.is_learned = term.learned_by.filter(id=request.user.id).exists()
+
+    return render(request, 'set_page.html', {
         'flashcard_set': flashcard_set,
         'terms': terms,
-    }
-    return render(request, 'set_page.html', context)
+    })
+
+
+
+
+
+
+
+
+
+
 def ensure_superuser():
     User = get_user_model()
     admin_email = "admin@hotmail.com"  
@@ -420,3 +459,187 @@ def ensure_superuser():
 
 def learning_page(request):
     return render(request, 'learning.html')
+
+
+#calender page
+
+
+def calendar_view(request):
+    return render(request, 'calendar.html')  # This is the new calendar page
+
+def generate_recurring_events(event):
+    occurrences = []
+    base_date = event.date  # Changed from `start_date` to `date`
+
+    for i in range(10):  # Generate up to 10 future occurrences
+        if event.recurring_type == 'daily':
+            new_date = base_date + timedelta(days=i)
+        elif event.recurring_type == 'weekly':
+            new_date = base_date + timedelta(weeks=i)
+        elif event.recurring_type == 'monthly':
+            new_date = base_date.replace(month=base_date.month + i)
+
+        occurrences.append({
+            "id": event.id,
+            "title": event.title,
+            "class_name": event.class_name,
+            "start_time": event.start_time.strftime("%I:%M %p"),
+            "end_time": event.end_time.strftime("%I:%M %p"),
+            "start": new_date.strftime("%Y-%m-%d"),
+            "is_recurring": event.is_recurring,
+            "recurring_type": event.recurring_type
+        })
+
+    return occurrences
+@csrf_exempt
+def get_events(request):
+    events = Event.objects.all()
+    event_list = []
+
+    for event in events:
+        if event.is_recurring:
+            event_list.extend(generate_recurring_events(event))  # Use fixed function
+        else:
+            event_list.append({
+                "id": event.id,
+                "title": event.title,
+                "class_name": event.class_name,
+                "start_time": event.start_time.strftime("%I:%M %p"),
+                "end_time": event.end_time.strftime("%I:%M %p"),
+                "start": event.date.strftime("%Y-%m-%d"),  # Changed from `start_date` to `date`
+                "is_recurring": event.is_recurring,
+                "recurring_type": event.recurring_type
+            })
+
+    return JsonResponse(event_list, safe=False)
+
+
+
+
+
+
+
+
+@csrf_exempt
+def add_event(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        title = data.get('title')
+        class_name = data.get('class_name', '')
+        date = data.get('date')
+        start_time = data.get('start_time', '00:00:00')
+        end_time = data.get('end_time', '23:59:59')
+        is_recurring = data.get('is_recurring', False)
+        recurring_type = data.get('recurring_type')
+
+        if not title or not date or not start_time or not end_time:
+            return JsonResponse({"error": "Missing required fields"}, status=400)
+
+        event = Event.objects.create(
+            title=title,
+            class_name=class_name,
+            date=date,
+            start_time=start_time,
+            end_time=end_time,
+            is_recurring=is_recurring,
+            recurring_type=recurring_type
+        )
+
+        return JsonResponse({"message": "Event added successfully"})
+    
+@csrf_exempt
+def delete_event(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        event_id = data.get('id')
+        delete_all = data.get('delete_all', False)
+
+        try:
+            event = Event.objects.get(id=event_id)
+
+            if delete_all and event.is_recurring:
+                # ✅ Delete all events that share the same title, class, and recurrence type
+                Event.objects.filter(
+                    title=event.title,
+                    class_name=event.class_name,
+                    recurring_type=event.recurring_type
+                ).delete()
+                return JsonResponse({"message": "All occurrences of the event deleted successfully"})
+
+            elif event.is_recurring:
+                # ✅ Delete only this specific occurrence
+                event.delete()
+                return JsonResponse({"message": "This occurrence of the event was deleted"})
+
+            else:
+                # ✅ Delete non-recurring event
+                event.delete()
+                return JsonResponse({"message": "Non-recurring event deleted successfully"})
+
+        except Event.DoesNotExist:
+            return JsonResponse({"error": "Event not found"}, status=404)
+
+
+
+@csrf_exempt
+def update_event(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        event_id = data.get('id')
+
+        try:
+            event = Event.objects.get(id=event_id)
+
+            event.title = data.get('title', event.title)
+            event.class_name = data.get('class_name', event.class_name)
+
+            # Convert date string to a proper Date object
+            date_str = data.get('date', event.date)
+            event.date = datetime.strptime(date_str, "%Y-%m-%d").date() if isinstance(date_str, str) else date_str
+
+            # Convert time strings to proper Time objects
+            start_time_str = data.get('start_time', event.start_time)
+            end_time_str = data.get('end_time', event.end_time)
+
+            event.start_time = datetime.strptime(start_time_str, "%H:%M").time() if isinstance(start_time_str, str) else start_time_str
+            event.end_time = datetime.strptime(end_time_str, "%H:%M").time() if isinstance(end_time_str, str) else end_time_str
+
+            event.is_recurring = data.get('is_recurring', event.is_recurring)
+            event.recurring_type = data.get('recurring_type', event.recurring_type)
+
+            event.save()
+
+            return JsonResponse({"message": "Event updated successfully"})
+        except Event.DoesNotExist:
+            return JsonResponse({"error": "Event not found"}, status=404)
+
+
+@csrf_exempt
+@login_required
+def update_flashcard_status(request, flashcard_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            learned = data.get("learned")
+
+            flashcard = Flashcard.objects.get(id=flashcard_id)
+
+            if learned:
+                flashcard.learned_by.add(request.user)
+                print(f"✅ {request.user.email} marked flashcard {flashcard.term} as learned.")
+            else:
+                flashcard.learned_by.remove(request.user)
+                print(f"❌ {request.user.email} marked flashcard {flashcard.term} as NOT learned.")
+
+            flashcard.save()
+
+            # Debugging: Confirm update
+            print(f"📌 Saved status: {flashcard.learned_by.all()}")
+
+            return JsonResponse({"success": True, "learned": learned})
+        except Flashcard.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Flashcard not found"})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
