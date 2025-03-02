@@ -5,9 +5,59 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/edit_learn_mode.css' %}">
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
+<style>
+    .navbar {
+        background-color: #002855 !important;
+    }
+    .navbar a {
+        color: white !important;
+        font-weight: bold;
+    }
 
-<!-- HERO SECTION (optional) -->
+    /* Notification Styles */
+    .notification {
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .notification.show {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Timer Widget for Flashcard & Study Page */
+    .timer-widget {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: #002855;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
 <section id="hero" class="hero section dark-background">
     <img src="{% static 'img/hero-bg-2.jpg' %}" alt="" class="hero-bg">
     <div class="container text-center">
@@ -20,14 +70,10 @@
 <section class="dashboard section py-5 light-background">
     <div class="container">
         <div class="row justify-content-center">
-            
-            <!-- EDIT LEARN MODE CARD -->
             <div class="col-lg-8 col-md-10">
                 <div class="card shadow-sm p-4" style="background-color: #004c99; border-radius: 15px;">
-                    
-                    <!-- Card Heading -->
                     <h2 class="text-center mb-4" style="color: white;">Edit Flashcards</h2>
-                    
+
                     <!-- SETTINGS PANEL -->
                     <div class="setting d-flex justify-content-between align-items-center mb-3">
                         <label class="text-white">Study only starred items:</label>
@@ -55,12 +101,12 @@
                             <option value="50">50 min study / 10 min break</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary w-100 mb-3" onclick="startTimerFromDropdown()">Apply Timer</button>
-                    
+                    <button class="btn btn-primary w-100 mb-3" onclick="applyTimerSetting()">Apply Timer</button>
+
                     <div class="setting d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <label class="text-white mb-1"><strong>Ultradian Rhythm</strong></label>
-                            <small class="d-block text-secondary" style="font-size: 12px;">90-minute intervals with 30-minute breaks</small>
+                            <small class="d-block text-secondary">90-minute study / 30-minute break</small>
                         </div>
                         <label class="switch">
                             <input type="checkbox" id="ultradianToggle">
@@ -71,10 +117,8 @@
                     <hr class="border-light">
 
                     <!-- QUESTION FORMAT -->
-                    <div class="mb-3 text-white">
-                        <strong>Question Format:</strong>
-                    </div>
-                    
+                    <div class="mb-3 text-white"><strong>Question Format:</strong></div>
+
                     <div class="setting d-flex justify-content-between align-items-center mb-3">
                         <label class="text-white">Answer with Term:</label>
                         <label class="switch">
@@ -93,120 +137,95 @@
 
                     <hr class="border-light">
 
-                    <!-- ROUND LENGTH -->
                     <div class="mb-3">
                         <label class="text-white">Length of rounds:</label>
                         <select id="roundLength" class="form-select mt-2">
-                            {% for i in "12345678910"|make_list %}
+                            {% for i in "123456789"|make_list %}
                             <option value="{{ i }}">{{ i }} Round{{ i|pluralize }}</option>
                             {% endfor %}
+                            <option value="10">10 Rounds</option>
                         </select>
                     </div>
 
                     <hr class="border-light">
 
-                    <!-- SAVE BUTTON -->
                     <button class="btn btn-primary w-100" onclick="saveSettings()">Save Updates</button>
                     <a href="javascript:history.back()" class="btn btn-light w-100 mt-2">Go Back</a>
-                    
                 </div>
             </div>
-            <!-- END EDIT LEARN MODE CARD -->
-
         </div>
     </div>
 </section>
 
-<!-- NOTIFICATION POPUP -->
+<!-- NOTIFICATION POPUPS -->
 <div id="saveNotification" class="notification">✅ Settings saved successfully!</div>
+<div id="timerStartPopup" class="notification">⏳ Study timer started!</div>
+<div id="ultradianStartPopup" class="notification">⏳ 90-minute study session started!</div>
+<div id="ultradianEndPopup" class="notification">✅ 90-minute study completed. Please take a 30-minute break.</div>
+<div id="breakEndPopup" class="notification">⏳ Break over! Time to resume your study session.</div>
 
+<!-- Timer Widget (Only for Flashcard & Study Page) -->
+<div id="timerWidget" class="timer-widget"></div>
 
-
-<!-- SCRIPTS FOR SAVING & LOADING SETTINGS, TIMERS, ETC. -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         loadSettings();
+        checkIfOnTimerPage();
     });
 
     function saveSettings() {
-        const starred = document.getElementById('starredToggle').checked;
-        const shuffle = document.getElementById('shuffleToggle').checked;
+        applyTimerSetting();
+        showPopup('saveNotification');
+    }
+
+    function applyTimerSetting() {
         const timer = document.getElementById('timerSelect').value;
         const ultradian = document.getElementById('ultradianToggle').checked;
-        const termAnswer = document.getElementById('termToggle').checked;
-        const definitionAnswer = document.getElementById('definitionToggle').checked;
-        const roundLength = document.getElementById('roundLength').value;
 
-        localStorage.setItem("studySettings", JSON.stringify({
-            starred,
-            shuffle,
-            timer,
-            ultradian,
-            termAnswer,
-            definitionAnswer,
-            roundLength
-        }));
+        localStorage.setItem("studySettings", JSON.stringify({ timer, ultradian }));
 
-        console.log("Settings saved:", {
-            starred, shuffle, timer, ultradian,
-            termAnswer, definitionAnswer, roundLength
-        });
+        showPopup('timerStartPopup');
 
-        // Show notification
-        const notification = document.getElementById('saveNotification');
-        notification.classList.add('show');
-
-        // Hide after 3 seconds
-        setTimeout(() => {
-            notification.classList.add('hide');
+        if (ultradian) {
+            showPopup('ultradianStartPopup');
             setTimeout(() => {
-                notification.classList.remove('show', 'hide');
-            }, 500);
-        }, 3000);
+                showPopup('ultradianEndPopup');
+                setTimeout(() => {
+                    showPopup('breakEndPopup');
+                }, 30 * 60 * 1000);
+            }, 90 * 60 * 1000);
+        }
     }
 
     function loadSettings() {
         const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
         if (savedSettings) {
-            document.getElementById('starredToggle').checked = savedSettings.starred;
-            document.getElementById('shuffleToggle').checked = savedSettings.shuffle;
             document.getElementById('timerSelect').value = savedSettings.timer;
             document.getElementById('ultradianToggle').checked = savedSettings.ultradian;
-            document.getElementById('termToggle').checked = savedSettings.termAnswer;
-            document.getElementById('definitionToggle').checked = savedSettings.definitionAnswer;
-            document.getElementById('roundLength').value = savedSettings.roundLength;
         }
     }
 
-    function startTimerFromDropdown() {
-        const selectedValue = document.getElementById("timerSelect").value;
-        if (selectedValue > 0) {
-            startTimer(parseInt(selectedValue));
-        } else {
-            resetTimer();
+    function showPopup(id) {
+        const popup = document.getElementById(id);
+        popup.classList.add('show');
+        setTimeout(() => {
+            popup.classList.remove('show');
+        }, 5000);
+    }
+
+    function checkIfOnTimerPage() {
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/flashcards/') || currentPath.includes('/studypage/')) {
+            displayTimer();
         }
     }
 
-    function applyTimerSetting() {
-        let selectedTime = document.getElementById("timerSelect").value;
-        if (selectedTime === "none") {
-            localStorage.setItem("timerEnabled", "false");
-            resetTimer();
-        } else {
-            localStorage.setItem("timerEnabled", "true");
-            startTimer(parseInt(selectedTime));
+    function displayTimer() {
+        const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
+        if (savedSettings && savedSettings.timer !== "none") {
+            document.getElementById("timerWidget").style.display = "block";
+            document.getElementById("timerWidget").textContent = "⏳ Timer Running: " + savedSettings.timer + " min";
         }
-    }
-
-    // Example stubs for your actual timer functions
-    function startTimer(minutes) {
-        console.log("Timer started for", minutes, "minutes");
-        // Implement your timer logic here...
-    }
-
-    function resetTimer() {
-        console.log("Timer reset");
-        // Implement your timer logic here...
     }
 </script>
 

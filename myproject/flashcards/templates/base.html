@@ -27,14 +27,33 @@
     <link href="{% static 'css/custom.css' %}" rel="stylesheet">
     <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
 
-
-    {% block extra_css %}{% endblock %}
+    {% block extra_css %}
+    <style>
+        /* Timer Widget for Flashcard & Study Page */
+        .timer-widget {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #002855;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+    </style>
+    {% endblock %}
 </head>
 
 <body class="index-page">
 
     <!-- Navbar -->
     {% include 'partials/navbar.html' %}
+
+    <!-- Timer Widget (Only for Flashcard & Study Page) -->
+    <div id="timerWidget" class="timer-widget"></div>
 
     <!-- Page Content -->
     <main class="main">
@@ -55,7 +74,62 @@
 
     <link rel="stylesheet" href="{% static 'css/auth.css' %}?v=2">
 
+    {% block extra_js %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            checkIfOnTimerPage();
+        });
 
-    {% block extra_js %}{% endblock %}
+        function checkIfOnTimerPage() {
+            const currentPath = window.location.pathname;
+
+            // Check if page is 'studypage' or 'flashcards/<int:set_id>/'
+            if (currentPath.includes('/studypage/') || currentPath.match(/^\/flashcards\/\d+\/$/)) {
+                startCountdownTimer();
+            }
+        }
+
+        function startCountdownTimer() {
+            const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
+            
+            if (savedSettings && savedSettings.timer !== "none") {
+                let remainingTime = parseInt(savedSettings.remainingTime) || (parseInt(savedSettings.timer) * 60); // Convert minutes to seconds
+                const timerWidget = document.getElementById("timerWidget");
+                
+                if (!timerWidget) return; // Avoid errors if widget is missing
+
+                // Display Timer
+                timerWidget.style.display = "block";
+                updateTimerDisplay(remainingTime);
+
+                // Start Countdown
+                const countdownInterval = setInterval(() => {
+                    remainingTime--;
+                    localStorage.setItem("studySettings", JSON.stringify({ ...savedSettings, remainingTime }));
+
+                    updateTimerDisplay(remainingTime);
+
+                    if (remainingTime <= 0) {
+                        clearInterval(countdownInterval);
+                        timerWidget.textContent = "✅ Timer Completed!";
+                        setTimeout(() => {
+                            timerWidget.style.display = "none";
+                        }, 5000); // Hide after 5 seconds
+                    }
+                }, 1000); // Update every second
+            }
+        }
+
+        function updateTimerDisplay(seconds) {
+            const timerWidget = document.getElementById("timerWidget");
+            if (!timerWidget) return;
+
+            let minutes = Math.floor(seconds / 60);
+            let sec = seconds % 60;
+            timerWidget.textContent = `⏳ ${minutes}:${sec < 10 ? "0" : ""}${sec} remaining`;
+        }
+    </script>
+    {% endblock %}
+
 </body>
 </html>
