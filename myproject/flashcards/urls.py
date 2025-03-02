@@ -11,6 +11,7 @@ from django.urls import path, reverse_lazy
 from django.urls import path
 from .views import update_flashcard  # <-- Add this line
 from .views import update_flashcard_status
+from .views import forgot_password_view, reset_password_view
 
 def logout_view(request):
     logout(request)
@@ -22,7 +23,6 @@ urlpatterns = [
     path('studypage/', views.studypage, name='studypage'),    
     path('edit-learn-mode/', views.edit_learn_mode, name='edit_learn_mode'),
     path('login/', views.login_page, name='login'),
-    path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('register/', views.register, name='register'),
     
     path('create-flashcard-set', views.create_flashcard_set, name='create_flashcard_set'), # need the homepage to function properly first
@@ -61,6 +61,8 @@ urlpatterns = [
     # for the search bar
     path('search/<int:set_id>/', views.search_terms, name='search_terms'),
 
+    path('forgot-password/', forgot_password_view, name='forgot_password'),
+    path('reset/<uidb64>/<token>/', reset_password_view, name='reset_password'),
 
 ]
 

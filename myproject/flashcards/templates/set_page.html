@@ -77,9 +77,9 @@
 
         <!-- Navigation -->
         <div class="navigation mt-3">
-            <button id="prevBtn" class="nav-btn">&#8592;</button>
+            <button id="prevBtn" class="nav-btn">⬅</button>
             <span id="cardCounter">1 / {{ terms|length }}</span>
-            <button id="nextBtn" class="nav-btn">&#8594;</button>
+            <button id="nextBtn" class="nav-btn">➡</button>
         </div>
 
         <!-- Learn/Not Learned Buttons -->
@@ -345,16 +345,16 @@
                 })
                 .catch(error => console.error("❌ API Error:", error));
 
-        } else {
-
-            fields.forEach(el => {
-                el.contentEditable = "true";
-                el.classList.add('editable');
-            });
-            card.classList.add('editing');
-            button.textContent = "Save";
-        }
+    } else {
+        // --- EDIT MODE ---
+        fields.forEach(el => {
+            el.contentEditable = "true";
+            el.classList.add('editable'); 
+        });
+        card.classList.add('editing');
+        button.textContent = "Save";
     }
+}
 
     function getCSRFToken() {
         return document.querySelector("[name=csrfmiddlewaretoken]").value;

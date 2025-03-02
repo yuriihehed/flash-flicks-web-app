@@ -9,6 +9,27 @@
 <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
 <style>
+    .hero-bg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .hero.section.dark-background {
+        position: relative;
+        background: #141414; 
+        padding: 100px 0 80px; 
+    }
+
+
+    #hero {
+        min-height: 60vh; 
+        padding: 60px 0; 
+    }
     .navbar {
         background-color: #002855 !important;
     }
