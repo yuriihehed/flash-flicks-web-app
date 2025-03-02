@@ -4,6 +4,7 @@
 {% block title %}Set Page{% endblock %}
 
 {% block extra_css %}
+
 <link rel="stylesheet" href="{% static 'css/set_page.css' %}">
 <style>
     /* Glowing Effect */
@@ -93,6 +94,11 @@
         <div class="study-progress mt-4">
             <h2>Studying Progress:</h2>
             <p>Progress: 0%</p>
+
+            <!-- Chart Container -->
+            <div class="chart-container" style="width: 300px; margin: 0 auto;">
+                <canvas id="myProgressChart"></canvas>
+            </div>
         </div>
 
         <!-- Search Terms & Definitions Section -->
@@ -101,7 +107,8 @@
             <div class="search-box">
                 <form method="GET" action="{% url 'search_terms' flashcard_set.id %}">
                     <div class="search-container">
-                        <input type="text" id="term-search" name="q" placeholder="Search for a term or definition..." value="{{ query }}" />
+                        <input type="text" id="term-search" name="q" placeholder="Search for a term or definition..."
+                            value="{{ query }}" />
                         <button type="submit">Search</button>
                     </div>
                 </form>
@@ -132,6 +139,8 @@
     </div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 <script>
 
@@ -144,6 +153,62 @@
         const cardCounter = document.getElementById("cardCounter");
         const learnedBtn = document.getElementById("learned-btn");
         const notLearnedBtn = document.getElementById("not-learned-btn");
+
+        // 1. Initialize Chart.js
+        const ctx = document.getElementById('myProgressChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Learned', 'Not Learned'],
+                datasets: [{
+                    label: 'Study Progress',
+                    data: [0, 0], // We'll fill this dynamically
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.6)',  // Teal for "Learned"
+                        'rgba(255, 99, 132, 0.6)'   // Red for "Not Learned"
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Flashcard Study Progress'
+                    }
+                }
+            }
+        });
+        // 2. Function to count Learned vs Not Learned from the DOM
+        function countLearnedStatus() {
+            let learnedCount = 0;
+            let notLearnedCount = 0;
+            const statusSpans = document.querySelectorAll('.learned-status span');
+            statusSpans.forEach((span) => {
+                const text = span.innerText.trim();
+                if (text === "Learned ✅") {
+                    learnedCount++;
+                } else if (text === "Not Learned ❌") {
+                    notLearnedCount++;
+                }
+            });
+            return [learnedCount, notLearnedCount];
+        }
+        // 3. Function to update the chart data
+        function updateChart() {
+            const [learnedCount, notLearnedCount] = countLearnedStatus();
+            myChart.data.datasets[0].data[0] = learnedCount;
+            myChart.data.datasets[0].data[1] = notLearnedCount;
+            myChart.update();
+        }
 
         function updateCards() {
             cards.forEach((card, index) => {
@@ -216,12 +281,16 @@
                                 }
                             }
                         }
+                        // Update the chart whenever a flashcard's status changes
+                        updateChart();
                     } else {
                         console.error("❌ Error updating status:", data.error);
                     }
                 })
                 .catch(error => console.error("❌ API Error:", error));
         }
+        // 5. Initial chart update based on the current DOM state
+        updateChart();
     };
 
 
@@ -345,20 +414,19 @@
                 })
                 .catch(error => console.error("❌ API Error:", error));
 
-    } else {
-        // --- EDIT MODE ---
-        fields.forEach(el => {
-            el.contentEditable = "true";
-            el.classList.add('editable'); 
-        });
-        card.classList.add('editing');
-        button.textContent = "Save";
+        } else {
+            // --- EDIT MODE ---
+            fields.forEach(el => {
+                el.contentEditable = "true";
+                el.classList.add('editable');
+            });
+            card.classList.add('editing');
+            button.textContent = "Save";
+        }
     }
-}
 
     function getCSRFToken() {
         return document.querySelector("[name=csrfmiddlewaretoken]").value;
     }
 </script>
-
 {% endblock %}
