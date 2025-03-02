@@ -1,60 +1,61 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}
-Set Page
-{% endblock %}
+{% block title %}Set Page{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/set_page.css' %}">
+
 {% endblock %}
 
 {% block content %}
 
 <!-- HERO SECTION (Dark Background) -->
 <section id="hero" class="hero section dark-background position-relative">
-    <!-- Example hero background image -->
     <img src="{% static 'img/hero-bg-2.jpg' %}" alt="" class="hero-bg">
     <div class="container text-center">
         <h1 class="text-white">{{ flashcard_set.title }}</h1>
-        <p class="text-white-75">
-            Manage your terms and definitions in style!
-        </p>
-        <button type="button" class="btn btn-danger" 
-        onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">
+        <p class="text-white-75">Manage your terms and definitions in style!</p>
+        <button type="button" class="btn btn-danger"
+            onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">
             Edit Flashcard Set
         </button>
     </div>
 </section>
 
-<!-- MAIN SET SECTION (Light Background) -->
-        <section class="set-section py-5 light-background">
-            <div class="container">
-               
-                
-            <!-- Flashcard Display Section -->
-            <div class="flashcard-area d-flex justify-content-center">
-                {% for term in terms %}
-                <div class="flashcard" id="card{{ term.id }}" {% if not forloop.first %}style="display: none;"{% endif %}>
-                    <div class="card-inner">
-                        <!-- Front -->
-                        <div class="front">
-                            <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
-                        </div>
-                        <!-- Back -->
-                        <div class="back">
-                            <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
-                        </div>
-                    </div>
-                    <!-- Edit and Star Buttons -->
-                    <div class="top-buttons">
-                        <button class="oval-button star-btn" onclick="flashEffect(this)">&#9733;</button>
-                        <button class="oval-button edit-btn">Edit</button>
+<!-- MAIN SET SECTION -->
+<section class="set-section py-5 light-background">
+    <div class="container">
 
+        <!-- Flashcard Display Section -->
+        <div class="flashcard-area d-flex justify-content-center">
+            {% for term in terms %}
+            <!-- Hide all but the first card by default -->
+            <div class="flashcard" id="card{{ term.id }}" {% if not forloop.first %}style="display: none;"{% endif %}>
+                <div class="card-inner">
+                    <div class="front">
+                        <!-- Front side: Term -->
+                        <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
+                    </div>
+                    <div class="back">
+                        <!-- Back side: Definition -->
+                        <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
                     </div>
                 </div>
-                {% endfor %}
+                <!-- Buttons (Star + Edit) -->
+                <div class="top-buttons">
+                    <!-- If this term is already starred, give the button the .active-star class -->
+                    <button 
+                        class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}" 
+                        onclick="toggleStar(this, event)"
+                    >
+                        &#9733;
+                    </button>
+                    <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+                </div>
             </div>
+            {% endfor %}
+        </div>
 
         <!-- Navigation -->
         <div class="navigation mt-3">
@@ -70,39 +71,34 @@ Set Page
         </div>
         <br>
 
-    
-
-
-        <!-- Terms and Definitions List -->
+        <!-- Terms and Definitions List (below the flashcards) -->
         {% for term in terms %}
         <div class="term-box" data-flashcard-id="{{ term.id }}">
-            <h3>{{ term.term }}</h3>
+            <h3>
+                {{ term.term }}
+                {% if term.is_starred %}
+                  <!-- If starred, show a star in the corner -->
+                  <span class="corner-star">★</span>
+                {% endif %}
+            </h3>
             <p>{{ term.definition }}</p>
             <p class="learned-status">
                 Status: 
                 {% if term.is_learned %}
-                    <span class="text-success fw-bold">Learned ✅</span>
+                <span class="text-success fw-bold">Learned ✅</span>
                 {% else %}
-                    <span class="text-danger fw-bold">Not Learned ❌</span>
+                <span class="text-danger fw-bold">Not Learned ❌</span>
                 {% endif %}
             </p>
         </div>
         {% endfor %}
-
-
-        
-
-
-        
-    </div> <!-- end .container -->
+    </div>
 </section>
 
 
-
-<!-- Inline Scripts for Flashcard Logic -->
 <script>
+
 window.onload = function () {
-    // Select all flashcards and buttons
     const cards = document.querySelectorAll(".flashcard");
     let currentIndex = 0;
     const totalCards = cards.length;
@@ -112,24 +108,13 @@ window.onload = function () {
     const learnedBtn = document.getElementById("learned-btn");
     const notLearnedBtn = document.getElementById("not-learned-btn");
 
-    // Function to update which flashcard is visible
     function updateCards() {
         cards.forEach((card, index) => {
             card.style.display = index === currentIndex ? "block" : "none";
         });
-
-        // Update counter display
         cardCounter.innerText = `${currentIndex + 1} / ${totalCards}`;
-
-        // Get current flashcard ID
-        const currentFlashcardId = cards[currentIndex].id.replace("card", "");
-
-        // Update buttons' data attributes
-        learnedBtn.setAttribute("data-flashcard-id", currentFlashcardId);
-        notLearnedBtn.setAttribute("data-flashcard-id", currentFlashcardId);
     }
 
-    // Event listeners for navigation
     prevBtn.addEventListener("click", () => {
         currentIndex = Math.max(0, currentIndex - 1);
         updateCards();
@@ -139,84 +124,27 @@ window.onload = function () {
         currentIndex = Math.min(totalCards - 1, currentIndex + 1);
         updateCards();
     });
-    function flashEffect(button) {
-    const card = button.closest('.flashcard');
-    card.classList.add('flash');
+
+    learnedBtn.addEventListener("click", () => markLearned(true));
+    notLearnedBtn.addEventListener("click", () => markLearned(false));
+
     
-    setTimeout(() => card.classList.remove('flash'), 500);
+    cards.forEach(card => {
+        card.addEventListener("click", function (e) {
+            if (
+                !e.target.classList.contains("star-btn") &&
+                !card.classList.contains("editing")
+            ) {
+                this.classList.toggle("flipped");
+            }
+        });
+    });
 
-    // Toggle star state
-    button.classList.toggle("starred");
-
-    // Optional: Save starred state (Requires backend)
-    saveFlashcardStar(card);
-}
-
-// Optional: Save Starred State (Requires Django backend)
-function saveFlashcardStar(card) {
-    const flashcardId = card.id.replace("card", "");
-
-    fetch(`/update_flashcard_star/${flashcardId}/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": getCSRFToken(),
-        },
-        body: JSON.stringify({
-            starred: card.querySelector(".star-btn").classList.contains("starred"),
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log("⭐ Flashcard starred state updated!");
-        } else {
-            console.error("❌ Error starring flashcard:", data.error);
-        }
-    })
-    .catch(error => console.error("❌ API Error:", error));
-}
+    updateCards();
 
 
-// Optional: Function to Save Edits (requires Django backend update)
-function saveFlashcardEdits(card) {
-    const flashcardId = card.id.replace("card", "");
-    const term = card.querySelector('.card-title').innerText;
-    const definition = card.querySelector('.card-term').innerText;
-
-    fetch(`/update_flashcard/${flashcardId}/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": getCSRFToken(),
-        },
-        body: JSON.stringify({
-            term: term,
-            definition: definition,
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log("✅ Flashcard updated successfully!");
-        } else {
-            console.error("❌ Error updating flashcard:", data.error);
-        }
-    })
-    .catch(error => console.error("❌ API Error:", error));
-}
-
-
-
-
-    // Function to mark a flashcard as Learned / Not Learned
     function markLearned(learned) {
-        const flashcardId = learnedBtn.getAttribute("data-flashcard-id");
-
-        if (!flashcardId) {
-            console.error("❌ Flashcard ID is missing!");
-            return;
-        }
+        const flashcardId = cards[currentIndex].id.replace("card", "");
 
         fetch(`/update_flashcard_status/${flashcardId}/`, {
             method: "POST",
@@ -229,85 +157,172 @@ function saveFlashcardEdits(card) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log(`✅ Flashcard ${flashcardId} marked as ${learned ? "Learned" : "Not Learned"}`);
+                console.log(
+                    `✅ Flashcard ${flashcardId} marked as ${
+                        learned ? "Learned" : "Not Learned"
+                    }`
+                );
+               
+                const termBox = document.querySelector(
+                    `.term-box[data-flashcard-id='${flashcardId}']`
+                );
+                if (termBox) {
+                    const statusSpan = termBox.querySelector(".learned-status span");
+                    if (statusSpan) {
+                        if (learned) {
+                            statusSpan.innerText = "Learned ✅";
+                            statusSpan.classList.remove("text-danger");
+                            statusSpan.classList.add("text-success");
+                        } else {
+                            statusSpan.innerText = "Not Learned ❌";
+                            statusSpan.classList.remove("text-success");
+                            statusSpan.classList.add("text-danger");
+                        }
+                    }
+                }
             } else {
                 console.error("❌ Error updating status:", data.error);
             }
         })
         .catch(error => console.error("❌ API Error:", error));
     }
+};
 
-    // Attach event listeners to buttons
-    learnedBtn.addEventListener("click", () => markLearned(true));
-    notLearnedBtn.addEventListener("click", () => markLearned(false));
 
-    // Function to get CSRF token
+function toggleStar(button, event) {
+    event.stopPropagation();
+    flashEffect(button);
 
-    // Initialize display
-    updateCards();
-    function getCSRFToken() {
-    return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    const card = button.closest('.flashcard');
+    const flashcardId = card.id.replace("card", "");
+
+    const isCurrentlyStarred = button.classList.contains("active-star");
+    const newStarredState = !isCurrentlyStarred;
+
+    if (newStarredState) {
+        button.classList.add("active-star");
+    } else {
+        button.classList.remove("active-star");
+    }
+
+    fetch(`/update_star_status/${flashcardId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),
+        },
+        body: JSON.stringify({ starred: newStarredState }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(`Flashcard ${flashcardId} star set to ${newStarredState}`);
+
+            const termBox = document.querySelector(
+                `.term-box[data-flashcard-id='${flashcardId}']`
+            );
+            if (termBox) {
+            
+                let cornerStarSpan = termBox.querySelector(".corner-star");
+          
+                if (!cornerStarSpan) {
+                    cornerStarSpan = document.createElement("span");
+                    cornerStarSpan.classList.add("corner-star");
+                    cornerStarSpan.innerText = "★";
+                  
+                    const heading = termBox.querySelector("h3");
+                    heading.appendChild(cornerStarSpan);
+                }
+
+              
+                if (newStarredState) {
+                    cornerStarSpan.style.display = "inline";
+                } else {
+                    cornerStarSpan.style.display = "none";
+                }
+            }
+        } else {
+            console.error("Error toggling star:", data.error);
+        }
+    })
+    .catch(err => console.error(err));
 }
 
-function toggleEdit(button) {
-    const card = button.closest(".flashcard");
-    const termId = card.id.replace("card", ""); // Extract the term ID
-    const termField = card.querySelector(".card-title");
-    const definitionField = card.querySelector(".card-term");
-    const isEditing = card.classList.contains("editing");
+
+function flashEffect(element) {
+    const card = element.closest('.flashcard');
+    card.classList.add('flash');
+    setTimeout(() => card.classList.remove('flash'), 500);
+}
+
+
+function toggleEdit(button, event) {
+    event.stopPropagation();
+
+    const card = button.closest('.flashcard');
+
+    const fields = card.querySelectorAll('.card-title, .card-term');
+    const isEditing = card.classList.contains('editing');
 
     if (isEditing) {
-        // Save Mode
-        termField.contentEditable = "false";
-        definitionField.contentEditable = "false";
+
+        fields.forEach(el => {
+            el.contentEditable = "false";
+            el.classList.remove('editable'); 
+        });
+        card.classList.remove('editing');
         button.textContent = "Edit";
 
-        // Get updated values
-        const updatedTerm = termField.innerText.trim();
-        const updatedDefinition = definitionField.innerText.trim();
 
-        // Send data to server to update the backend
-        fetch(`/update_flashcard/${termId}/`, {
+        const flashcardId = card.id.replace("card", "");
+        const newTerm = card.querySelector('.card-title').innerText;
+        const newDefinition = card.querySelector('.card-term').innerText;
+
+
+        fetch(`/update_flashcard_text/${flashcardId}/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRFToken": getCSRFToken(),
             },
-            body: JSON.stringify({
-                term: updatedTerm,
-                definition: updatedDefinition
-            }),
+            body: JSON.stringify({ term: newTerm, definition: newDefinition }),
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update the term-box at the bottom dynamically
-                const termBox = document.querySelector(`.term-box[data-flashcard-id='${termId}']`);
+                console.log(`✅ Updated text for flashcard ${flashcardId}`);
+
+                const termBox = document.querySelector(
+                    `.term-box[data-flashcard-id='${flashcardId}']`
+                );
                 if (termBox) {
-                    termBox.querySelector("h3").textContent = updatedTerm;
-                    termBox.querySelector("p").textContent = updatedDefinition;
+                    const termHeading = termBox.querySelector('h3');
+                    const definitionParagraph = termBox.querySelector('p');
+                    if (termHeading && definitionParagraph) {
+                        termHeading.innerText = newTerm;
+                        definitionParagraph.innerText = newDefinition;
+                    }
                 }
             } else {
-                alert("Error saving changes. Please try again.");
+                console.error("❌ Error updating text:", data.error);
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => console.error("❌ API Error:", error));
 
     } else {
-        // Edit Mode
-        termField.contentEditable = "true";
-        definitionField.contentEditable = "true";
+
+        fields.forEach(el => {
+            el.contentEditable = "true";
+            el.classList.add('editable'); 
+        });
+        card.classList.add('editing');
         button.textContent = "Save";
     }
-
-    card.classList.toggle("editing");
 }
 
-console.log("✅ JavaScript Loaded!");
-
-};
-
-
+function getCSRFToken() {
+    return document.querySelector("[name=csrfmiddlewaretoken]").value;
+}
 </script>
 
 {% endblock %}
