@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
+
 from .forms import FlashcardSetForm, FlashcardForm, FlashcardFormSet
 from django.forms.models import modelformset_factory 
 from django.core.validators import validate_email
@@ -67,18 +68,6 @@ def home(request):
         "user_folders": user_folders  # This is needed for the sidebar
     })
 
-# @login_required
-# def folder_list(request):
-#     """View for showing all folders and flashcard sets in the 'General' folder"""
-#     folders = Folder.objects.filter(user=request.user)
-#     general_folder = Folder.objects.filter(user=request.user, name="General").first()
-#     flashcard_sets = FlashcardSet.objects.filter(folder=general_folder) if general_folder else []
-
-#     return render(request, 'folder.html', {
-#         'folders': folders,
-#         'flashcard_sets': flashcard_sets  # Now available in the template
-#     })
-
 @login_required
 def accounts_settings(request):
     if request.method == "POST":
@@ -118,35 +107,6 @@ def folder_list(request):
         'flashcard_sets': flashcard_sets_without_folder  # Now shows sets without a folder
     })
 
-
-# @login_required
-# def folder_detail(request, slug):
-#     if not slug:
-#         return redirect('folder_list')
-#     try:
-#         # Handle the 'general' folder case
-#         if slug == 'general':
-#             # You might need to create a general folder if it doesn't exist
-#             folder, created = Folder.objects.get_or_create(
-#                 name="General", 
-#                 user=request.user,
-#                 defaults={'slug': 'general'}
-#             )
-#         else:
-#             folder = get_object_or_404(Folder, slug=slug, user=request.user)
-
-#         # Get flashcard sets belonging to this folder
-#         flashcard_sets = FlashcardSet.objects.filter(folder=folder, user=request.user)
-#         context = {
-#             'folder': folder,
-#             'flashcard_sets': flashcard_sets,
-#             'folders': Folder.objects.filter(user=request.user)  # For sidebar
-#         }
-#         return render(request, 'folder_detail.html', context)
-    
-#     except Folder.DoesNotExist:
-#         messages.error(request, "Folder not found.")
-#         return redirect('folder_list')
 
 @login_required
 def folder_detail(request, slug):
@@ -223,6 +183,40 @@ def create_folder(request):
         print(f"Folder creation error: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)})
 
+@login_required
+@require_POST
+def delete_folder(request, folder_id):
+    """View for deleting a folder and its contents"""
+    try:
+        # Get the folder and ensure it belongs to the current user
+        folder = get_object_or_404(Folder, id=folder_id, user=request.user)
+        
+        # Delete the folder (this will cascade delete all flashcard sets if you've set up your models properly)
+        folder_name = folder.name  # Store for logging/messaging
+        folder.delete()
+        
+        messages.success(request, f'Folder "{folder_name}" was successfully deleted.')
+        
+        return JsonResponse({
+            'success': True,
+            'redirect_url': reverse('folder_list')  # Redirect to folder list
+        })
+        
+    except Folder.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Folder not found.'
+        })
+        
+    except Exception as e:
+        # Log the error
+        print(f"Error deleting folder: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+    
+    
 @login_required
 def create_flashcard_set(request):
     if request.method == 'POST':

@@ -1,94 +1,118 @@
+<!-- folder_detail.html -->
 {% extends "base.html" %}
 {% load static %}
-{% block title %}{{ folder.name }} - Folder{% endblock %}
+{% block title %}
+{{ folder.name }} Folder
+{% endblock %}
+{% block content %}
+<!-- HERO SECTION (Optional) -->
+<section id="hero" class="hero section dark-background position-relative">
+    <img src="{% static 'img/hero-bg.jpg' %}" alt="Hero Background" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">{{ folder.name }}</h1>
+        <p class="text-white-75">Manage flashcards in this folder.</p>
+    </div>
+</section>
+<!-- MAIN DASHBOARD SECTION -->
+<section class="dashboard section py-5 light-background">
+    <div class="container">
+        <!-- Include folder and delete modal partials -->
+        {% include 'partials/folder_modal.html' %}
+        {% include 'partials/delete_modal.html' %}
 
-{% block container %}
-{% include 'partials/folder_modal.html' %}
-
-<div class="container-fluid p-0" style="min-height: 100vh;">
-  <div class="row no-gutters">
-    <!-- Sidebar -->
-    <aside id="sidebar" class="col-md-2 bg-primary text-white p-3" style="transition: width 0.3s ease-in-out;">
-      <button id="sidebarToggle" class="btn btn-light d-block mb-3">➞</button>
-      <h5 class="mb-3">Folders</h5>
-      <ul class="nav flex-column">
-        {% for folder in user_folders %}
-        <li class="nav-item mb-2">
-          <a href="{% url 'folder_detail' folder.slug %}" class="nav-link text-white">
-            📁 {{ folder.name }}
-          </a>
-        </li>
-        {% empty %}
-        <li class="nav-item text-muted">No folders created yet.</li>
-        {% endfor %}
-      </ul>
-      <button class="btn btn-secondary mt-3" id="openModal">+ Create New Folder</button>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="col-md-10 p-4">
-      <h2>{{ folder.name }}</h2>
-      
-      <!-- Action Buttons -->
-      <div class="mb-4">
-        <a class="btn btn-secondary" href="/create-flashcard-set?folder={{ folder.id }}">
-          + Create New Study Set
-        </a>
-      </div>
-      
-      <!-- Study Sets Section -->
-      <section class="mb-3">
-        <h3>Study Sets:</h3>
-        <div class="row">
-          {% for set in flashcard_sets %}
-          <div class="col-md-4 mb-3">
-            <div class="card h-100">
-              <div class="card-body">
-                <h5 class="card-title">{{ set.title }}</h5>
-                <p class="card-text">{{ set.description|truncatechars:50 }}</p>
-                <a href="{% url 'flashcard_set_details' set.id %}" class="btn btn-primary">Study</a>
-              </div>
+        <!-- Folder Actions -->
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <a href="{% url 'folder_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Folders
+            </a>
+            <div>
+                <button class="btn btn-danger" id="openDeleteModal" data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.name }}">
+                    <i class="bi bi-trash"></i> Delete Folder
+                </button>
             </div>
-          </div>
-          {% empty %}
-          <div class="col-12">
-            <p>No study sets in this folder yet.</p>
-          </div>
-          {% endfor %}
         </div>
-      </section>
-    </main>
-  </div>
-</div>
 
-<!-- Include Modal CSS/JS (once only) -->
+        <!-- Flashcard Sets in this Folder -->
+        <div class="mb-3">
+            <h3>Flashcard Sets:</h3>
+            <div class="d-flex flex-wrap gap-3">
+                {% for set in flashcard_sets %}
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📚 {{ set.title }}</h5>
+                            <p class="card-text">{{ set.description|truncatechars:50 }}</p>
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'flashcard_set_details' set_id=set.id %}" class="btn btn-primary">
+                                    View
+                                </a>
+                                <a href="{% url 'edit_flashcard_set' pk=set.id %}" class="btn btn-outline-secondary">
+                                    Edit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">This folder has no flashcard sets yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Action Button for Creating a New Flashcard Set -->
+        <div class="text-center mt-4">
+            <a href="{% url 'create_flashcard_set' %}" class="btn btn-secondary">
+                + Create New Flashcard Set
+            </a>
+        </div>
+    </div> <!-- End .container -->
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Hero Section Styles */
+    .hero-bg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+    .hero.section.dark-background {
+        position: relative;
+        background: #141414;
+        padding: 100px 0 80px;
+    }
+    .light-background {
+        background-color: #f5f5f5;
+    }
+    /* Card Styling for Folders */
+    .card {
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    var folderCreateUrl = "{% url 'create_folder' %}";
+    var folderDeleteUrl = "{% url 'delete_folder' folder.id %}";  // You'll need to create this URL
+    var csrfToken = "{{ csrf_token }}";
+</script>
 <link rel="stylesheet" href="{% static 'css/modal.css' %}">
 <script src="{% static 'js/folder.js' %}"></script>
+<script src="{% static 'js/delete-folder.js' %}"></script>  <!-- We'll create this JS file -->
 
-<!-- Sidebar Toggle Script -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  var sidebar = document.getElementById("sidebar");
-  var toggleBtn = document.getElementById("sidebarToggle");
-
-  // Optionally start with the sidebar collapsed (adjust width as needed)
-  sidebar.classList.add("sidebar-collapsed");
-  sidebar.style.width = "50px";
-  toggleBtn.innerHTML = "➞";
-
-  toggleBtn.addEventListener("click", function () {
-    if (sidebar.classList.contains("sidebar-collapsed")) {
-      // Expand sidebar
-      sidebar.classList.remove("sidebar-collapsed");
-      sidebar.style.width = "200px";
-      toggleBtn.innerHTML = "⬅";
-    } else {
-      // Collapse sidebar
-      sidebar.classList.add("sidebar-collapsed");
-      sidebar.style.width = "50px";
-      toggleBtn.innerHTML = "➞";
-    }
-  });
-});
+  // Define these variables for the delete-folder.js script
+  const folderDeleteUrl = "{% url 'delete_folder' folder.id %}";
+  const csrfToken = "{{ csrf_token }}";
 </script>
+<script src="{% static 'js/delete-folder.js' %}"></script>
+
 {% endblock %}
