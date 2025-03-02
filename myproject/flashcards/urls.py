@@ -34,6 +34,8 @@ urlpatterns = [
     path('update_flashcard_text/<int:term_id>/', views.update_flashcard, name='update_flashcard_text'),
     path('update_star_status/<int:term_id>/', views.update_star_status, name='update_star_status'),
 
+    # Settings
+    path('settings/', views.accounts_settings, name='settings'),
     
     #Home Page
     path('homepage/', views.home, name='home'), 

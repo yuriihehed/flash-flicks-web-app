@@ -6,7 +6,7 @@ from django.forms.models import modelformset_factory
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth import authenticate, login, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.models import User
 from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak, FlashcardSet, UserProfile
 from django.db.models import Count
@@ -67,6 +67,28 @@ def home(request):
         "flashcard_sets": deck,
         "user_folders": user_folders  # This is needed for the sidebar
     })
+
+@login_required
+def accounts_settings(request):
+   if request.method == "POST":
+       field = request.POST.get("field")
+       value = request.POST.get("value")
+
+       if field and value:
+           user = request.user  # Get the logged-in user
+           if field == "username":
+               user.first_name = value
+           elif field == "password":
+               user.set_password(value)  # Encrypts new password
+               user.save()
+               update_session_auth_hash(request, user)  # Prevent logout
+               login(request, user)  # Log the user back in
+               messages.success(request, "Password updated successfully!")
+               return redirect("settings")
+           user.save()
+           messages.success(request, f"{field.capitalize()} updated successfully!")
+           return redirect("settings")  # Redirect to account settings
+   return render(request, 'accounts_settings.html')
 
 @login_required
 def folder_list(request):
