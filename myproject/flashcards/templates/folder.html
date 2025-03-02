@@ -43,8 +43,18 @@ Home Dashboard
                 <p class="text-muted">You have no folders yet. Create one!</p>
                 {% endfor %}
             </div>
-        </div>
+        </div> 
 
+        <!-- <h3>Uncategorized Flashcards</h3>
+        <ul>
+        {% for set in flashcard_sets_without_folder %}
+            <li><a href="{% url 'flashcard_detail' set.id %}">{{ set.title }}</a></li>
+        {% empty %}
+            <li>No uncategorized flashcard sets.</li>
+        {% endfor %}
+        </ul>
+         -->
+        
         <!-- Action Button for Creating a New Folder -->
         <div class="text-center mt-4">
             <button class="btn btn-secondary" id="openModalMain">

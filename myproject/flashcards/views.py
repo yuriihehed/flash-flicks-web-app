@@ -145,6 +145,7 @@ def folder_detail(request, slug):
         messages.error(request, "Folder not found.")
         return redirect('folder_list')
     
+
 def folder_view(request):
     folders = Folder.objects.filter(user=request.user)
     flashcard_sets_without_folder = FlashcardSet.objects.filter(user=request.user, folder=None)
