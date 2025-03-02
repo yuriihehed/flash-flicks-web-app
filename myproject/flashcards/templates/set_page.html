@@ -5,6 +5,18 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/set_page.css' %}">
+<style>
+    /* Glowing Effect */
+    .flash {
+        animation: flash 0.5s ease-in-out;
+    }
+
+    @keyframes flash {
+        0% { box-shadow: 0 0 20px 10px rgb(243, 230, 159); }
+        50% { box-shadow: 0 0 30px 20px rgb(237, 190, 163); }
+        100% { box-shadow: none; }
+    }
+</style>
 
 {% endblock %}
 
@@ -59,9 +71,9 @@
 
         <!-- Navigation -->
         <div class="navigation mt-3">
-            <button id="prevBtn" class="nav-btn">⬅</button>
+            <button id="prevBtn" class="nav-btn">&#8592;</button>
             <span id="cardCounter">1 / {{ terms|length }}</span>
-            <button id="nextBtn" class="nav-btn">➡</button>
+            <button id="nextBtn" class="nav-btn">&#8594;</button>
         </div>
 
         <!-- Learn/Not Learned Buttons -->
