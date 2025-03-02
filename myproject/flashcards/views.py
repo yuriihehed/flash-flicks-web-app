@@ -19,6 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Event
 from datetime import datetime, timedelta
 from .models import Flashcard
+from django.db.models import Q
 
 def landing_page(request):
     ensure_superuser()
@@ -649,3 +650,31 @@ def update_star_status(request, term_id):
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
     return JsonResponse({"success": False, "error": "Invalid request"})
+
+def search_terms(request, set_id):
+    # Get the flashcard set by ID (or 404 if not found)
+    flashcard_set = get_object_or_404(FlashcardSet, id=set_id)
+    
+    # Get the search query from GET parameters
+    query = request.GET.get("q", "")
+    
+    if query:
+        # Filter flashcards within this set where the term or definition matches the query
+        filtered_flashcards = flashcard_set.flashcards.filter(
+            Q(term__icontains=query) | Q(definition__icontains=query)
+        )
+        # If we found matches, use them; otherwise, show all flashcards in this set
+        flashcards = filtered_flashcards if filtered_flashcards.exists() else flashcard_set.flashcards.all()
+    else:
+        # No search query provided, so display all flashcards in the set
+        flashcards = flashcard_set.flashcards.all()
+    
+    # Optionally, set a flag on each flashcard (if needed for your template logic)
+    for flashcard in flashcards:
+        flashcard.is_learned = flashcard.learned_by.filter(id=request.user.id).exists()
+    
+    return render(request, "set_page.html", {
+        "flashcard_set": flashcard_set,
+        "terms": flashcards,  # your template might loop over "terms"
+        "query": query,
+    })

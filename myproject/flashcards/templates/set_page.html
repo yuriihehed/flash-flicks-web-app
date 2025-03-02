@@ -12,9 +12,17 @@
     }
 
     @keyframes flash {
-        0% { box-shadow: 0 0 20px 10px rgb(243, 230, 159); }
-        50% { box-shadow: 0 0 30px 20px rgb(237, 190, 163); }
-        100% { box-shadow: none; }
+        0% {
+            box-shadow: 0 0 20px 10px rgb(243, 230, 159);
+        }
+
+        50% {
+            box-shadow: 0 0 30px 20px rgb(237, 190, 163);
+        }
+
+        100% {
+            box-shadow: none;
+        }
     }
 </style>
 
@@ -43,7 +51,7 @@
         <div class="flashcard-area d-flex justify-content-center">
             {% for term in terms %}
             <!-- Hide all but the first card by default -->
-            <div class="flashcard" id="card{{ term.id }}" {% if not forloop.first %}style="display: none;"{% endif %}>
+            <div class="flashcard" id="card{{ term.id }}" {% if not forloop.first %}style="display: none;" {% endif %}>
                 <div class="card-inner">
                     <div class="front">
                         <!-- Front side: Term -->
@@ -57,10 +65,8 @@
                 <!-- Buttons (Star + Edit) -->
                 <div class="top-buttons">
                     <!-- If this term is already starred, give the button the .active-star class -->
-                    <button 
-                        class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}" 
-                        onclick="toggleStar(this, event)"
-                    >
+                    <button class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}"
+                        onclick="toggleStar(this, event)">
                         &#9733;
                     </button>
                     <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
@@ -83,19 +89,38 @@
         </div>
         <br>
 
+        <!-- Study Progress -->
+        <div class="study-progress mt-4">
+            <h2>Studying Progress:</h2>
+            <p>Progress: 0%</p>
+        </div>
+
+        <!-- Search Terms & Definitions Section -->
+        <section id="search-terms">
+            <!-- New container div -->
+            <div class="search-box">
+                <form method="GET" action="{% url 'search_terms' flashcard_set.id %}">
+                    <div class="search-container">
+                        <input type="text" id="term-search" name="q" placeholder="Search for a term or definition..." value="{{ query }}" />
+                        <button type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
         <!-- Terms and Definitions List (below the flashcards) -->
         {% for term in terms %}
         <div class="term-box" data-flashcard-id="{{ term.id }}">
             <h3>
                 {{ term.term }}
                 {% if term.is_starred %}
-                  <!-- If starred, show a star in the corner -->
-                  <span class="corner-star">★</span>
+                <!-- If starred, show a star in the corner -->
+                <span class="corner-star">★</span>
                 {% endif %}
             </h3>
             <p>{{ term.definition }}</p>
             <p class="learned-status">
-                Status: 
+                Status:
                 {% if term.is_learned %}
                 <span class="text-success fw-bold">Learned ✅</span>
                 {% else %}
@@ -110,231 +135,230 @@
 
 <script>
 
-window.onload = function () {
-    const cards = document.querySelectorAll(".flashcard");
-    let currentIndex = 0;
-    const totalCards = cards.length;
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const cardCounter = document.getElementById("cardCounter");
-    const learnedBtn = document.getElementById("learned-btn");
-    const notLearnedBtn = document.getElementById("not-learned-btn");
+    window.onload = function () {
+        const cards = document.querySelectorAll(".flashcard");
+        let currentIndex = 0;
+        const totalCards = cards.length;
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const cardCounter = document.getElementById("cardCounter");
+        const learnedBtn = document.getElementById("learned-btn");
+        const notLearnedBtn = document.getElementById("not-learned-btn");
 
-    function updateCards() {
-        cards.forEach((card, index) => {
-            card.style.display = index === currentIndex ? "block" : "none";
+        function updateCards() {
+            cards.forEach((card, index) => {
+                card.style.display = index === currentIndex ? "block" : "none";
+            });
+            cardCounter.innerText = `${currentIndex + 1} / ${totalCards}`;
+        }
+
+        prevBtn.addEventListener("click", () => {
+            currentIndex = Math.max(0, currentIndex - 1);
+            updateCards();
         });
-        cardCounter.innerText = `${currentIndex + 1} / ${totalCards}`;
-    }
 
-    prevBtn.addEventListener("click", () => {
-        currentIndex = Math.max(0, currentIndex - 1);
-        updateCards();
-    });
-
-    nextBtn.addEventListener("click", () => {
-        currentIndex = Math.min(totalCards - 1, currentIndex + 1);
-        updateCards();
-    });
-
-    learnedBtn.addEventListener("click", () => markLearned(true));
-    notLearnedBtn.addEventListener("click", () => markLearned(false));
-
-    
-    cards.forEach(card => {
-        card.addEventListener("click", function (e) {
-            if (
-                !e.target.classList.contains("star-btn") &&
-                !card.classList.contains("editing")
-            ) {
-                this.classList.toggle("flipped");
-            }
+        nextBtn.addEventListener("click", () => {
+            currentIndex = Math.min(totalCards - 1, currentIndex + 1);
+            updateCards();
         });
-    });
 
-    updateCards();
+        learnedBtn.addEventListener("click", () => markLearned(true));
+        notLearnedBtn.addEventListener("click", () => markLearned(false));
 
 
-    function markLearned(learned) {
-        const flashcardId = cards[currentIndex].id.replace("card", "");
+        cards.forEach(card => {
+            card.addEventListener("click", function (e) {
+                if (
+                    !e.target.classList.contains("star-btn") &&
+                    !card.classList.contains("editing")
+                ) {
+                    this.classList.toggle("flipped");
+                }
+            });
+        });
 
-        fetch(`/update_flashcard_status/${flashcardId}/`, {
+        updateCards();
+
+
+        function markLearned(learned) {
+            const flashcardId = cards[currentIndex].id.replace("card", "");
+
+            fetch(`/update_flashcard_status/${flashcardId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken(),
+                },
+                body: JSON.stringify({ learned: learned }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log(
+                            `✅ Flashcard ${flashcardId} marked as ${learned ? "Learned" : "Not Learned"
+                            }`
+                        );
+
+                        const termBox = document.querySelector(
+                            `.term-box[data-flashcard-id='${flashcardId}']`
+                        );
+                        if (termBox) {
+                            const statusSpan = termBox.querySelector(".learned-status span");
+                            if (statusSpan) {
+                                if (learned) {
+                                    statusSpan.innerText = "Learned ✅";
+                                    statusSpan.classList.remove("text-danger");
+                                    statusSpan.classList.add("text-success");
+                                } else {
+                                    statusSpan.innerText = "Not Learned ❌";
+                                    statusSpan.classList.remove("text-success");
+                                    statusSpan.classList.add("text-danger");
+                                }
+                            }
+                        }
+                    } else {
+                        console.error("❌ Error updating status:", data.error);
+                    }
+                })
+                .catch(error => console.error("❌ API Error:", error));
+        }
+    };
+
+
+    function toggleStar(button, event) {
+        event.stopPropagation();
+        flashEffect(button);
+
+        const card = button.closest('.flashcard');
+        const flashcardId = card.id.replace("card", "");
+
+        const isCurrentlyStarred = button.classList.contains("active-star");
+        const newStarredState = !isCurrentlyStarred;
+
+        if (newStarredState) {
+            button.classList.add("active-star");
+        } else {
+            button.classList.remove("active-star");
+        }
+
+        fetch(`/update_star_status/${flashcardId}/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRFToken": getCSRFToken(),
             },
-            body: JSON.stringify({ learned: learned }),
+            body: JSON.stringify({ starred: newStarredState }),
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log(
-                    `✅ Flashcard ${flashcardId} marked as ${
-                        learned ? "Learned" : "Not Learned"
-                    }`
-                );
-               
-                const termBox = document.querySelector(
-                    `.term-box[data-flashcard-id='${flashcardId}']`
-                );
-                if (termBox) {
-                    const statusSpan = termBox.querySelector(".learned-status span");
-                    if (statusSpan) {
-                        if (learned) {
-                            statusSpan.innerText = "Learned ✅";
-                            statusSpan.classList.remove("text-danger");
-                            statusSpan.classList.add("text-success");
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`Flashcard ${flashcardId} star set to ${newStarredState}`);
+
+                    const termBox = document.querySelector(
+                        `.term-box[data-flashcard-id='${flashcardId}']`
+                    );
+                    if (termBox) {
+
+                        let cornerStarSpan = termBox.querySelector(".corner-star");
+
+                        if (!cornerStarSpan) {
+                            cornerStarSpan = document.createElement("span");
+                            cornerStarSpan.classList.add("corner-star");
+                            cornerStarSpan.innerText = "★";
+
+                            const heading = termBox.querySelector("h3");
+                            heading.appendChild(cornerStarSpan);
+                        }
+
+
+                        if (newStarredState) {
+                            cornerStarSpan.style.display = "inline";
                         } else {
-                            statusSpan.innerText = "Not Learned ❌";
-                            statusSpan.classList.remove("text-success");
-                            statusSpan.classList.add("text-danger");
+                            cornerStarSpan.style.display = "none";
                         }
                     }
-                }
-            } else {
-                console.error("❌ Error updating status:", data.error);
-            }
-        })
-        .catch(error => console.error("❌ API Error:", error));
-    }
-};
-
-
-function toggleStar(button, event) {
-    event.stopPropagation();
-    flashEffect(button);
-
-    const card = button.closest('.flashcard');
-    const flashcardId = card.id.replace("card", "");
-
-    const isCurrentlyStarred = button.classList.contains("active-star");
-    const newStarredState = !isCurrentlyStarred;
-
-    if (newStarredState) {
-        button.classList.add("active-star");
-    } else {
-        button.classList.remove("active-star");
-    }
-
-    fetch(`/update_star_status/${flashcardId}/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": getCSRFToken(),
-        },
-        body: JSON.stringify({ starred: newStarredState }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log(`Flashcard ${flashcardId} star set to ${newStarredState}`);
-
-            const termBox = document.querySelector(
-                `.term-box[data-flashcard-id='${flashcardId}']`
-            );
-            if (termBox) {
-            
-                let cornerStarSpan = termBox.querySelector(".corner-star");
-          
-                if (!cornerStarSpan) {
-                    cornerStarSpan = document.createElement("span");
-                    cornerStarSpan.classList.add("corner-star");
-                    cornerStarSpan.innerText = "★";
-                  
-                    const heading = termBox.querySelector("h3");
-                    heading.appendChild(cornerStarSpan);
-                }
-
-              
-                if (newStarredState) {
-                    cornerStarSpan.style.display = "inline";
                 } else {
-                    cornerStarSpan.style.display = "none";
+                    console.error("Error toggling star:", data.error);
                 }
-            }
-        } else {
-            console.error("Error toggling star:", data.error);
-        }
-    })
-    .catch(err => console.error(err));
-}
-
-
-function flashEffect(element) {
-    const card = element.closest('.flashcard');
-    card.classList.add('flash');
-    setTimeout(() => card.classList.remove('flash'), 500);
-}
-
-
-function toggleEdit(button, event) {
-    event.stopPropagation();
-
-    const card = button.closest('.flashcard');
-
-    const fields = card.querySelectorAll('.card-title, .card-term');
-    const isEditing = card.classList.contains('editing');
-
-    if (isEditing) {
-
-        fields.forEach(el => {
-            el.contentEditable = "false";
-            el.classList.remove('editable'); 
-        });
-        card.classList.remove('editing');
-        button.textContent = "Edit";
-
-
-        const flashcardId = card.id.replace("card", "");
-        const newTerm = card.querySelector('.card-title').innerText;
-        const newDefinition = card.querySelector('.card-term').innerText;
-
-
-        fetch(`/update_flashcard_text/${flashcardId}/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken(),
-            },
-            body: JSON.stringify({ term: newTerm, definition: newDefinition }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log(`✅ Updated text for flashcard ${flashcardId}`);
-
-                const termBox = document.querySelector(
-                    `.term-box[data-flashcard-id='${flashcardId}']`
-                );
-                if (termBox) {
-                    const termHeading = termBox.querySelector('h3');
-                    const definitionParagraph = termBox.querySelector('p');
-                    if (termHeading && definitionParagraph) {
-                        termHeading.innerText = newTerm;
-                        definitionParagraph.innerText = newDefinition;
-                    }
-                }
-            } else {
-                console.error("❌ Error updating text:", data.error);
-            }
-        })
-        .catch(error => console.error("❌ API Error:", error));
-
-    } else {
-
-        fields.forEach(el => {
-            el.contentEditable = "true";
-            el.classList.add('editable'); 
-        });
-        card.classList.add('editing');
-        button.textContent = "Save";
+            })
+            .catch(err => console.error(err));
     }
-}
 
-function getCSRFToken() {
-    return document.querySelector("[name=csrfmiddlewaretoken]").value;
-}
+
+    function flashEffect(element) {
+        const card = element.closest('.flashcard');
+        card.classList.add('flash');
+        setTimeout(() => card.classList.remove('flash'), 500);
+    }
+
+
+    function toggleEdit(button, event) {
+        event.stopPropagation();
+
+        const card = button.closest('.flashcard');
+
+        const fields = card.querySelectorAll('.card-title, .card-term');
+        const isEditing = card.classList.contains('editing');
+
+        if (isEditing) {
+
+            fields.forEach(el => {
+                el.contentEditable = "false";
+                el.classList.remove('editable');
+            });
+            card.classList.remove('editing');
+            button.textContent = "Edit";
+
+
+            const flashcardId = card.id.replace("card", "");
+            const newTerm = card.querySelector('.card-title').innerText;
+            const newDefinition = card.querySelector('.card-term').innerText;
+
+
+            fetch(`/update_flashcard_text/${flashcardId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken(),
+                },
+                body: JSON.stringify({ term: newTerm, definition: newDefinition }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log(`✅ Updated text for flashcard ${flashcardId}`);
+
+                        const termBox = document.querySelector(
+                            `.term-box[data-flashcard-id='${flashcardId}']`
+                        );
+                        if (termBox) {
+                            const termHeading = termBox.querySelector('h3');
+                            const definitionParagraph = termBox.querySelector('p');
+                            if (termHeading && definitionParagraph) {
+                                termHeading.innerText = newTerm;
+                                definitionParagraph.innerText = newDefinition;
+                            }
+                        }
+                    } else {
+                        console.error("❌ Error updating text:", data.error);
+                    }
+                })
+                .catch(error => console.error("❌ API Error:", error));
+
+        } else {
+
+            fields.forEach(el => {
+                el.contentEditable = "true";
+                el.classList.add('editable');
+            });
+            card.classList.add('editing');
+            button.textContent = "Save";
+        }
+    }
+
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
 </script>
 
 {% endblock %}
