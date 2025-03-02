@@ -22,15 +22,32 @@ class RegisterForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.fields.pop('username', None)
 
-
-# The form manages creating/updating a FlashcardSet object in the database
+# class FlashcardSetForm(forms.ModelForm):
+#     class Meta:
+#         model = FlashcardSet
+#         fields = ["title", "description", "folder"]
+#         widgets = {
+#             'title': forms.TextInput(attrs={
+#                 'placeholder': "Enter a title, like 'Algebra'",
+#                 'style': "border: 1px solid #ccc; padding: 1rem; width: 100%;"
+#             }),
+#             'description': forms.TextInput(attrs={
+#                 'placeholder': "Add a description.....",
+#                 'style': "border: 1px solid #ccc; padding: 1rem; width: 100%;"
+#             }),
+#         }
+    
+#     def __init__(self, *args, **kwargs):
+#         email = kwargs.pop('email', None)
+#         super().__init__(*args, **kwargs)
+#         # Make folder optional in the form
+#         self.fields['folder'].required = False
+#         if email:
+#             self.fields['folder'].queryset = Folder.objects.filter(user__email=email)
 class FlashcardSetForm(forms.ModelForm):
     class Meta:
-        # This form is based on the FlashcardSet model
         model = FlashcardSet
-        # These are the fields that will be displayed in the form
         fields = ["title", "description", "folder"]
-        # These are the widgets that will be used to render the form fields
         widgets = {
             'title': forms.TextInput(attrs={
                 'placeholder': "Enter a title, like 'Algebra'",
@@ -40,13 +57,44 @@ class FlashcardSetForm(forms.ModelForm):
                 'placeholder': "Add a description.....",
                 'style': "border: 1px solid #ccc; padding: 1rem; width: 100%;"
             }),
-        }  
+        }
+    
     def __init__(self, *args, **kwargs):
-        email = kwargs.pop('email', None)  # Get the email from kwargs
+        email = kwargs.pop('email', None)
         super().__init__(*args, **kwargs)
         
-        if email:  # Filter folders by email instead of user
-            self.fields['folder'].queryset = Folder.objects.filter(user__email=email)
+        # Make folder field optional
+        self.fields['folder'].required = False
+        
+        # Add an empty choice for "No folder"
+        if email:
+            folder_queryset = Folder.objects.filter(user__email=email)
+            self.fields['folder'].queryset = folder_queryset
+            self.fields['folder'].empty_label = "No folder"
+# # The form manages creating/updating a FlashcardSet object in the database
+# class FlashcardSetForm(forms.ModelForm):
+#     class Meta:
+#         # This form is based on the FlashcardSet model
+#         model = FlashcardSet
+#         # These are the fields that will be displayed in the form
+#         fields = ["title", "description", "folder"]
+#         # These are the widgets that will be used to render the form fields
+#         widgets = {
+#             'title': forms.TextInput(attrs={
+#                 'placeholder': "Enter a title, like 'Algebra'",
+#                 'style': "border: 1px solid #ccc; padding: 1rem; width: 100%;"
+#             }),
+#             'description': forms.TextInput(attrs={
+#                 'placeholder': "Add a description.....",
+#                 'style': "border: 1px solid #ccc; padding: 1rem; width: 100%;"
+#             }),
+#         }  
+#     def __init__(self, *args, **kwargs):
+#         email = kwargs.pop('email', None)  # Get the email from kwargs
+#         super().__init__(*args, **kwargs)
+        
+#         if email:  # Filter folders by email instead of user
+#             self.fields['folder'].queryset = Folder.objects.filter(user__email=email)
 
 # The form manages creating/updating a single Flashcard object and its fields in the database
 class FlashcardForm(forms.ModelForm):
