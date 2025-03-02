@@ -17,8 +17,8 @@
 
 /* Reduce hero section height ONLY for this page */
 #hero {
-    min-height: 60vh !important; 
-    padding: 60px 0 !important; 
+    min-height: 50vh !important; 
+    padding: 50px 0 !important; 
 }
 /* Settings Container */
 .setting label {
