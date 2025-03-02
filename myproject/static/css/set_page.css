@@ -16,7 +16,7 @@
 
 /* Reduce hero section height ONLY for this page */
 #hero {
-    min-height: 60vh; 
+    min-height: 50vh; 
     padding: 60px 0; 
 }
 .light-background {
