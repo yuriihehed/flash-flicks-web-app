@@ -111,20 +111,38 @@
     cursor: pointer;
 }
 
-/* Flash (Star Button) Effect */
-.flash {
-    animation: flash 0.5s ease-in-out;
+.term-box {
+    position: relative; /* So corner-star can be positioned absolute if desired */
+}
+.corner-star {
+    position: absolute;
+    top: 5px;    /* Adjust to taste */
+    right: 5px;  /* Adjust to taste */
+    font-size: 1.2em;
+    color: gold;
+    /* If you want it hidden by default, do: display: none;
+       We'll turn it on/off with JS. But for demonstration
+       we handle it via if statements in the template. */
 }
 
-@keyframes flash {
-    0% { box-shadow: 0 0 20px 10px rgb(243, 230, 159); }
-    50% { box-shadow: 0 0 30px 20px rgb(237, 190, 163); }
-    100% { box-shadow: none; }
-}
-
+/* Example styling for 'editable' fields, if desired */
 .editable {
-    border: 2px solid rgb(20, 50, 136);
-    padding: 10px;
-    border-radius: 10px;
-    background-color: #fff;
+    outline: 2px dashed red;
+}
+/* Example flash effect */
+.flash {
+    animation: flashEffect 0.5s ease;
+}
+@keyframes flashEffect {
+    from {
+        background-color: yellow;
+    }
+    to {
+        background-color: inherit;
+    }
+}
+
+/* Optional highlight for star button on flashcards */
+.active-star {
+    color: gold;
 }
