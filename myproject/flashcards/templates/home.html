@@ -80,6 +80,8 @@
                         <div class="card shadow-sm p-4">
                             <h5 class="card-title">{{ flashcard.title }}</h5>
                             <p class="card-text">Contains {{ flashcard.flashcard_count }} sets</p>
+                            <p class="card-text">Folder: {{ flashcard.folder }}</p>
+
                             <a href="{% url 'flashcard_set_details' flashcard.id %}" class="btn btn-primary btn-sm">View</a>
                         </div>
                     </div>

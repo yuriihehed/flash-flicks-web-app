@@ -7,7 +7,6 @@ from django.dispatch import receiver
 from django.conf import settings  # ✅ This ensures we use the correct user model
 
 
-
 # Custom user model
 class CustomUser(AbstractUser):
     """Extends Django's built-in User model to use email instead of username."""
@@ -38,29 +37,6 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
-    
-
-@receiver(post_save, sender=CustomUser)
-
-def create_default_folder(sender, instance, created, **kwargs):
-    if created:
-        base_slug = "general"
-        slug = base_slug
-        count = 1
-
-        while Folder.objects.filter(slug=slug).exists():
-            slug = f"{base_slug}-{count}"
-            count += 1
-
-        try:
-            Folder.objects.create(
-                user=instance,
-                name="General",
-                slug=slug
-            )
-        except IntegrityError:
-            print("Could not create unique folder slug")
-
 
 # Folder model for grouping decks 
 class Folder(models.Model):
@@ -82,19 +58,29 @@ class Folder(models.Model):
         return self.name
     
 # The flashcard set model hold the overall title and description of the flashcard set
-class FlashcardSet(models.Model):
-    title = models.CharField(max_length=200)  # required text for flashcard
-    description = models.TextField(blank=True, null = True) # optional description for flashcard (can be blank)
-    created_at = models.DateTimeField(auto_now_add=True)  # auto set the created date
-    updated_at = models.DateTimeField(auto_now=True)  # auto set the updated date
-    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='flashcard_sets') # added by Gulbanu
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
-
-
-    
+# class FlashcardSet(models.Model):
+#     title = models.CharField(max_length=200)  # required text for flashcard
+#     description = models.TextField(blank=True, null = True) # optional description for flashcard (can be blank)
+#     created_at = models.DateTimeField(auto_now_add=True)  # auto set the created date
+#     updated_at = models.DateTimeField(auto_now=True)  # auto set the updated date
+#     folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='flashcard_sets') # added by Gulbanu
+#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     # returns the title of the flashcard set
+    # def __str__(self):
+    #     return self.title
+    
+class FlashcardSet(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='flashcard_sets', null=True, blank=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+    
     def __str__(self):
         return self.title
+    
+
 
 # The flashcard model holds the question and answer for the flashcard
 class Flashcard(models.Model):
@@ -163,7 +149,6 @@ class StudyStreak(models.Model):
 
 #Calender
 
-from django.db import models
 
 class Event(models.Model):
     title = models.CharField(max_length=200)
@@ -182,7 +167,4 @@ class Event(models.Model):
     )
 
     def __str__(self):
-        return f"{self.title} - {self.class_name} ({self.start_time} - {self.end_time})"
-
-
-    
+        return f"{self.title} - {self.class_name} ({self.start_time} - {self.end_time})" 

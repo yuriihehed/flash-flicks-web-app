@@ -20,7 +20,6 @@ from .models import Event
 from datetime import datetime, timedelta
 from .models import Flashcard
 
-
 def landing_page(request):
     ensure_superuser()
     return render(request, 'landing.html')
@@ -68,6 +67,18 @@ def home(request):
         "user_folders": user_folders  # This is needed for the sidebar
     })
 
+# @login_required
+# def folder_list(request):
+#     """View for showing all folders and flashcard sets in the 'General' folder"""
+#     folders = Folder.objects.filter(user=request.user)
+#     general_folder = Folder.objects.filter(user=request.user, name="General").first()
+#     flashcard_sets = FlashcardSet.objects.filter(folder=general_folder) if general_folder else []
+
+#     return render(request, 'folder.html', {
+#         'folders': folders,
+#         'flashcard_sets': flashcard_sets  # Now available in the template
+#     })
+
 @login_required
 def accounts_settings(request):
     if request.method == "POST":
@@ -96,15 +107,46 @@ def accounts_settings(request):
 
 @login_required
 def folder_list(request):
-    """View for showing all folders and flashcard sets in the 'General' folder"""
+    """View for showing all folders and flashcard sets without a folder"""
     folders = Folder.objects.filter(user=request.user)
-    general_folder = Folder.objects.filter(user=request.user, name="General").first()
-    flashcard_sets = FlashcardSet.objects.filter(folder=general_folder) if general_folder else []
+    
+    # Get flashcard sets that don't have a folder assigned
+    flashcard_sets_without_folder = FlashcardSet.objects.filter(user=request.user, folder=None)
 
     return render(request, 'folder.html', {
         'folders': folders,
-        'flashcard_sets': flashcard_sets  # Now available in the template
+        'flashcard_sets': flashcard_sets_without_folder  # Now shows sets without a folder
     })
+
+
+# @login_required
+# def folder_detail(request, slug):
+#     if not slug:
+#         return redirect('folder_list')
+#     try:
+#         # Handle the 'general' folder case
+#         if slug == 'general':
+#             # You might need to create a general folder if it doesn't exist
+#             folder, created = Folder.objects.get_or_create(
+#                 name="General", 
+#                 user=request.user,
+#                 defaults={'slug': 'general'}
+#             )
+#         else:
+#             folder = get_object_or_404(Folder, slug=slug, user=request.user)
+
+#         # Get flashcard sets belonging to this folder
+#         flashcard_sets = FlashcardSet.objects.filter(folder=folder, user=request.user)
+#         context = {
+#             'folder': folder,
+#             'flashcard_sets': flashcard_sets,
+#             'folders': Folder.objects.filter(user=request.user)  # For sidebar
+#         }
+#         return render(request, 'folder_detail.html', context)
+    
+#     except Folder.DoesNotExist:
+#         messages.error(request, "Folder not found.")
+#         return redirect('folder_list')
 
 @login_required
 def folder_detail(request, slug):
@@ -113,20 +155,10 @@ def folder_detail(request, slug):
         return redirect('folder_list')
     
     try:
-        # Handle the 'general' folder case
-        if slug == 'general':
-            # You might need to create a general folder if it doesn't exist
-            folder, created = Folder.objects.get_or_create(
-                name="General", 
-                user=request.user,
-                defaults={'slug': 'general'}
-            )
-        else:
-            folder = get_object_or_404(Folder, slug=slug, user=request.user)
+        # Get the specific folder (no special case for General anymore)
+        folder = get_object_or_404(Folder, slug=slug, user=request.user)
         
-        # Get flashcard sets belonging to this folder
         flashcard_sets = FlashcardSet.objects.filter(folder=folder, user=request.user)
-
         
         context = {
             'folder': folder,
@@ -138,6 +170,16 @@ def folder_detail(request, slug):
     except Folder.DoesNotExist:
         messages.error(request, "Folder not found.")
         return redirect('folder_list')
+    
+
+def folder_view(request):
+    folders = Folder.objects.filter(user=request.user)
+    flashcard_sets_without_folder = FlashcardSet.objects.filter(user=request.user, folder=None)
+    
+    return render(request, 'folder.html', {
+        'folders': folders,
+        'flashcard_sets_without_folder': flashcard_sets_without_folder
+    })
 
 @require_POST
 def create_folder(request):
@@ -180,46 +222,6 @@ def create_folder(request):
         # Log the error for debugging
         print(f"Folder creation error: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)})
-# @login_required
-# def create_flashcard_set(request):
-#     # We can also define the formset here if not defined in forms.py
-#     # FlashcardFormSet = modelformset_factory(Flashcard, form=FlashcardForm, extra=1, can_delete=True)
-
-#     if request.method == 'POST':
-#         set_form = FlashcardSetForm(request.POST, email=request.user.email)
-#         formset = FlashcardFormSet(request.POST, request.FILES, queryset=Flashcard.objects.none())
-
-#         if set_form.is_valid() and formset.is_valid():
-#             # Save the flashcard set
-#             flashcard_set = set_form.save()
-
-#             # Save each individual card
-#             valid_card_count = 0
-#             for form in formset:
-#                 # Check that the form has data (to avoid empty forms)
-#                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-#                     flashcard = form.save(commit=False)
-#                     flashcard.flashcard_set = flashcard_set
-#                     flashcard.save()
-#                     valid_card_count += 1
-#             if valid_card_count < 2:
-#                 # Optionally, add an error message and re-render the form
-#                 messages.error(request, "You must add at least two flashcards.")
-#                 # You might choose to delete the flashcard_set or not save it yet
-#                 return render(request, 'create_flashcard_set.html', {'set_form': set_form, 'formset': formset})
-
-#             # Redirect to some page, e.g., a list of all flashcard sets
-#             return redirect('flashcard_set_details', set_id=flashcard_set.id) # Placeholder
-#     else:
-#         set_form = FlashcardSetForm(email=request.user.email)
-#         # We pass an empty queryset, so we’re not editing existing cards
-#         formset = FlashcardFormSet(queryset=Flashcard.objects.none())
-
-#     context = {
-#         'set_form': set_form,
-#         'formset': formset
-#     }
-#     return render(request, 'create_flashcard_set.html', context)
 
 @login_required
 def create_flashcard_set(request):
@@ -269,42 +271,6 @@ def create_flashcard_set(request):
     }
     return render(request, 'create_flashcard_set.html', context)
 
-# def edit_flashcard_set(request, pk):
-#     # Retrieve the FlashcardSet instance by its primary key (pk)
-#     flashcard_set = get_object_or_404(FlashcardSet, pk=pk)
-
-#     if request.method == 'POST':
-#         # If the request method is POST, bind the form and formset to the POST data
-#         set_form = FlashcardSetForm(request.POST, instance=flashcard_set)
-#         formset = FlashcardFormSet(request.POST, request.FILES, queryset=flashcard_set.flashcards.all())
-
-#         # if its valid save the form and formset
-#         if set_form.is_valid() and formset.is_valid():
-#             set_form.save()
-
-#             # then save each individual card
-#             for form in formset:
-#                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-#                     flashcard = form.save(commit=False)
-#                     flashcard.flashcard_set = flashcard_set  # assign the foreign key
-#                     flashcard.save()
-                    
-#             # redirect to some page, e.g., a list of all flashcard sets
-#             return redirect('flashcard_set_details',set_id=flashcard_set.id)  # Placeholder
-#     else:
-#         # If the request method is GET, populate the form and formset with the existing data
-#         set_form = FlashcardSetForm(instance=flashcard_set)
-#         formset = FlashcardFormSet(queryset=flashcard_set.flashcards.all())
-        
-#     # Pass the form, formset, and flashcard set to the template context
-#     context = {
-#         'set_form': set_form,
-#         'formset': formset,
-#         'flashcard_set': flashcard_set
-#     }
-#     # Render the edit_flashcard_set.html template with the context
-#     return render(request, 'edit_flashcard_set.html', context)
-
 @login_required
 def edit_flashcard_set(request, pk):
     # Retrieve the FlashcardSet instance by its primary key (pk)
@@ -353,11 +319,6 @@ def edit_flashcard_set(request, pk):
     }
     # Render the edit_flashcard_set.html template with the context
     return render(request, 'edit_flashcard_set.html', context)
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .models import Flashcard
 
 @csrf_exempt  # Only use if CSRF token is not available
 def update_flashcard(request, term_id):
