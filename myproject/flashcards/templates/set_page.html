@@ -149,6 +149,7 @@
 <script>
 
     window.onload = function () {
+        const progressElement = document.querySelector(".study-progress p");
         const cards = document.querySelectorAll(".flashcard");
         let currentIndex = 0;
         const totalCards = cards.length;
@@ -212,6 +213,18 @@
             myChart.data.datasets[0].data[0] = learnedCount;
             myChart.data.datasets[0].data[1] = notLearnedCount;
             myChart.update();
+            // After updating the chart, update the percentage text
+            updateProgress(learnedCount, notLearnedCount);
+        }
+        // 4. Display the percentage in the "Progress: X%" paragraph
+        function updateProgress(learnedCount, notLearnedCount) {
+            const total = learnedCount + notLearnedCount;
+            let percentage = 0;
+            if (total > 0) {
+                percentage = Math.round((learnedCount / total) * 100);
+            }
+            // Update the DOM text
+            progressElement.innerText = `Progress: ${percentage}%`;
         }
 
         function updateCards() {
