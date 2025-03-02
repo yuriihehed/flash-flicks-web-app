@@ -103,6 +103,10 @@
 
         <!-- Search Terms & Definitions Section -->
         <section id="search-terms">
+            <!-- Display the total number of terms in the set -->
+            <p class="term-count">
+                {{ terms|length }} Terms
+            </p>
             <!-- New container div -->
             <div class="search-box">
                 <form method="GET" action="{% url 'search_terms' flashcard_set.id %}">
