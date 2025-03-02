@@ -279,14 +279,17 @@ def create_folder(request):
 
 @login_required
 @require_POST
-def delete_folder(request, folder_id):
+def delete_folder(request):
     """View for deleting a folder and its contents"""
     try:
-        # Get the folder and ensure it belongs to the current user
+        # Decode JSON request body
+        data = json.loads(request.body)
+        folder_id = data.get('folder_id')  # Get the folder_id from the request body
+
+        # Ensure folder exists and belongs to current user
         folder = get_object_or_404(Folder, id=folder_id, user=request.user)
         
-        # Delete the folder (this will cascade delete all flashcard sets if you've set up your models properly)
-        folder_name = folder.name  # Store for logging/messaging
+        folder_name = folder.name
         folder.delete()
         
         messages.success(request, f'Folder "{folder_name}" was successfully deleted.')
@@ -295,20 +298,10 @@ def delete_folder(request, folder_id):
             'success': True,
             'redirect_url': reverse('folder_list')  # Redirect to folder list
         })
-        
     except Folder.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'error': 'Folder not found.'
-        })
-        
+        return JsonResponse({'success': False, 'error': 'Folder not found.'})
     except Exception as e:
-        # Log the error
-        print(f"Error deleting folder: {str(e)}")
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        })
+        return JsonResponse({'success': False, 'error': str(e)})
     
     
 @login_required

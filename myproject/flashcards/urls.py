@@ -47,6 +47,8 @@ urlpatterns = [
     path('create-folder/', views.create_folder, name='create_folder'),
     path('flashcards/<int:set_id>/', views.flashcard_set_details, name='flashcard_set_details'),
     path('folder/<int:folder_id>/delete/', views.delete_folder, name='delete_folder'),
+    path('delete-folder/', views.delete_folder, name='delete_folder'),
+
 
     #Calender
     

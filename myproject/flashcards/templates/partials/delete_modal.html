@@ -1,19 +1,14 @@
 <!-- partials/delete_modal.html -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          Are you sure you want to delete the folder "<span id="folderNameToDelete"></span>"? 
-          This will delete all flashcard sets in this folder.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
-        </div>
-      </div>
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Delete Folder</h2>
+        <p>Are you sure you want to delete the folder "<span id="folderName"></span>"?</p>
+        <form method="POST" id="deleteForm">
+            {% csrf_token %}
+            <input type="hidden" name="folder_id" id="folderId">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <button type="button" class="btn btn-secondary" id="cancelDelete">Cancel</button>
+        </form>
     </div>
-  </div>
+</div>

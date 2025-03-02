@@ -7,28 +7,31 @@
 {% block content %}
 <!-- HERO SECTION (Optional) -->
 <section id="hero" class="hero section dark-background position-relative">
-    <img src="{% static 'img/hero-bg.jpg' %}" alt="Hero Background" class="hero-bg">
-    <div class="container text-center">
-        <h1 class="text-white">{{ folder.name }}</h1>
-        <p class="text-white-75">Manage flashcards in this folder.</p>
-    </div>
+  <img src="{% static 'img/hero-bg-2.jpg' %}" alt="Hero Background" class="hero-bg">
+  <div class="container text-center">
+      <h1 class="text-white">Your Folders</h1>
+      <p class="text-white-75">Manage your folders here.</p>
+  </div>
+  <style>
+      #hero {
+  min-height: 40vh; /* Reduced height */
+  padding: 60px 0; /* Less vertical padding */
+  }
+  </style>
 </section>
+
 <!-- MAIN DASHBOARD SECTION -->
 <section class="dashboard section py-5 light-background">
     <div class="container">
-        <!-- Include folder and delete modal partials -->
-        {% include 'partials/folder_modal.html' %}
-        {% include 'partials/delete_modal.html' %}
-
         <!-- Folder Actions -->
         <div class="mb-4 d-flex justify-content-between align-items-center">
             <a href="{% url 'folder_list' %}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back to Folders
             </a>
             <div>
-                <button class="btn btn-danger" id="openDeleteModal" data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.name }}">
+                <a class="btn btn-danger" id="openDeleteModal" data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.name }}">
                     <i class="bi bi-trash"></i> Delete Folder
-                </button>
+                </a>
             </div>
         </div>
 
@@ -67,6 +70,95 @@
         </div>
     </div> <!-- End .container -->
 </section>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Delete Folder</h2>
+        <p>Are you sure you want to delete the folder "<span id="folderName"></span>"?</p>
+        <form method="POST" id="deleteForm">
+            {% csrf_token %}
+            <input type="hidden" name="folder_id" id="folderId">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <button type="button" class="btn btn-secondary" id="cancelDelete">Cancel</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+  var folderDeleteUrl = "{% url 'delete_folder' %}";
+  var csrfToken = "{{ csrf_token }}";
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var deleteModal = document.getElementById("deleteModal");
+  var openDeleteModal = document.getElementById("openDeleteModal");
+  var closeDeleteModal = document.querySelector(".close");
+  var cancelDelete = document.getElementById("cancelDelete");
+  var folderNameSpan = document.getElementById("folderName");
+  var folderIdInput = document.getElementById("folderId");
+
+  // Open Delete Modal
+  if (openDeleteModal) {
+      openDeleteModal.onclick = function () {
+          var folderId = openDeleteModal.getAttribute("data-folder-id");
+          var folderName = openDeleteModal.getAttribute("data-folder-name");
+          folderNameSpan.textContent = folderName;
+          folderIdInput.value = folderId;
+          deleteModal.style.display = "block";
+      };
+  }
+
+  // Close Delete Modal
+  if (closeDeleteModal) {
+      closeDeleteModal.onclick = function () {
+          deleteModal.style.display = "none";
+      };
+  }
+
+  // Cancel Delete
+  if (cancelDelete) {
+      cancelDelete.onclick = function () {
+          deleteModal.style.display = "none";
+      };
+  }
+
+  // Close Modal When Clicking Outside the Modal
+  window.onclick = function (event) {
+      if (event.target === deleteModal) {
+          deleteModal.style.display = "none";
+      }
+  };
+
+  // Handle AJAX Form Submission
+  document.getElementById("deleteForm").addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent traditional form submission
+      var formData = new FormData(this);
+
+      fetch(folderDeleteUrl, {
+          method: "POST",
+          body: JSON.stringify({
+              folder_id: folderIdInput.value
+          }),
+          headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": csrfToken
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              window.location.href = data.redirect_url; // Redirect to folder list
+          } else {
+              alert("Error: " + data.error);
+          }
+      });
+  });
+});
+</script>
 {% endblock %}
 
 {% block extra_head %}
@@ -94,25 +186,57 @@
         border-radius: 8px;
         margin-bottom: 15px;
     }
-    
+    /* Modal Styles */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+    .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 30%;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+    }
+    input {
+        width: 80%;
+        padding: 8px;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    button {
+        margin-top: 10px;
+        padding: 8px 16px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
 </style>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-    var folderCreateUrl = "{% url 'create_folder' %}";
-    var folderDeleteUrl = "{% url 'delete_folder' folder.id %}";  // You'll need to create this URL
-    var csrfToken = "{{ csrf_token }}";
-</script>
-<link rel="stylesheet" href="{% static 'css/modal.css' %}">
-<script src="{% static 'js/folder.js' %}"></script>
-<script src="{% static 'js/delete-folder.js' %}"></script>  <!-- We'll create this JS file -->
-
-<script>
-  // Define these variables for the delete-folder.js script
-  const folderDeleteUrl = "{% url 'delete_folder' folder.id %}";
-  const csrfToken = "{{ csrf_token }}";
-</script>
-<script src="{% static 'js/delete-folder.js' %}"></script>
-
 {% endblock %}
