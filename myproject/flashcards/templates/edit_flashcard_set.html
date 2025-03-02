@@ -29,7 +29,7 @@ Edit Flashcard Set
             <h2 class="mb-0">Edit Flashcard Set</h2>
             <div>
                 <button type="button" class="btn btn-danger me-2"
-                        onclick="window.location.href='{% url 'home' %}'">Cancel</button>
+                    onclick="window.location.href='{% url 'home' %}'">Cancel</button>
                 <button type="submit" form="edit-flashcard-form" class="btn btn-primary">
                     Save Changes
                 </button>
@@ -63,29 +63,28 @@ Edit Flashcard Set
             </button>
             <button type="submit" class="btn btn-primary w-100">Save Changes</button>
         </form>
-
     </div> <!-- End .container -->
 </section>
 
 <!-- Inline JavaScript for dynamic card addition -->
 <script>
-document.getElementById("add-card-btn").addEventListener("click", function () {
-    var container = document.getElementById('cards-container');
-    var totalFormsInput = document.querySelector('[name="form-TOTAL_FORMS"]');
-    var totalForms = parseInt(totalFormsInput.value);
-    var emptyFormHtml = document.getElementById('empty-form').innerHTML;
-    var newFormHtml = emptyFormHtml.replace(/__prefix__/g, totalForms);
-    var newFormDiv = document.createElement('div');
-    newFormDiv.className = 'card mb-3';
-    newFormDiv.innerHTML = `
+    document.getElementById("add-card-btn").addEventListener("click", function () {
+        var container = document.getElementById('cards-container');
+        var totalFormsInput = document.querySelector('[name="form-TOTAL_FORMS"]');
+        var totalForms = parseInt(totalFormsInput.value);
+        var emptyFormHtml = document.getElementById('empty-form').innerHTML;
+        var newFormHtml = emptyFormHtml.replace(/__prefix__/g, totalForms);
+        var newFormDiv = document.createElement('div');
+        newFormDiv.className = 'card mb-3';
+        newFormDiv.innerHTML = `
         <div class="card-body">
             <h5 class="card-title">Card ${totalForms + 1}</h5>
             ${newFormHtml}
         </div>
     `;
-    container.appendChild(newFormDiv);
-    totalFormsInput.value = totalForms + 1;
-});
+        container.appendChild(newFormDiv);
+        totalFormsInput.value = totalForms + 1;
+    });
 </script>
 
 {% endblock %}

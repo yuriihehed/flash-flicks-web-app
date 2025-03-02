@@ -1,3 +1,25 @@
+/* Hero Section Styles */
+.hero-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.hero.section.dark-background {
+    position: relative;
+    background: #141414; /* fallback if hero image fails */
+    padding: 100px 0 80px; 
+}
+
+/* Reduce hero section height ONLY for this page */
+#hero {
+    min-height: 50vh !important; 
+    padding: 50px 0 !important; 
+}
 /* Settings Container */
 .setting label {
     color: white;
