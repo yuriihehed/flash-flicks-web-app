@@ -771,3 +771,4 @@ def search_terms(request, set_id):
         "terms": flashcards,  # your template might loop over "terms"
         "query": query,
     })
+    

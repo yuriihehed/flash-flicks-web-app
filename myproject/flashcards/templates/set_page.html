@@ -130,6 +130,10 @@
                 {% endif %}
             </h3>
             <p>{{ term.definition }}</p>
+            <!-- Display the image if it exists -->
+            {% if term.image %}
+            <img src="{{ term.image.url }}" alt="{{ term.term }}" style="max-width:200px; display:block; margin:1em 0;">
+            {% endif %}
             <p class="learned-status">
                 Status:
                 {% if term.is_learned %}

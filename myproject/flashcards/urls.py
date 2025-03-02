@@ -63,6 +63,7 @@ urlpatterns = [
 
     path('forgot-password/', forgot_password_view, name='forgot_password'),
     path('reset/<uidb64>/<token>/', reset_password_view, name='reset_password'),
+    
 
 ]
 
@@ -71,3 +72,6 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
