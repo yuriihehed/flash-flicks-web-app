@@ -1,76 +1,193 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}
-Study Page
-{% endblock %}
+{% block title %}Study Page{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/study_page.css' %}">
+<link rel="stylesheet" href="{% static 'css/studypage.css' %}">
+<style>
+    /* Timer Widget */
+    .timer-widget {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: #002855;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+
+    /* Flashcard Layout */
+    .flashcard-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+    .flashcard {
+        position: relative;
+        width: 800px;
+        height: 450px;
+        perspective: 1000px;
+        border-radius: 10px;
+        transition: box-shadow 0.5s ease-in-out;
+    }
+    .card-inner {
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+        position: relative;
+    }
+    .flashcard.flipped .card-inner {
+        transform: rotateY(180deg);
+    }
+    .front, .back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: #99c2ff;
+        border-radius: 10px;
+    }
+    .back {
+        background-color: #66a3ff;
+        transform: rotateY(180deg);
+    }
+
+    /* Edit & Star Button - Top Right */
+    .top-buttons {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 5px;
+    }
+    .edit-btn, .star-btn {
+        background-color: white;
+        border: 1px solid #002855;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .edit-btn:hover {
+        background-color: #0056b3;
+        color: white;
+    }
+    .star-btn {
+        font-size: 16px;
+        color: gold;
+    }
+
+    /* Glowing Effect on Entire Flashcard */
+    .flashcard.flash {
+        animation: flash 0.5s ease-in-out;
+        box-shadow: 0 0 20px 10px gold;
+    }
+
+    @keyframes flash {
+        0% { box-shadow: 0 0 20px 10px gold; }
+        50% { box-shadow: 0 0 30px 20px yellow; }
+        100% { box-shadow: none; }
+    }
+
+    /* Disable Flipping when Favorited */
+    .flashcard.favorited {
+        pointer-events: none; /* Disables flipping when favorited */
+    }
+
+    /* Navigation */
+    .navigation {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ccc;
+        border-radius: 60px;
+        padding: 5px 20px;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .nav-btn {
+        background-color: transparent;
+        border: none;
+        font-size: 25px;
+        cursor: pointer;
+    }
+
+    /* Editable Mode */
+    .editable {
+        border: 1px solid rgb(20, 50, 136);
+        padding: 20px;
+        border-radius: 10px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-
-<!-- HERO SECTION (Dark Background) -->
-<section id="hero" class="hero section dark-background position-relative">
-    <img src="{% static 'img/hero-bg.jpg' %}" alt="Hero Background" class="hero-bg">
+<!-- HERO SECTION -->
+<section id="hero" class="hero section dark-background">
+    <img src="{% static 'img/hero-bg-3.jpg' %}" alt="" class="hero-bg">
     <div class="container text-center">
-        <h1 class="text-white">Object-Oriented Programming</h1>
-        <p class="text-white-75">Review and refine your OOP knowledge with these interactive flashcards.</p>
-        <a href="{% url 'edit_learn_mode' %}" class="btn btn-secondary">Edit Learn Mode</a>
+        <h1 class="text-white">Study Page</h1>
+        <p class="text-white-75">This is where your flashcard learning begins. Stay focused and study effectively.</p>
     </div>
 </section>
 
-<!-- MAIN STUDY SECTION (Light Background) -->
-<section class="study-section py-5 light-background">
-    <div class="container">
-        
-        <div class="header text-center">
-            <h2>OOP Flashcards</h2>
-        </div>
-
-        <!-- Flashcards Container -->
-        <div class="flashcard-container">
-            {% for i in cards %}
-            <div class="flashcard" id="card{{ i }}">
-                <div class="card-inner">
-                    <div class="front">
-                        <h2 contenteditable="false" class="card-title">Card {{ i }}</h2>
-                        <p contenteditable="false" class="card-term">Term for card {{ i }}</p>
-                    </div>
-                    <div class="back">
-                        <h2 contenteditable="false" class="card-back-title">Back of Card {{ i }}</h2>
-                        <p contenteditable="false" class="card-back-content">This is the back of the card.</p>
-                    </div>
+<!-- MAIN CONTENT -->
+<div class="container py-5">
+    <div class="flashcard-container mt-4">
+        {% for i in cards %}
+        <div class="flashcard" id="card{{ i }}">
+            <div class="card-inner">
+                <div class="front">
+                    <h2 contenteditable="false" class="card-title">Card {{ i }}</h2>
+                    <p contenteditable="false" class="card-term">Term for card {{ i }}</p>
                 </div>
-                <div class="top-buttons">
-                    <button class="oval-button star-btn" onclick="flashEffect(this)">&#9733;</button>
-                    <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+                <div class="back">
+                    <h2 contenteditable="false" class="card-back-title">Back of Card {{ i }}</h2>
+                    <p contenteditable="false" class="card-back-content">This is the back of the card.</p>
                 </div>
             </div>
-            {% endfor %}
+            <!-- Buttons (Edit & Star) -->
+            <div class="top-buttons">
+                <button class="star-btn" onclick="toggleFavorite(this)">&#9733;</button>
+                <button class="edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+            </div>
         </div>
-
-        <!-- Navigation -->
-        <div class="navigation">
-            <button id="prevBtn" class="nav-btn">&#8592;</button>
-            <span id="cardCounter">1 / {{ cards|length }}</span>
-            <button id="nextBtn" class="nav-btn">&#8594;</button>
-        </div>
-
+        {% endfor %}
     </div>
-</section>
 
-{% endblock %}
+    <div class="navigation">
+        <button id="prevBtn" class="nav-btn">&#8592;</button>
+        <span id="cardCounter">1 / {{ cards|length }}</span>
+        <button id="nextBtn" class="nav-btn">&#8594;</button>
+    </div>
+</div>
 
+<!-- Timer Widget -->
+<div id="timerWidget" class="timer-widget"></div>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        loadSettings();
+        checkIfOnTimerPage();
+    });
+
     const cards = document.querySelectorAll('.flashcard');
     let currentIndex = 0;
 
     function updateCards() {
         cards.forEach((card, index) => {
-            card.style.display = (index === currentIndex) ? 'block' : 'none';
+            card.style.display = index === currentIndex ? 'block' : 'none';
         });
         document.getElementById('cardCounter').innerText = `${currentIndex + 1} / ${cards.length}`;
     }
@@ -87,28 +204,28 @@ Study Page
 
     cards.forEach(card => {
         card.addEventListener('click', function (e) {
-            // Prevent flipping if the edit/star button is clicked
-            if (!e.target.classList.contains('star-btn') && !card.classList.contains('editing') 
-                && !e.target.classList.contains('edit-btn')) {
+            if (!e.target.classList.contains('edit-btn') && !e.target.classList.contains('star-btn') && !card.classList.contains('editing')) {
                 this.classList.toggle('flipped');
             }
         });
     });
 
-    function flashEffect(element) {
+    function toggleFavorite(element) {
         const card = element.closest('.flashcard');
-        card.classList.add('flash');
+        card.classList.toggle('flash');
+        card.classList.toggle('favorited'); // Disables flipping when favorited
         setTimeout(() => card.classList.remove('flash'), 500);
     }
 
     function toggleEdit(button, event) {
-        event.stopPropagation(); 
+        event.stopPropagation();
+
         const card = button.closest('.flashcard');
         const fields = card.querySelectorAll('.card-title, .card-term, .card-back-title, .card-back-content');
+
         const isEditing = card.classList.contains('editing');
 
         if (isEditing) {
-            // Save Mode
             fields.forEach(el => {
                 el.contentEditable = "false";
                 el.classList.remove('editable');
@@ -116,7 +233,6 @@ Study Page
             card.classList.remove('editing');
             button.textContent = "Edit";
         } else {
-            // Edit Mode
             fields.forEach(el => {
                 el.contentEditable = "true";
                 el.classList.add('editable');
@@ -126,7 +242,6 @@ Study Page
         }
     }
 
-    // Initialize display
     updateCards();
 </script>
 

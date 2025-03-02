@@ -16,6 +16,8 @@
         color: white !important;
         font-weight: bold;
     }
+
+    /* Notification Styles */
     .notification {
         display: none;
         position: fixed;
@@ -35,6 +37,21 @@
         display: block;
         opacity: 1;
         transform: translateY(0);
+    }
+
+    /* Timer Widget for Flashcard & Study Page */
+    .timer-widget {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: #002855;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
     }
 </style>
 {% endblock %}
@@ -89,9 +106,7 @@
                     <div class="setting d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <label class="text-white mb-1"><strong>Ultradian Rhythm</strong></label>
-                            <small class="d-block text-secondary" style="font-size: 12px;">
-                                90-minute intervals with 30-minute breaks
-                            </small>
+                            <small class="d-block text-secondary">90-minute study / 30-minute break</small>
                         </div>
                         <label class="switch">
                             <input type="checkbox" id="ultradianToggle">
@@ -101,6 +116,7 @@
 
                     <hr class="border-light">
 
+                    <!-- QUESTION FORMAT -->
                     <div class="mb-3 text-white"><strong>Question Format:</strong></div>
 
                     <div class="setting d-flex justify-content-between align-items-center mb-3">
@@ -143,35 +159,32 @@
 
 <!-- NOTIFICATION POPUPS -->
 <div id="saveNotification" class="notification">✅ Settings saved successfully!</div>
+<div id="timerStartPopup" class="notification">⏳ Study timer started!</div>
 <div id="ultradianStartPopup" class="notification">⏳ 90-minute study session started!</div>
-<div id="ultradianEndPopup" class="notification">✅ 90-minute study completed. Please take your 30-minute break.</div>
+<div id="ultradianEndPopup" class="notification">✅ 90-minute study completed. Please take a 30-minute break.</div>
 <div id="breakEndPopup" class="notification">⏳ Break over! Time to resume your study session.</div>
+
+<!-- Timer Widget (Only for Flashcard & Study Page) -->
+<div id="timerWidget" class="timer-widget"></div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         loadSettings();
+        checkIfOnTimerPage();
     });
 
     function saveSettings() {
-        const starred = document.getElementById('starredToggle').checked;
-        const shuffle = document.getElementById('shuffleToggle').checked;
+        applyTimerSetting();
+        showPopup('saveNotification');
+    }
+
+    function applyTimerSetting() {
         const timer = document.getElementById('timerSelect').value;
         const ultradian = document.getElementById('ultradianToggle').checked;
-        const termAnswer = document.getElementById('termToggle').checked;
-        const definitionAnswer = document.getElementById('definitionToggle').checked;
-        const roundLength = document.getElementById('roundLength').value;
 
-        localStorage.setItem("studySettings", JSON.stringify({
-            starred,
-            shuffle,
-            timer,
-            ultradian,
-            termAnswer,
-            definitionAnswer,
-            roundLength
-        }));
+        localStorage.setItem("studySettings", JSON.stringify({ timer, ultradian }));
 
-        showPopup('saveNotification');
+        showPopup('timerStartPopup');
 
         if (ultradian) {
             showPopup('ultradianStartPopup');
@@ -187,13 +200,8 @@
     function loadSettings() {
         const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
         if (savedSettings) {
-            document.getElementById('starredToggle').checked = savedSettings.starred;
-            document.getElementById('shuffleToggle').checked = savedSettings.shuffle;
             document.getElementById('timerSelect').value = savedSettings.timer;
             document.getElementById('ultradianToggle').checked = savedSettings.ultradian;
-            document.getElementById('termToggle').checked = savedSettings.termAnswer;
-            document.getElementById('definitionToggle').checked = savedSettings.definitionAnswer;
-            document.getElementById('roundLength').value = savedSettings.roundLength;
         }
     }
 
@@ -202,7 +210,22 @@
         popup.classList.add('show');
         setTimeout(() => {
             popup.classList.remove('show');
-        }, 3000);
+        }, 5000);
+    }
+
+    function checkIfOnTimerPage() {
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/flashcards/') || currentPath.includes('/studypage/')) {
+            displayTimer();
+        }
+    }
+
+    function displayTimer() {
+        const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
+        if (savedSettings && savedSettings.timer !== "none") {
+            document.getElementById("timerWidget").style.display = "block";
+            document.getElementById("timerWidget").textContent = "⏳ Timer Running: " + savedSettings.timer + " min";
+        }
     }
 </script>
 
