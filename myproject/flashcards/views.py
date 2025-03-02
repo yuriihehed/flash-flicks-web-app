@@ -643,3 +643,22 @@ def update_flashcard_status(request, flashcard_id):
             return JsonResponse({"success": False, "error": str(e)})
 
     return JsonResponse({"success": False, "error": "Invalid request"})
+
+
+@csrf_exempt
+def update_star_status(request, term_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            favorite = data.get("favorite", False)  # True/False from the JS
+
+            flashcard = Flashcard.objects.get(id=term_id)
+            flashcard.is_favorite = favorite
+            flashcard.save()
+
+            return JsonResponse({"success": True})
+        except Flashcard.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Flashcard not found"})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    return JsonResponse({"success": False, "error": "Invalid request"})
