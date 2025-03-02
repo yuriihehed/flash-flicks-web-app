@@ -19,6 +19,17 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Event
 from datetime import datetime, timedelta
 from .models import Flashcard
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.conf import settings
+from django.urls import reverse
+from django.contrib.auth import update_session_auth_hash
 
 def landing_page(request):
     ensure_superuser()
@@ -34,8 +45,90 @@ def studypage(request):
 def edit_learn_mode(request):
     return render(request, 'edit_learn_mode.html')
 
+
+
+
+#Forgot Password
+
 def forgot_password(request):
     return render(request, 'forgot_password.html')
+def forgot_password_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        # Check if user with this email exists
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "No account found with that email address.")
+            return redirect('forgot_password')
+
+        # Generate a token
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        # Build reset URL (e.g., https://yourdomain.com/reset/<uid>/<token>/ )
+        reset_url = request.build_absolute_uri(
+            reverse('reset_password', kwargs={'uidb64': uid, 'token': token})
+        )
+
+        # Send email
+        subject = "Reset Your FlashFlicks Password"
+        from_email = settings.EMAIL_HOST_USER
+        to_email = [user.email]
+
+        # Render the HTML message
+        html_content = render_to_string('email_templates/reset_password_email.html', {
+            'user': user,
+            'reset_url': reset_url,
+        })
+        # Optionally render a plain-text fallback
+        plain_content = (
+            f"Hi {user.first_name or user.username},\n\n"
+            f"Please click the link to reset your password:\n{reset_url}\n\n"
+            "If you did not request this, ignore this email."
+        )
+
+        send_mail(
+            subject,
+            plain_content,          # Plain-text fallback
+            from_email,
+            to_email,
+            fail_silently=False,
+            html_message=html_content  # The HTML version
+        )
+
+        messages.success(request, "A password reset link has been sent to your email.")
+        return redirect('forgot_password')
+
+    return render(request, 'forgot_password.html')
+def reset_password_view(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        # Token is valid; allow user to change password
+        if request.method == 'POST':
+            password = request.POST.get('password')
+            confirm_password = request.POST.get('confirm_password')
+
+            if password == confirm_password:
+                user.set_password(password)
+                user.save()
+
+                messages.success(request, "Your password has been reset successfully. You can now log in.")
+                return redirect('login')
+            else:
+                messages.error(request, "Passwords do not match. Try again.")
+
+        return render(request, 'reset_password.html', {'validlink': True})
+    else:
+        # Invalid or expired link
+        messages.error(request, "This link is invalid or has expired.")
+        return redirect('forgot_password')
+
 
 @login_required
 def home(request):
