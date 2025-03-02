@@ -70,6 +70,7 @@
                     </div>
                     {% empty %}
                     <p class="text-muted">You have no folders yet. Create one!</p>
+                    
                     {% endfor %}
                 </div>
             </div>
@@ -90,6 +91,9 @@
                     </div>
                     {% empty %}
                     <p class="text-muted">No flashcard sets found.</p>
+                    <!-- <button href="/create-flashcard-set" class="btn btn-primary" data-bs-toggle="modal" >
+                        + Create New Study Set
+                    </button> -->
                     {% endfor %}
                 </div>
             </div>
@@ -152,7 +156,10 @@
             var responseMessage = document.getElementById("responseMessage");
             if (data.success) {
                 responseMessage.innerHTML = "Folder created: " + data.folder_name;
-                // Optionally, you might want to update the folder list here or close the modal.
+                // Optionally, you might want to update the folder list here or close the modal. 
+                setTimeout(() => {
+                    location.reload(); // Reload the page to show the new folder
+                }, 2000);
             } else {
                 responseMessage.innerHTML = "Folder creation failed.";
             }
