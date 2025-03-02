@@ -70,25 +70,29 @@ def home(request):
 
 @login_required
 def accounts_settings(request):
-   if request.method == "POST":
-       field = request.POST.get("field")
-       value = request.POST.get("value")
+    if request.method == "POST":
+        field = request.POST.get("field")
+        value = request.POST.get("value")
 
-       if field and value:
-           user = request.user  # Get the logged-in user
-           if field == "username":
-               user.first_name = value
-           elif field == "password":
-               user.set_password(value)  # Encrypts new password
-               user.save()
-               update_session_auth_hash(request, user)  # Prevent logout
-               login(request, user)  # Log the user back in
-               messages.success(request, "Password updated successfully!")
-               return redirect("settings")
-           user.save()
-           messages.success(request, f"{field.capitalize()} updated successfully!")
-           return redirect("settings")  # Redirect to account settings
-   return render(request, 'accounts_settings.html')
+        if field and value:
+            user = request.user  # Get the logged-in user
+            if field == "username":
+                user.first_name = value
+            elif field == "password":
+                confirm_password = request.POST.get("confirm_password")
+                if value != confirm_password:
+                    messages.error(request, "Passwords do not match!")
+                    return redirect("settings")
+                user.set_password(value)  # Encrypts new password
+                user.save()
+                update_session_auth_hash(request, user)  # Prevent logout
+                login(request, user)  # Log the user back in
+                messages.success(request, "Password updated successfully!")
+                return redirect("settings")
+            user.save()
+            messages.success(request, f"{field.capitalize()} updated successfully!")
+            return redirect("settings")  # Redirect to account settings
+    return render(request, 'accounts_settings.html')    
 
 @login_required
 def folder_list(request):
