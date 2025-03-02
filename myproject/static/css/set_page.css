@@ -157,3 +157,23 @@
 .term-box p {
     margin: 0;
 }
+.active-star {
+    color: gold; 
+    /* or text-shadow: 0 0 5px gold; etc. */
+}
+/* Example styling for 'editable' fields */
+.editable {
+    outline: 2px dashed red;
+}
+/* Example flash effect */
+.flash {
+    animation: flashEffect 0.5s ease;
+}
+@keyframes flashEffect {
+    from {
+        background-color: yellow;
+    }
+    to {
+        background-color: inherit;
+    }
+}
