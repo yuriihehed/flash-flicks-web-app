@@ -38,6 +38,16 @@
         opacity: 1;
         transform: translateY(0);
     }
+    /* Ensure new notifications appear below previous ones */
+    .notification-stack {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Add space between stacked notifications */
+        z-index: 1000;
+    }
 
     /* Timer Widget for Flashcard & Study Page */
     .timer-widget {
