@@ -181,3 +181,14 @@
         background-color: inherit;
     }
 }
+.search-box {
+    border: 1px solid #000000;         /* A light gray border */
+    padding: 16px;                  /* Spacing inside the box */
+    border-radius: 8px;             /* Slightly rounded corners */
+    background-color: #f8f9fa;      /* A light background color (optional) */
+    max-width: 450px;     /* limits the box width */
+}
+
+.search-container input[type="text"]{
+    width: 300px; /* or whatever width you prefer */
+}

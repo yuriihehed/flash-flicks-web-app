@@ -58,6 +58,8 @@ urlpatterns = [
     path('delete-event/', views.delete_event, name='delete-event'),
 
     path('update_flashcard_status/<int:flashcard_id>/', update_flashcard_status, name='update_flashcard_status'),
+    # for the search bar
+    path('search/<int:set_id>/', views.search_terms, name='search_terms'),
 
     path('forgot-password/', forgot_password_view, name='forgot_password'),
     path('reset/<uidb64>/<token>/', reset_password_view, name='reset_password'),
