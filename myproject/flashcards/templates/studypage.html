@@ -6,19 +6,22 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/studypage.css' %}">
 <style>
+    /* Hero Section Styling - Smaller Header */
+    #hero {
+        min-height: 30vh;
+        padding: 20px 0;
+    }
+    
     /* Timer Widget */
     .timer-widget {
         display: none;
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        background: #002855;
+        font-size: 28px;
         color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
         font-weight: bold;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        z-index: 1000;
+        margin-top: 5px;
+        background: rgba(0, 40, 85, 0.8);
+        padding: 20px 10px;
+        border-radius: 5px;
     }
 
     /* Flashcard Layout */
@@ -63,7 +66,7 @@
         transform: rotateY(180deg);
     }
 
-    /* Edit & Star Button - Top Right */
+    /* Buttons - Edit & Star */
     .top-buttons {
         position: absolute;
         top: 10px;
@@ -71,11 +74,11 @@
         display: flex;
         gap: 5px;
     }
-    .edit-btn, .star-btn {
+    .star-btn, .edit-btn {
         background-color: white;
         border: 1px solid #002855;
         padding: 8px 15px;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         font-weight: bold;
     }
@@ -88,21 +91,16 @@
         color: gold;
     }
 
-    /* Glowing Effect on Entire Flashcard */
+    /* Flashcard Glow Effect */
     .flashcard.flash {
         animation: flash 0.5s ease-in-out;
-        box-shadow: 0 0 20px 10px gold;
+        box-shadow: 0 0 20px 10px rgb(243, 230, 159);
     }
 
     @keyframes flash {
-        0% { box-shadow: 0 0 20px 10px gold; }
-        50% { box-shadow: 0 0 30px 20px yellow; }
+        0% { box-shadow: 0 0 20px 10px rgb(243, 230, 159); }
+        50% { box-shadow: 0 0 30px 20px rgb(237, 190, 163); }
         100% { box-shadow: none; }
-    }
-
-    /* Disable Flipping when Favorited */
-    .flashcard.favorited {
-        pointer-events: none; /* Disables flipping when favorited */
     }
 
     /* Navigation */
@@ -137,8 +135,13 @@
 <section id="hero" class="hero section dark-background">
     <img src="{% static 'img/hero-bg-3.jpg' %}" alt="" class="hero-bg">
     <div class="container text-center">
-        <h1 class="text-white">Study Page</h1>
-        <p class="text-white-75">This is where your flashcard learning begins. Stay focused and study effectively.</p>
+        <h1 class="text-white" style="font-size: 24px; margin-bottom: 5px;">Study Page</h1>
+        <p class="text-white-75" style="font-size: 14px;">This is where your flashcard learning begins. Stay focused and study effectively.</p>
+        
+        <!-- Timer Widget (Initially Hidden) -->
+        <div id="heroTimerWidget" class="timer-widget">
+            <span id="timerDisplay">00:00</span>
+        </div>
     </div>
 </section>
 
@@ -173,14 +176,53 @@
     </div>
 </div>
 
-<!-- Timer Widget -->
-<div id="timerWidget" class="timer-widget"></div>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        loadSettings();
+        // If there's a global timer running, stop it
+        if (window.globalTimer) {
+            clearInterval(window.globalTimer);
+            console.log("Stopped global timer.");
+        }
+
+        // Check if the timer should be displayed
         checkIfOnTimerPage();
+
+        // Initialize flipping functionality
+        document.querySelectorAll('.flashcard').forEach(card => {
+            card.addEventListener("click", function (e) {
+                if (!e.target.classList.contains("star-btn") && !e.target.classList.contains("edit-btn") && !card.classList.contains("editing")) {
+                    this.classList.toggle("flipped");
+                }
+            });
+        });
+
+        updateCards();
     });
+
+    function checkIfOnTimerPage() {
+        const heroTimer = document.getElementById("heroTimerWidget");
+        const timerEnabled = localStorage.getItem("study_timer_active");
+
+        if (timerEnabled === "true") {
+            heroTimer.style.display = "block";
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        let timerDisplay = document.getElementById("timerDisplay");
+        let seconds = 0;
+        let minutes = 0;
+
+        window.globalTimer = setInterval(() => {
+            seconds++;
+            if (seconds === 60) {
+                seconds = 0;
+                minutes++;
+            }
+            timerDisplay.innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }, 1000);
+    }
 
     const cards = document.querySelectorAll('.flashcard');
     let currentIndex = 0;
@@ -202,18 +244,9 @@
         updateCards();
     });
 
-    cards.forEach(card => {
-        card.addEventListener('click', function (e) {
-            if (!e.target.classList.contains('edit-btn') && !e.target.classList.contains('star-btn') && !card.classList.contains('editing')) {
-                this.classList.toggle('flipped');
-            }
-        });
-    });
-
     function toggleFavorite(element) {
         const card = element.closest('.flashcard');
         card.classList.toggle('flash');
-        card.classList.toggle('favorited'); // Disables flipping when favorited
         setTimeout(() => card.classList.remove('flash'), 500);
     }
 

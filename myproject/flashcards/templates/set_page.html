@@ -7,6 +7,26 @@
 
 <link rel="stylesheet" href="{% static 'css/set_page.css' %}">
 <style>
+
+    /* Hero Section Updates */
+    #hero {
+        min-height: 40vh;
+        padding: 50px 0;
+    }
+
+    /* Timer Widget */
+    .hero-timer-widget {
+        display: none;
+        font-size: 24px;
+        color: white;
+        font-weight: bold;
+        background: rgba(0, 40, 85, 0.8);
+        padding: 15px 20px;
+        border-radius: 5px;
+        margin-top: 10px;
+        text-align: center;
+    }
+
     /* Glowing Effect */
     .flash {
         animation: flash 0.5s ease-in-out;
@@ -37,11 +57,25 @@
     <div class="container text-center">
         <h1 class="text-white">{{ flashcard_set.title }}</h1>
         <p class="text-white-75">Manage your terms and definitions in style!</p>
-        <button type="button" class="btn btn-danger"
-            onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">
-            Edit Flashcard Set
-        </button>
-    </div>
+
+        <!-- Timer Widget (Initially Hidden) -->
+        <div id="heroTimerWidget" class="hero-timer-widget">
+            <span id="timerDisplay">00:00</span>
+        </div>
+
+        
+        <div class="text-end mt-3">
+           <!-- Study Space& Edit Flashcard set Buttons -->
+            <button type="button" class="btn btn-success"
+                onclick="window.location.href='{% url 'studypage' %}'">
+                Study Space
+            </button>
+
+            <button type="button" class="btn btn-danger"
+                onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">
+                Edit Flashcard Set
+            </button>          
+        </div>
 </section>
 
 <!-- MAIN SET SECTION -->

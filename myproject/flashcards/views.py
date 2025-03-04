@@ -533,7 +533,7 @@ def learning_page(request):
 
 
 def calendar_view(request):
-    return render(request, 'calendar.html')  # This is the new calendar page
+    return render(request, 'calendar.html')  # This is the new calendar pages
 
 def generate_recurring_events(event):
     occurrences = []
