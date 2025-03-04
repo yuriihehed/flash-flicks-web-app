@@ -27,17 +27,18 @@
             <div class="col-lg-8">
                 <div class="card shadow-sm p-4">
                     <h3 class="text-center mb-4">Flashcard Set Details</h3>
-                    
+
+                    <!-- Error messages-->
                     {% if messages %}
-                        <div class="messages">
-                            {% for message in messages %}
-                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                            {{ message }}
                         </div>
+                        {% endfor %}
+                    </div>
                     {% endif %}
-                    
+
                     <form id="create-flashcard-form" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         {{ set_form.as_p }}
@@ -51,12 +52,13 @@
                             </div>
                             {% endfor %}
                         </div>
-                        
+
                         <div id="empty-form" style="display: none;">
                             {{ formset.empty_form.as_p }}
                         </div>
 
-                        <button type="button" id="add-card-btn" class="btn btn-secondary w-100 mb-3">+ Add a Card</button>
+                        <button type="button" id="add-card-btn" class="btn btn-secondary w-100 mb-3">+ Add a
+                            Card</button>
                         <button type="submit" class="btn btn-primary w-100">Create Flashcard Set</button>
                     </form>
                 </div>

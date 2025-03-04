@@ -40,14 +40,19 @@ def landing_page(request):
 def base_page(request):
     return render(request, 'base.html')
 
-def studypage(request):
-    cards = range(1, 7)  # Example card range
-    return render(request, 'studypage.html', {'cards': cards})
+def studypage(request, set_id):
+    flashcard_set = get_object_or_404(FlashcardSet, id=set_id)
+    terms = flashcard_set.flashcards.all()
+
+    for term in terms:
+        term.is_learned = term.learned_by.filter(id=request.user.id).exists()
+    return render(request, 'studypage.html', {
+        'flashcard_set': flashcard_set,
+        'terms': terms,
+        })
 
 def edit_learn_mode(request):
     return render(request, 'edit_learn_mode.html')
-
-
 
 
 #Forgot Password
@@ -504,14 +509,6 @@ def flashcard_set_details(request, set_id):
     })
 
 
-
-
-
-
-
-
-
-
 def ensure_superuser():
     User = get_user_model()
     admin_email = "admin@hotmail.com"  
@@ -533,7 +530,7 @@ def learning_page(request):
 
 
 def calendar_view(request):
-    return render(request, 'calendar.html')  # This is the new calendar page
+    return render(request, 'calendar.html')  # This is the new calendar pages
 
 def generate_recurring_events(event):
     occurrences = []
@@ -758,4 +755,30 @@ def search_terms(request, set_id):
         "terms": flashcards,  # your template might loop over "terms"
         "query": query,
     })
+    
+@login_required
+@require_POST
+def update_learn_settings(request):
+    data = json.loads(request.body)
+    starred = data.get("starred", False)
+    shuffle = data.get("shuffle", False)
+    timer = data.get("timer", "none")
+    ultradian = data.get("ultradian", False)
+    answer_with_term = data.get("answer_with_term", False)
+    answer_with_definition = data.get("answer_with_definition", False)
+    round_length = data.get("round_length", 1)
+
+    # Example: if you have a UserSettings model (or store these in the UserProfile)
+    # user_settings = request.user.settings  # assuming a OneToOneField linking a settings model to your user
+    # user_settings.study_starred = starred
+    # user_settings.study_shuffle = shuffle
+    # user_settings.study_timer = timer
+    # user_settings.ultradian = ultradian
+    # user_settings.answer_with_term = answer_with_term
+    # user_settings.answer_with_definition = answer_with_definition
+    # user_settings.round_length = round_length
+    # user_settings.save()
+
+    return JsonResponse({"success": True})
+    
     

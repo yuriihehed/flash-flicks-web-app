@@ -27,6 +27,14 @@
 }
 
 /* Card Styling for Folders */
+
 .card {
     border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+.card:hover {
+    
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Add shadow effect */
+    background-color: rgba(240, 240, 240, 0.9); /* Light background on hover */
 }

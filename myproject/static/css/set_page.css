@@ -192,3 +192,29 @@
 .search-container input[type="text"]{
     width: 300px; /* or whatever width you prefer */
 }
+
+/* Three horizontal boxes for the learn, study, flashcards */
+.three-box-container {
+    display: flex;
+    gap: 10px;
+    /* spacing between boxes */
+    margin-bottom: 20px;
+}
+.box {
+    background-color: #e5e5e5;
+    border: 1px solid #ccc;
+    flex: 1;
+    /* each box shares available space */
+    height: 120px;
+    /* approximate height, tweak as needed */
+    padding: 10px;
+    overflow: hidden; /* Prevent text from overflowing */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content vertically */
+    align-items: center; /* Centers content horizontally */
+    word-wrap: break-word;
+    white-space: normal;
+    max-width: 100%; /* Ensures no overflow */
+}
