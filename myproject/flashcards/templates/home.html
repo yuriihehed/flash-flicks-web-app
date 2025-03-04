@@ -23,17 +23,19 @@
     </style>
 </section>
 
-<!---->
+<!--
 <section class="dashboard section light-background py-5">
     <div class="container">
         <div class="row gy-4">
-            <!-- Progress Tracker -->
+-->
+            <!-- Progress Tracker 
             <div class="col-lg-4 col-md-6">
                 <div class="card shadow-sm text-center p-4">
                     <h5 class="card-title">Progress Tracker</h5>
                     <p class="card-text">Track your study progress here.</p>
                 </div>
             </div>
+-->
             <!-- Calendar
             <div class="col-lg-4 col-md-6">
                 <div class="card shadow-sm text-center p-4">
@@ -41,24 +43,25 @@
                     <p class="card-text">Manage your study schedule.</p>
                 </div>
             </div> -->
-            <!-- My Account -->
+            <!-- My Account 
             <div class="col-lg-4 col-md-6">
                 <div class="card shadow-sm text-center p-4">
                     <h5 class="card-title">My Account</h5>
                     <p class="card-text">Manage your settings.</p>
                 </div>
-            </div>
+            </div> 
         </div>
     </div>
 </section>
+-->
 
 <!-- Folders and Flashcards -->
 <section class="dashboard section py-5">
     <div class="container">
         <div class="row">
             <!-- Folders Section -->
-            <div class="col-12 mb-4">
-                <h3 class="mb-3">📂 Folders</h3>
+            <div class="col-8 mb-4">
+                <h3 class="mb-3">📂<b> Folders</b></h3>
                 <!-- Trigger the Folder Modal -->
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#folderModal">
                     + Create New Folder
@@ -67,11 +70,13 @@
                 <div class="row mt-4">
                     {% for folder in user_folders %}
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <div class="card shadow-sm p-4">
-                            <h5 class="card-title">📁 {{ folder.name }}</h5>
-                            <p class="card-text">Manage your folder.</p>
-                            <a href="{% url 'folder_detail' folder.slug %}" class="btn btn-primary btn-sm">View</a>
-                        </div>
+                        <a href="{% url 'folder_detail' folder.slug %}" class="text-black text-decoration-none">
+                            <div class="card shadow-sm p-4">
+                                <h5 class="card-title"><b>{{ folder.name }}</b></h5>
+                                <p class="card-text">Manage your folder.</p>
+                                <p &nbsp;</p>
+                            </div>
+                        </a>
                     </div>
                     {% empty %}
                     <p class="text-muted">You have no folders yet. Create one!</p>
@@ -81,23 +86,22 @@
             </div>
 
             <!-- Flashcard Sets Section -->
-            <div class="col-12">
+            <div class="col-8">
                 <h3 class="mb-3">📖 Flashcard Sets</h3>
 
-                
                 <a href="/create-flashcard-set" class="btn btn-primary btn-lg">+ Create New Study Set</a>
                 
-
                 <div class="row mt-4">
                     {% for flashcard in flashcard_sets %}
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <div class="card shadow-sm p-4">
-                            <h5 class="card-title">{{ flashcard.title }}</h5>
-                            <p class="card-text">Contains {{ flashcard.flashcard_count }} sets</p>
-                            <p class="card-text">Folder: {{ flashcard.folder }}</p>
-
-                            <a href="{% url 'flashcard_set_details' flashcard.id %}" class="btn btn-primary btn-sm">View</a>
-                        </div>
+                        <a href="{% url 'flashcard_set_details' flashcard.id %}" class="text-black text-decoration-none">
+                            <div class="card shadow-sm p-4">
+                                <h5 class="card-title"><b>{{ flashcard.title }}</b></h5>
+                                <p class="card-text">Contains {{ flashcard.flashcard_count }} cards</p>
+                                <p class="card-text">Folder: {{ flashcard.folder }}</p>
+                                <p &nbsp;</p>
+                            </div>
+                        </a>
                     </div>
                     {% empty %}
                     <p class="text-muted">No flashcard sets found.</p>

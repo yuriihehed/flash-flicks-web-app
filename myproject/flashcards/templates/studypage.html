@@ -147,7 +147,15 @@
 
 
 <!-- MAIN CONTENT -->
+ 
 <div class="container py-5">
+
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+
     <div class="flashcard-container mt-4">
         {% for term in terms %}
     <!-- Hide all but the first card by default -->
