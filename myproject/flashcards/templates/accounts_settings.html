@@ -28,64 +28,77 @@
 
 <!-- Main Content -->
 <section class="dashboard section py-5 light-background">
-   <div class="container">
-       <div class="row justify-content-center">
-          
-           <!-- Settings CARD -->
-           <div class="col-lg-8 col-md-10">
-               {% if messages %}
-                       {% for message in messages %}
-                           <div class="alert alert-success text-center">{{ message }}</div>
-                       {% endfor %}
-               {% endif %}
-           </div>
-           <div class="col-lg-8 col-md-10">
-               <div class="card shadow-sm p-4" style="background-color:rgba(49, 61, 72, 0.67); border-radius: 15px;">
-                  
-                   <!-- Card Heading -->
-                   <h2 class="text-center mb-4" style="color: white;">Settings</h2>
-                  
-                   <!-- SETTINGS PANEL -->
+    <div class="container col-10 ">
+            <div class="mb-4 d-flex justify-content-between align-items-center">
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+        <div class="row justify-content-center">
+            
+            <!-- Settings CARD -->
+            <div class="col-lg-8 col-md-10">
+                {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success text-center">{{ message }}</div>
+                        {% endfor %}
+                {% endif %}
+            </div>
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow-sm p-4" style="background-color:rgb(16,5,140); border-radius: 15px;">
+                    
+                    <!-- Card Heading -->
+                    <h2 class="text-center mb-4" style="color: white;">Settings</h2>
+                    
+                    <!-- SETTINGS PANEL -->
 
 
-                   <!--  Username -->
-                   <div class="setting d-flex justify-content-between align-items-center mb-3">
-                       <div>
-                           <label class="text-white">Username:</label>
-                           <small class="d-block text-white" style="font-size: 14px;">{{ user.first_name }}</small>
-                       </div>
-                       <button class="btn btn-outline-light btn-sm" onclick="openEditModal('username', '{{ user.first_name }}')">Edit</button>
-                   </div>
+                    <!--  Username -->
+                    <div class="setting d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <label class="text-white">Username:</label>
+                            <small class="d-block text-white" style="font-size: 14px;">{{ user.first_name }}</small>
+                        </div>
+                        <button class="btn btn-outline-light btn-sm" onclick="openEditModal('username', '{{ user.first_name }}')">Edit</button>
+                    </div>
 
 
                    <hr class="border-light">
                    <!-- Change Password -->
-                   <div class="setting d-flex justify-content-between align-items-center mb-3">
-                       <div>
-                           <label class="text-white">Change Password:</label>
-                           <small class="d-block text-white" style="font-size: 14px;">••••••••</small>
-                       </div>
-                       <button class="btn btn-outline-light btn-sm" onclick="openEditModal('password', '')">Edit</button>
-                   </div>
+                    <div class="setting d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <label class="text-white">Change Password:</label>
+                            <small class="d-block text-white" style="font-size: 14px;">••••••••</small>
+                        </div>
+                        <button class="btn btn-outline-light btn-sm" onclick="openEditModal('password', '')">Edit</button>
+                    </div>
 
 
-                   <hr class="border-light">
-                   <!-- Email -->
+                    <hr class="border-light">
+                    <!-- Email -->
 
 
-                   <div class="setting d-flex justify-content-between align-items-center mb-3">
-                       <div>
-                           <label class="text-white">Email:</label>
-                           <small class="d-block text-white" style="font-size: 14px;">{{ user }}</small>
-                       </div>
-                   </div>
+                    <div class="setting d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            
+                            <label class="text-white">Email:</label>
+                            <small class="d-block text-white" style="font-size: 14px;">{{ user }}</small>
+                        </div>
+                        <div style="height: 20px;"></div>
+                   
+                    </div>
+                   
+
+               
+                    <hr class="border-light">
+                   
+                    <div style="height: 20px;"></div> 
+
+                
               
-                   <hr class="border-light">
-              
-                   <!-- SAVE BUTTON -->
-                   <a href="javascript:history.back()" class="btn btn-light w-100 mt-2">Go Back</a>
+                   
                   
-               </div>
+                </div>
            </div>
           
        </div>

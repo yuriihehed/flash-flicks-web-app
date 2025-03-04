@@ -41,7 +41,6 @@ def base_page(request):
     return render(request, 'base.html')
 
 def studypage(request, set_id):
-    card = range(1, 11)
     flashcard_set = get_object_or_404(FlashcardSet, id=set_id)
     terms = flashcard_set.flashcards.all()
 
@@ -50,12 +49,10 @@ def studypage(request, set_id):
     return render(request, 'studypage.html', {
         'flashcard_set': flashcard_set,
         'terms': terms,
-        "card": card,})
+        })
 
 def edit_learn_mode(request):
     return render(request, 'edit_learn_mode.html')
-
-
 
 
 #Forgot Password
@@ -510,14 +507,6 @@ def flashcard_set_details(request, set_id):
         'flashcard_set': flashcard_set,
         'terms': terms,
     })
-
-
-
-
-
-
-
-
 
 
 def ensure_superuser():
