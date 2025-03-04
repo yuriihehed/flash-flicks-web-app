@@ -20,7 +20,7 @@ def logout_view(request):
 urlpatterns = [
     path('', views.landing_page, name='landing_page'),  
     path('base/', views.base_page, name='base_page'),
-    path('studypage/', views.studypage, name='studypage'),    
+    path('studypage/<int:set_id>/', views.studypage, name='studypage'),    
     path('edit-learn-mode/', views.edit_learn_mode, name='edit_learn_mode'),
     path('login/', views.login_page, name='login'),
     path('register/', views.register, name='register'),

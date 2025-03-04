@@ -145,28 +145,36 @@
     </div>
 </section>
 
+
 <!-- MAIN CONTENT -->
 <div class="container py-5">
     <div class="flashcard-container mt-4">
-        {% for i in cards %}
-        <div class="flashcard" id="card{{ i }}">
-            <div class="card-inner">
-                <div class="front">
-                    <h2 contenteditable="false" class="card-title">Card {{ i }}</h2>
-                    <p contenteditable="false" class="card-term">Term for card {{ i }}</p>
-                </div>
-                <div class="back">
-                    <h2 contenteditable="false" class="card-back-title">Back of Card {{ i }}</h2>
-                    <p contenteditable="false" class="card-back-content">This is the back of the card.</p>
-                </div>
+        {% for term in terms %}
+    <!-- Hide all but the first card by default -->
+    <div class="flashcard" id="card{{ term.id }}" {% if not forloop.first %}style="display: none;" {% endif %}>
+        <div class="card-inner">
+            <div class="front">
+                <!-- Front side: Term -->
+                <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
             </div>
-            <!-- Buttons (Edit & Star) -->
-            <div class="top-buttons">
-                <button class="star-btn" onclick="toggleFavorite(this)">&#9733;</button>
-                <button class="edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+            <div class="back">
+                <!-- Back side: Definition -->
+                <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
             </div>
         </div>
-        {% endfor %}
+        <!-- Buttons (Star + Edit) -->
+        <div class="top-buttons">
+            <!-- If this term is already starred, give the button the .active-star class -->
+            <!--
+            <button class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}"
+                onclick="toggleStar(this, event)">
+                &#9733;
+            </button>
+            <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+            -->
+        </div>
+    </div>
+    {% endfor %}
     </div>
 
     <div class="navigation">

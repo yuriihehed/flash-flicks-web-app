@@ -40,9 +40,17 @@ def landing_page(request):
 def base_page(request):
     return render(request, 'base.html')
 
-def studypage(request):
-    cards = range(1, 7)  # Example card range
-    return render(request, 'studypage.html', {'cards': cards})
+def studypage(request, set_id):
+    card = range(1, 11)
+    flashcard_set = get_object_or_404(FlashcardSet, id=set_id)
+    terms = flashcard_set.flashcards.all()
+
+    for term in terms:
+        term.is_learned = term.learned_by.filter(id=request.user.id).exists()
+    return render(request, 'studypage.html', {
+        'flashcard_set': flashcard_set,
+        'terms': terms,
+        "card": card,})
 
 def edit_learn_mode(request):
     return render(request, 'edit_learn_mode.html')
