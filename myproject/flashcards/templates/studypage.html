@@ -184,8 +184,19 @@
             console.log("Stopped global timer.");
         }
 
-        // Check if timer should be enabled in the hero section
+        // Check if the timer should be displayed
         checkIfOnTimerPage();
+
+        // Initialize flipping functionality
+        document.querySelectorAll('.flashcard').forEach(card => {
+            card.addEventListener("click", function (e) {
+                if (!e.target.classList.contains("star-btn") && !e.target.classList.contains("edit-btn") && !card.classList.contains("editing")) {
+                    this.classList.toggle("flipped");
+                }
+            });
+        });
+
+        updateCards();
     });
 
     function checkIfOnTimerPage() {
@@ -193,7 +204,7 @@
         const timerEnabled = localStorage.getItem("study_timer_active");
 
         if (timerEnabled === "true") {
-            heroTimer.style.display = "block"; // Show timer under the header text
+            heroTimer.style.display = "block";
             startTimer();
         }
     }
@@ -213,7 +224,6 @@
         }, 1000);
     }
 
-    // Flashcard Functions
     const cards = document.querySelectorAll('.flashcard');
     let currentIndex = 0;
 
@@ -242,13 +252,27 @@
 
     function toggleEdit(button, event) {
         event.stopPropagation();
+
         const card = button.closest('.flashcard');
         const fields = card.querySelectorAll('.card-title, .card-term, .card-back-title, .card-back-content');
+
         const isEditing = card.classList.contains('editing');
 
-        fields.forEach(el => el.contentEditable = isEditing ? "false" : "true");
-        card.classList.toggle('editing');
-        button.textContent = isEditing ? "Edit" : "Save";
+        if (isEditing) {
+            fields.forEach(el => {
+                el.contentEditable = "false";
+                el.classList.remove('editable');
+            });
+            card.classList.remove('editing');
+            button.textContent = "Edit";
+        } else {
+            fields.forEach(el => {
+                el.contentEditable = "true";
+                el.classList.add('editable');
+            });
+            card.classList.add('editing');
+            button.textContent = "Save";
+        }
     }
 
     updateCards();
