@@ -23,7 +23,7 @@
                 {% if not user.is_authenticated %}
                     <a class="btn btn-primary btn-lg" href="/register">Sign up for Free</a>
                 {% else %} 
-                    <a class="btn btn-primary btn-lg" href="/homepage">Start Studying</a>
+                    <a class="btn btn-primary btn-lg" href="/homepage/">Start Studying</a>
                 {% endif %}
             </div>
         </div>
@@ -37,30 +37,38 @@
         <div class="row gy-4">
             <div class="col-lg-3 col-md-6">
                 <div class="features-item">
-                    <i class="bi bi-lightbulb"></i>
-                    <h3>Active Recall</h3>
-                    <p>Boost memory retention with spaced repetition.</p>
+                    <a href="/learning-styles/" class="feature-link">
+                        <i class="bi bi-lightbulb"></i>
+                        <h3>Active Recall</h3>
+                        <p>Boost memory retention with spaced repetition.</p>
+                    </a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
                 <div class="features-item">
-                    <i class="bi bi-clock"></i>
-                    <h3>Time-Based Learning</h3>
-                    <p>Use study timers to enhance focus and productivity.</p>
+                    <a href="/learning-styles/" class="feature-link">
+                        <i class="bi bi-clock"></i>
+                        <h3>Time-Based Learning</h3>
+                        <p>Use study timers to enhance focus and productivity.</p>
+                    </a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
                 <div class="features-item">
-                    <i class="bi bi-bar-chart"></i>
-                    <h3>Track Progress</h3>
-                    <p>Monitor study habits and measure improvement.</p>
+                    <a href="/learning-styles/" class="feature-link">
+                        <i class="bi bi-bar-chart"></i>
+                        <h3>Track Progress</h3>
+                        <p>Monitor study habits and measure improvement.</p>
+                    </a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
                 <div class="features-item">
-                    <i class="bi bi-bookmark-star"></i>
-                    <h3>Customizable Decks</h3>
-                    <p>Organize your study material with ease.</p>
+                    <a href="/learning-styles/" class="feature-link">
+                        <i class="bi bi-bookmark-star"></i>
+                        <h3>Customizable Decks</h3>
+                        <p>Organize your study material with ease.</p>
+                    </a>
                 </div>
             </div>
         </div>
@@ -75,9 +83,22 @@
         {% if not user.is_authenticated %}
             <a href="/register" class="btn btn-primary btn-lg">Get Started</a>
         {% else %}
-            <a href="/homepage" class="btn btn-primary btn-lg">Go to Dashboard</a>
+            <a href="/homepage/" class="btn btn-primary btn-lg">Go to Dashboard</a>
         {% endif %}
     </div>
 </section>
 
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feature-link {
+        text-decoration: none;
+        color: inherit;
+    }
+    .feature-link:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+</style>
 {% endblock %}
