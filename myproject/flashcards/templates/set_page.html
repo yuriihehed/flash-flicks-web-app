@@ -11,7 +11,7 @@
     /* Hero Section Updates */
     #hero {
         min-height: 40vh;
-        padding: 50px 0;
+        padding: 100px 0;
     }
 
     /* Timer Widget */
@@ -66,8 +66,7 @@
         
         <div class="text-end mt-3">
            <!-- Study Space& Edit Flashcard set Buttons -->
-            <button type="button" class="btn btn-success"
-                onclick="window.location.href='{% url 'studypage' flashcard_set.id %}'">
+            <button type="button" class="btn btn-success" onclick="window.location.href='{% url 'studypage' flashcard_set.id %}'">
                 Study Space
             </button>
 
@@ -81,6 +80,7 @@
 <!-- MAIN SET SECTION -->
 <section class="set-section py-5 light-background">
     <div class="container">
+
 
         <!-- Flashcard Display Section -->
         <div class="flashcard-area d-flex justify-content-center">
@@ -119,8 +119,8 @@
 
         <!-- Learn/Not Learned Buttons -->
         <div class="learning-buttons text-center mt-3">
-            <button id="learned-btn" class="btn btn-success">✅ Yes (Learned)</button>
-            <button id="not-learned-btn" class="btn btn-danger">❌ No (Not Learned)</button>
+            <button id="learned-btn" class="btn btn-success"> Yes (Learned)</button>
+            <button id="not-learned-btn" class="btn btn-danger"> No (Not Learned)</button>
         </div>
         <br>
 
@@ -171,9 +171,9 @@
             <p class="learned-status">
                 Status:
                 {% if term.is_learned %}
-                <span class="text-success fw-bold">Learned ✅</span>
+                <span class="text-success fw-bold">Learned</span>
                 {% else %}
-                <span class="text-danger fw-bold">Not Learned ❌</span>
+                <span class="text-danger fw-bold">Not Learned</span>
                 {% endif %}
             </p>
         </div>
@@ -237,9 +237,9 @@
             const statusSpans = document.querySelectorAll('.learned-status span');
             statusSpans.forEach((span) => {
                 const text = span.innerText.trim();
-                if (text === "Learned ✅") {
+                if (text === "Learned") {
                     learnedCount++;
-                } else if (text === "Not Learned ❌") {
+                } else if (text === "Not Learned") {
                     notLearnedCount++;
                 }
             });
@@ -326,11 +326,11 @@
                             const statusSpan = termBox.querySelector(".learned-status span");
                             if (statusSpan) {
                                 if (learned) {
-                                    statusSpan.innerText = "Learned ✅";
+                                    statusSpan.innerText = "Learned";
                                     statusSpan.classList.remove("text-danger");
                                     statusSpan.classList.add("text-success");
                                 } else {
-                                    statusSpan.innerText = "Not Learned ❌";
+                                    statusSpan.innerText = "Not Learned";
                                     statusSpan.classList.remove("text-success");
                                     statusSpan.classList.add("text-danger");
                                 }

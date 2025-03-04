@@ -73,7 +73,7 @@
     <link rel="stylesheet" href="{% static 'css/auth.css' %}?v=2">
 
     {% block extra_js %}
-    <script>
+    <!--<script> I took this out because there doesnt need to be a timer on every page 
         document.addEventListener("DOMContentLoaded", function () {
             checkIfOnTimerPage();
         });
@@ -83,7 +83,7 @@
             const heroTimer = document.getElementById("heroTimerWidget");
 
             // Check if page is Study Page, Set Page, or Flashcards
-            if (heroTimer && (currentPath.includes('/studypage/') || currentPath.includes('/setpage/') || currentPath.match(/^\/flashcards\/\d+\/$/))) {
+            if (heroTimer && (currentPath.includes('/studypage/') ||  currentPath.match(/^\/flashcards\/\d+\/$/))) {
                 startCountdownTimer(heroTimer);
             }
         }
@@ -123,6 +123,6 @@
         }
     </script>
     {% endblock %}
-
+-->
 </body>
 </html>

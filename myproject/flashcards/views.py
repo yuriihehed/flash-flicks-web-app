@@ -767,3 +767,29 @@ def search_terms(request, set_id):
         "query": query,
     })
     
+@login_required
+@require_POST
+def update_learn_settings(request):
+    data = json.loads(request.body)
+    starred = data.get("starred", False)
+    shuffle = data.get("shuffle", False)
+    timer = data.get("timer", "none")
+    ultradian = data.get("ultradian", False)
+    answer_with_term = data.get("answer_with_term", False)
+    answer_with_definition = data.get("answer_with_definition", False)
+    round_length = data.get("round_length", 1)
+
+    # Example: if you have a UserSettings model (or store these in the UserProfile)
+    # user_settings = request.user.settings  # assuming a OneToOneField linking a settings model to your user
+    # user_settings.study_starred = starred
+    # user_settings.study_shuffle = shuffle
+    # user_settings.study_timer = timer
+    # user_settings.ultradian = ultradian
+    # user_settings.answer_with_term = answer_with_term
+    # user_settings.answer_with_definition = answer_with_definition
+    # user_settings.round_length = round_length
+    # user_settings.save()
+
+    return JsonResponse({"success": True})
+    
+    
