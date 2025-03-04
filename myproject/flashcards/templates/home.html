@@ -14,7 +14,6 @@
     <div class="container text-center">
         <h1 class="text-white">Welcome Back, <span>{{ user.first_name }}</span></h1>
         <p class="text-white-75">Manage your flashcards and folders easily with FlashFlicks.</p>
-        <a href="/create-flashcard-set" class="btn btn-primary btn-lg">+ Create New Study Set</a>
     </div>
     <style>
         #hero {
@@ -24,7 +23,7 @@
     </style>
 </section>
 
-<!-- Dashboard Section -->
+<!---->
 <section class="dashboard section light-background py-5">
     <div class="container">
         <div class="row gy-4">
@@ -84,7 +83,12 @@
             <!-- Flashcard Sets Section -->
             <div class="col-12">
                 <h3 class="mb-3">📖 Flashcard Sets</h3>
-                <div class="row">
+
+                
+                <a href="/create-flashcard-set" class="btn btn-primary btn-lg">+ Create New Study Set</a>
+                
+
+                <div class="row mt-4">
                     {% for flashcard in flashcard_sets %}
                     <div class="col-lg-4 col-md-6 mb-3">
                         <div class="card shadow-sm p-4">
