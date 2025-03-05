@@ -1,3 +1,6 @@
+edit learn mode
+
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -210,24 +213,204 @@
 <div id="timerWidget" class="timer-widget"></div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        loadSettings();
-        checkIfOnTimerPage();
-    });
+    // Global variables for timer management
+    let countdownInterval = null;
+    let isTimerRunning = false;
 
-    function saveSettings() {
-        applyTimerSetting();
-        showPopup('saveNotification');
+    // NEW: Function to stop any running timer
+    function stopCountdownTimer() {
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+        isTimerRunning = false;
+        // Hide the timer widget (we use the element with id "timerWidget")
+        document.getElementById("timerWidget").style.display = "none";
     }
 
+    // NEW: Function to start the countdown timer based on saved settings
+    function startCountdownTimer() {
+        const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
+        if (!savedSettings || savedSettings.timer === "none") return;
+        
+        // Before starting a new timer, stop any that may be running
+        stopCountdownTimer();
+
+        isTimerRunning = true;
+        // Convert timer minutes to seconds
+        let remainingTime = parseInt(savedSettings.timer, 10) * 60;
+        if (isNaN(remainingTime) || remainingTime <= 0) return;
+
+        // Use the timer widget with id "timerWidget" (ensure you use the same id throughout)
+        const timerWidget = document.getElementById("timerWidget");
+        timerWidget.style.display = "block";
+        updateTimerDisplay(remainingTime);
+
+        countdownInterval = setInterval(() => {
+            remainingTime--;
+            updateTimerDisplay(remainingTime);
+
+            if (remainingTime <= 0) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                isTimerRunning = false;
+                timerWidget.textContent = "✅ Timer Completed!";
+                setTimeout(() => {
+                    timerWidget.style.display = "none";
+                }, 3000);
+            }
+        }, 1000);
+    }
+
+    // Updates the timer widget's text with the remaining time
+    function updateTimerDisplay(seconds) {
+        const timerWidget = document.getElementById("timerWidget");
+        let min = Math.floor(seconds / 60);
+        let sec = seconds % 60;
+        timerWidget.textContent = `⏳ ${min}:${sec < 10 ? "0" : ""}${sec} remaining`;
+    }
+
+    /***** Flashcard Navigation Logic (Encapsulated) *****/
+    (function () {
+        let currentIndex = 0;
+
+        function updateCards() {
+            const cards = document.querySelectorAll('.flashcard');
+            const totalCards = cards.length;
+            cards.forEach((card, index) => {
+                card.style.display = (index === currentIndex) ? 'block' : 'none';
+            });
+            const cardCounter = document.getElementById('cardCounter');
+            if (cardCounter) {
+                cardCounter.innerText = `${currentIndex + 1} / ${totalCards}`;
+            }
+        }
+        function bindFlashcardEvents() {
+            const cards = document.querySelectorAll('.flashcard');
+            cards.forEach(card => {
+                card.addEventListener("click", function (e) {
+                    // Prevent flip if the edit button was clicked or card is in editing mode
+                    if (!e.target.classList.contains("edit-btn") && !card.classList.contains("editing")) {
+                        card.classList.toggle("flipped");
+                    }
+                });
+            });
+        }
+
+        function shuffleFlashcards() {
+            const container = document.querySelector('.flashcard-container');
+            const flashcards = Array.from(container.querySelectorAll('.flashcard'));
+            // Fisher-Yates shuffle:
+            for (let i = flashcards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+            }
+            // Clear container and reappend flashcards in new order
+            container.innerHTML = '';
+            flashcards.forEach(card => container.appendChild(card));
+            updateCards();
+            bindFlashcardEvents();
+        }
+
+        // Bind navigation buttons:
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function () {
+                currentIndex = Math.max(0, currentIndex - 1);
+                updateCards();
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () {
+                const total = document.querySelectorAll('.flashcard').length;
+                currentIndex = Math.min(total - 1, currentIndex + 1);
+                updateCards();
+            });
+        }
+
+        // Initial binding:
+        bindFlashcardEvents();
+        updateCards();
+
+        // Expose functions globally:
+        window.updateCards = updateCards;
+        window.shuffleFlashcards = shuffleFlashcards;
+        window.bindFlashcardEvents = bindFlashcardEvents;
+    })();
+
+    /***** Global Modal and Settings Functions *****/
+    function openModal() {
+        document.getElementById('editLearnModeModal').style.display = 'block';
+    }
+    function closeModal() {
+        document.getElementById('editLearnModeModal').style.display = 'none';
+    }
+
+    // When saving settings, update the timer based on user selection
+    function saveSettings() {
+        const starred = document.getElementById('starredToggle').checked;
+        const shuffle = document.getElementById('shuffleToggle').checked;
+        const timer = document.getElementById('timerSelect').value;
+        const ultradian = document.getElementById('ultradianToggle').checked;
+        const answerWithTerm = document.getElementById('termToggle').checked;
+        const answerWithDefinition = document.getElementById('definitionToggle').checked;
+        const roundLength = document.getElementById('roundLength').value;
+
+        let savedSettingsLS = JSON.parse(localStorage.getItem("studySettings")) || {};
+
+        fetch("{% url 'update_learn_settings' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: JSON.stringify({
+                starred: starred,
+                shuffle: shuffle,
+                timer: timer,
+                ultradian: ultradian,
+                answer_with_term: answerWithTerm,
+                answer_with_definition: answerWithDefinition,
+                round_length: roundLength
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("✅ Settings saved on the server!");
+                showPopup('saveNotification');
+                if (shuffle) {
+                    shuffleFlashcards();
+                }
+                // Stop any running timer before applying the new setting
+                stopCountdownTimer();
+                if (timer !== "none") {
+                    savedSettingsLS.timer = timer;
+                    savedSettingsLS.ultradian = ultradian;
+                    localStorage.setItem("studySettings", JSON.stringify(savedSettingsLS));
+                    startCountdownTimer();
+                }
+            } else {
+                console.error("❌ Error saving settings:", data);
+            }
+        })
+        .catch(err => console.error("❌ API Error:", err));
+    }
+
+    // Called from settings page when the user clicks "Apply Timer"
     function applyTimerSetting() {
         const timer = document.getElementById('timerSelect').value;
         const ultradian = document.getElementById('ultradianToggle').checked;
-
         localStorage.setItem("studySettings", JSON.stringify({ timer, ultradian }));
-
         showPopup('timerStartPopup');
 
+        // Stop any running timer first
+        stopCountdownTimer();
+
+        if (timer !== "none") {
+            startCountdownTimer();
+        }
         if (ultradian) {
             showPopup('ultradianStartPopup');
             setTimeout(() => {
@@ -237,6 +420,10 @@
                 }, 30 * 60 * 1000);
             }, 90 * 60 * 1000);
         }
+    }
+
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
     }
 
     function loadSettings() {
@@ -258,17 +445,27 @@
     function checkIfOnTimerPage() {
         const currentPath = window.location.pathname;
         if (currentPath.includes('/flashcards/') || currentPath.includes('/studypage/')) {
-            displayTimer();
+            // Optionally, you could call startCountdownTimer() here based on saved settings.
+            const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
+            if (savedSettings && savedSettings.timer !== "none") {
+                startCountdownTimer();
+            }
         }
     }
 
-    /*function displayTimer() {
-        const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
-        if (savedSettings && savedSettings.timer !== "none") {
-            document.getElementById("timerWidget").style.display = "block";
-            document.getElementById("timerWidget").textContent = "⏳ Timer Running: " + savedSettings.timer + " min";
+    // Bind timer-related functions on DOMContentLoaded
+    document.addEventListener("DOMContentLoaded", function () {
+        loadSettings();
+        checkIfOnTimerPage();
+    });
+
+    // Rebind flashcard flip events on pageshow (for browser back/forward navigation)
+    window.addEventListener("pageshow", function () {
+        if (typeof window.bindFlashcardEvents === "function") {
+            window.bindFlashcardEvents();
         }
-    }*/
+    });
 </script>
+
 
 {% endblock %}
