@@ -1,754 +1,795 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Study Page</title>
-    <style>
-        /* Reset some default margins/padding */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <title>Study Page</title>
+  <style>
+    /* Reset some default margins/padding */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+    }
+    /* HEADER */
+    .header {
+      position: relative;
+      background-color: #f2f2f2;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid #ccc;
+    }
+    .header h1 {
+      font-size: 20px;
+      font-weight: normal;
+    }
+    .header .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header .header-right button {
+      border: none;
+      background: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .header .close-btn {
+      font-size: 20px;
+      font-weight: bold;
+      padding: 0 5px;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-        }
+    /* MAIN CONTENT AREA */
+    /* Flashcard Layout */
+    .flashcard-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .flashcard {
+      position: relative;
+      width: 800px;
+      height: 450px;
+      perspective: 1000px;
+      border-radius: 10px;
+      transition: box-shadow 0.5s ease-in-out;
+    }
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+    .flashcard.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    .front,
+    .back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: #99c2ff;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+    .back {
+      background-color: #66a3ff;
+      transform: rotateY(180deg);
+    }
 
-        /* HEADER */
-        .header {
-            position: relative;
-            /* allows for absolutely positioned close button if desired */
-            background-color: #f2f2f2;
-            /* or #ffc0cb (pinkish) if you want the entire header pink */
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            border-bottom: 1px solid #ccc;
-        }
+    
+    .card-title {
+      font-size: 30px; 
+      line-height: 1.2;
+    }
+    .card-term {
+      font-size: 30px;
+      line-height: 1.2;
+    }
 
-        .header h1 {
-            font-size: 20px;
-            font-weight: normal;
-        }
+    /* Buttons - Edit & Star */
+    .top-buttons {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 5px;
+    }
+    .star-btn,
+    .edit-btn {
+      background-color: white;
+      border: 1px solid #002855;
+      padding: 8px 15px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .edit-btn:hover {
+      background-color: #0056b3;
+      color: white;
+    }
+    .star-btn {
+      font-size: 16px;
+      color: gold;
+    }
 
-        .header .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    /* Flashcard Glow Effect */
+    .flashcard.flash {
+      animation: flash 0.5s ease-in-out;
+      box-shadow: 0 0 20px 10px rgb(243, 230, 159);
+    }
+    @keyframes flash {
+      0% {
+        box-shadow: 0 0 20px 10px rgb(243, 230, 159);
+      }
+      50% {
+        box-shadow: 0 0 30px 20px rgb(237, 190, 163);
+      }
+      100% {
+        box-shadow: none;
+      }
+    }
 
-        .header .header-right button {
-            border: none;
-            background: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
+    /* NAVIGATION (arrows and counter) */
+    .navigation {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+      gap: 20px;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .card-counter {
+      font-size: 16px;
+    }
 
-        .header .close-btn {
-            font-size: 20px;
-            font-weight: bold;
-            padding: 0 5px;
-        }
+    /* Basic Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .modal-content {
+      display: flex;
+      flex-direction: column;
+      height: 80vh;
+      max-height: 90vh;
+      overflow: hidden;
+      border-radius: 15px;
+      background-color: #004c99;
+      color: white;
+      position: relative;
+      width: 600px;
+      margin: 5% auto;
+    }
+    .modal-header,
+    .modal-footer {
+      padding: 20px;
+    }
+    .modal-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #fff;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .notification {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      z-index: 9999;
+    }
+    .notification.show {
+      display: block;
+    }
+    .setting {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .setting label {
+      margin-right: 10px;
+    }
+    .switch {
+      display: inline-block;
+      margin-left: auto;
+    }
+    .form-select {
+      display: inline-block;
+      margin-left: auto;
+    }
 
-        /* MAIN CONTENT AREA */
-        /* Flashcard Layout */
-        .flashcard-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .flashcard {
-            position: relative;
-            width: 800px;
-            height: 450px;
-            perspective: 1000px;
-            border-radius: 10px;
-            transition: box-shadow 0.5s ease-in-out;
-        }
-
-        .card-inner {
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            position: relative;
-        }
-
-        .flashcard.flipped .card-inner {
-            transform: rotateY(180deg);
-        }
-
-        .front,
-        .back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            background-color: #99c2ff;
-            border-radius: 10px;
-        }
-
-        .back {
-            background-color: #66a3ff;
-            transform: rotateY(180deg);
-        }
-
-        /* Buttons - Edit & Star */
-        .top-buttons {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 5px;
-        }
-
-        .star-btn,
-        .edit-btn {
-            background-color: white;
-            border: 1px solid #002855;
-            padding: 8px 15px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .edit-btn:hover {
-            background-color: #0056b3;
-            color: white;
-        }
-
-        .star-btn {
-            font-size: 16px;
-            color: gold;
-        }
-
-        /* Flashcard Glow Effect */
-        .flashcard.flash {
-            animation: flash 0.5s ease-in-out;
-            box-shadow: 0 0 20px 10px rgb(243, 230, 159);
-        }
-
-        @keyframes flash {
-            0% {
-                box-shadow: 0 0 20px 10px rgb(243, 230, 159);
-            }
-
-            50% {
-                box-shadow: 0 0 30px 20px rgb(237, 190, 163);
-            }
-
-            100% {
-                box-shadow: none;
-            }
-        }
-
-        /* NAVIGATION (arrows and counter) */
-        .navigation {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            gap: 20px;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .card-counter {
-            font-size: 16px;
-        }
-
-        /* Basic Modal Styles */
-        .modal {
-            display: none;
-            /* Hidden by default */
-            position: fixed;
-            /* Stay in place */
-            z-index: 9999;
-            /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%;
-            /* Full width */
-            height: 100%;
-            /* Full height */
-            overflow: auto;
-            /* Enable scroll if needed */
-            background-color: rgba(0, 0, 0, 0.4);
-            /* Black w/ opacity */
-        }
-
-        .modal-content {
-            display: flex;
-            flex-direction: column;
-            height: 80vh;
-            /* or 90% or 90vh */
-            max-height: 90vh;
-            overflow: hidden;
-            /* we’ll control scrolling in .modal-body */
-            border-radius: 15px;
-            background-color: #004c99;
-            color: white;
-            position: relative;
-            width: 600px;
-            /* your preferred width */
-            margin: 5% auto;
-        }
-
-        .modal-header,
-        .modal-footer {
-            padding: 20px;
-        }
-
-        .modal-body {
-            flex: 1;
-            /* take remaining vertical space */
-            padding: 20px;
-            overflow-y: auto;
-            /* only the body scrolls if content is long */
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 25px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #fff;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked+.slider {
-            background-color: #2196F3;
-        }
-
-        input:checked+.slider:before {
-            transform: translateX(26px);
-        }
-
-        .notification {
-            display: none;
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #333;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            z-index: 9999;
-        }
-
-        .notification.show {
-            display: block;
-            /* or flex */
-        }
-
-        .setting {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            /* Adjusts space between items */
-        }
-
-        .setting label {
-            margin-right: 10px;
-            /* Adds space between label and the switch */
-        }
-
-        .switch {
-            display: inline-block;
-            margin-left: auto;
-            /* Pushes switch to the right */
-        }
-
-        .form-select {
-            display: inline-block;
-            margin-left: auto;
-        }
-
-        /* Timer Widget for Flashcard & Study Page */
-        .timer-widget {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: #002855;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-        }
-    </style>
+    /* Timer Widget for Flashcard & Study Page */
+    .timer-widget {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #002855;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+  </style>
 </head>
-
 <body>
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-
-    <!-- HEADER -->
-    <div class="header">
-        <h1>{{ flashcard_set.title }}</h1>
-        <div class="header-right">
-            <!-- Instead of redirecting, open the modal -->
-            <button type="button" onclick="openModal()">Edit Learn Mode</button>
-            <button type="button" class="close-btn"
-                onclick="window.location.href='{% url 'flashcard_set_details' flashcard_set.id %}'">
-                X
-            </button>
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  
+  <!-- HEADER -->
+  <div class="header">
+    <h1>{{ flashcard_set.title }}</h1>
+    <div class="header-right">
+      <button type="button" onclick="openModal()">Edit Learn Mode</button>
+      <button type="button" class="close-btn"
+        onclick="window.location.href='{% url 'flashcard_set_details' flashcard_set.id %}'">X</button>
+    </div>
+  </div>
+  
+  <!-- MAIN CONTENT -->
+  <div class="container py-5">
+    <!-- Flashcard container using event delegation for flipping -->
+    <div class="flashcard-container" id="flashcardContainer">
+      {% for term in terms %}
+      <div class="flashcard" id="card{{ term.id }}"
+        data-term="{{ term.term }}"
+        data-definition="{{ term.definition }}"
+        {% if not forloop.first %}style="display: none;"{% endif %}>
+        
+        <div class="card-inner">
+          <div class="front">
+            <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
+          </div>
+          <div class="back">
+            <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
+          </div>
         </div>
+
+        <div class="top-buttons">
+          <button class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}"
+            onclick="toggleStar(this, event)">&#9733;</button>
+          <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+        </div>
+      </div>
+      {% endfor %}
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="container py-5">
-        <div class="flashcard-container mt-4">
-            {% for term in terms %}
-            <!-- Hide all but the first card by default -->
-            <div class="flashcard" id="card{{ term.id }}" {% if not forloop.first %}style="display: none;" {% endif %}>
-                <div class="card-inner">
-                    <div class="front">
-                        <!-- Front side: Term -->
-                        <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
-                    </div>
-                    <div class="back">
-                        <!-- Back side: Definition -->
-                        <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
-                    </div>
-                </div>
-                <!-- Buttons (Star + Edit) -->
-                <div class="top-buttons">
-                    <button class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}"
-                        onclick="toggleStar(this, event)">
-                        &#9733;
-                    </button>
-                    <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
-                </div>
-            </div>
+    <div class="navigation">
+      <button id="prevBtn" class="nav-btn">&#8592;</button>
+      <span id="cardCounter">1 / {{ terms|length }}</span>
+      <button id="nextBtn" class="nav-btn">&#8594;</button>
+    </div>
+  </div>
+  
+  <!-- Timer Widget (Initially Hidden) -->
+  <div id="timer-widget" class="timer-widget">
+    <span id="timerDisplay">00:00</span>
+  </div>
+  
+  <!-- MODAL -->
+  <div id="editLearnModeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 class="text-center mb-4" style="text-align:center;">Edit Flashcards</h2>
+      </div>
+      <div class="modal-body">
+        <div class="setting d-flex justify-content-between align-items-center mb-3">
+          <label>Study only starred items:</label>
+          <label class="switch">
+            <input type="checkbox" id="starredToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting d-flex justify-content-between align-items-center">
+          <label>Shuffle terms:</label>
+          <label class="switch">
+            <input type="checkbox" id="shuffleToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <hr class="border-light">
+        <div class="setting mb-3">
+          <label>Set study timer (Pomodoro):</label>
+          <select id="timerSelect" class="form-select mt-2">
+            <option value="none">No Timer</option>
+            <option value="25">25 min study / 5 min break</option>
+            <option value="50">50 min study / 10 min break</option>
+          </select>
+        </div>
+        <button class="btn btn-primary w-100 mb-3" onclick="applyTimerSetting()">Apply Timer</button>
+        <div class="setting d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <label class="mb-1"><strong>Ultradian Rhythm</strong></label>
+            <small class="d-block text-secondary">90-minute study / 30-minute break</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="ultradianToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <hr class="border-light">
+        <!-- QUESTION FORMAT -->
+        <div class="mb-3"><strong>Question Format:</strong></div>
+        <div class="setting d-flex justify-content-between align-items-center mb-3">
+          <label>Answer with Term:</label>
+          <label class="switch">
+            <input type="checkbox" id="termToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting d-flex justify-content-between align-items-center mb-3">
+          <label>Answer with Definition:</label>
+          <label class="switch">
+            <input type="checkbox" id="definitionToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <hr class="border-light">
+        <div class="mb-3">
+          <label>Length of rounds:</label>
+          <select id="roundLength" class="form-select mt-2">
+            {% for i in "123456789"|make_list %}
+            <option value="{{ i }}">{{ i }} Round{{ i|pluralize }}</option>
             {% endfor %}
+            <option value="10">10 Rounds</option>
+          </select>
         </div>
-
-        <div class="navigation">
-            <button id="prevBtn" class="nav-btn">&#8592;</button>
-            <span id="cardCounter">1 / {{ terms|length }}</span>
-            <button id="nextBtn" class="nav-btn">&#8594;</button>
-        </div>
+      </div>
+      <div class="modal-footer" style="text-align: center; margin-top: 20px;">
+        <button class="btn btn-primary w-100" onclick="saveSettings()">Save Updates</button>
+      </div>
     </div>
-    <!-- Timer Widget (Initially Hidden) -->
-    <div id="timer-widget" class="timer-widget">
-        <span id="timerDisplay">00:00</span>
-    </div>
-
-
-    <!-- =============== MODAL START =============== -->
-    <div id="editLearnModeModal" class="modal">
-        <div class="modal-content">
-            <!-- MODAL HEADER -->
-            <div class="modal-header">
-                <span class="close-modal" onclick="closeModal()">&times;</span>
-                <h2 class="text-center mb-4" style="text-align:center;">Edit Flashcards</h2>
-            </div>
-
-            <!-- MODAL BODY -->
-            <div class="modal-body">
-                <!-- "Edit Learn Mode" Settings -->
-
-                <div class="setting d-flex justify-content-between align-items-center mb-3">
-                    <label>Study only starred items:</label>
-                    <label class="switch">
-                        <input type="checkbox" id="starredToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="setting d-flex justify-content-between align-items-center">
-                    <label>Shuffle terms:</label>
-                    <label class="switch">
-                        <input type="checkbox" id="shuffleToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <hr class="border-light">
-
-                <div class="setting mb-3">
-                    <label>Set study timer (Pomodoro):</label>
-                    <select id="timerSelect" class="form-select mt-2">
-                        <option value="none">No Timer</option>
-                        <option value="25">25 min study / 5 min break</option>
-                        <option value="50">50 min study / 10 min break</option>
-                    </select>
-                </div>
-                <button class="btn btn-primary w-100 mb-3" onclick="applyTimerSetting()">Apply Timer</button>
-
-                <div class="setting d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <label class="mb-1"><strong>Ultradian Rhythm</strong></label>
-                        <small class="d-block text-secondary">90-minute study / 30-minute break</small>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="ultradianToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <hr class="border-light">
-
-                <!-- QUESTION FORMAT -->
-                <div class="mb-3"><strong>Question Format:</strong></div>
-
-                <div class="setting d-flex justify-content-between align-items-center mb-3">
-                    <label>Answer with Term:</label>
-                    <label class="switch">
-                        <input type="checkbox" id="termToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="setting d-flex justify-content-between align-items-center mb-3">
-                    <label>Answer with Definition:</label>
-                    <label class="switch">
-                        <input type="checkbox" id="definitionToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <hr class="border-light">
-
-                <div class="mb-3">
-                    <label>Length of rounds:</label>
-                    <select id="roundLength" class="form-select mt-2">
-                        {% for i in "123456789"|make_list %}
-                        <option value="{{ i }}">{{ i }} Round{{ i|pluralize }}</option>
-                        {% endfor %}
-                        <option value="10">10 Rounds</option>
-                    </select>
-                </div>
-            </div> <!-- /.modal-body -->
-
-            <!-- MODAL FOOTER -->
-            <div class="modal-footer" style="text-align: center; margin-top: 20px;">
-                <button class="btn btn-primary w-100" onclick="saveSettings()">Save Updates</button>
-            </div>
-        </div>
-    </div>
-    <!-- =============== MODAL END =============== -->
-
-
-    <!-- Notification popups (if you want them on the same page) -->
-    <div id="saveNotification" class="notification">✅ Settings saved successfully!</div>
-    <div id="timerStartPopup" class="notification">⏳ Study timer started!</div>
-    <div id="ultradianStartPopup" class="notification">⏳ 90-minute study session started!</div>
-    <div id="ultradianEndPopup" class="notification">✅ 90-minute study completed. Please take a 30-minute break.</div>
-    <div id="breakEndPopup" class="notification">⏳ Break over! Time to resume your study session.</div>
-    <div id="timerWidget" class="timer-widget"></div>
-
-
-    <!-- Vendor JS Files -->
-    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'vendor/aos/aos.js' %}"></script>
-    <script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
-    <script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
-
-    <!-- Main JS File -->
-    <script src="{% static 'js/main.js' %}"></script>
-
-    <!-- Additional JS -->
-    <script src="{% static 'js/TimerFunction.js' %}"></script>
-    <script src="{% static 'js/LearnedFunction.js' %}"></script>
-
-    <script>
-        /***** Countdown Timer Functions *****/
-        let countdownInterval = null;
-
-        function startCountdownTimer() {
-            const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
-            if (!savedSettings || savedSettings.timer === "none") return;
-
-            // Convert minutes to seconds
-            let remainingTime = parseInt(savedSettings.timer, 10) * 60;
-            if (isNaN(remainingTime) || remainingTime <= 0) return;
-
-            const timerWidget = document.getElementById("timerWidget");
-            timerWidget.style.display = "block";
-
-            // Clear any existing interval
-            if (countdownInterval) clearInterval(countdownInterval);
-
-            updateTimerDisplay(remainingTime);
-
-            countdownInterval = setInterval(() => {
-                remainingTime--;
-                updateTimerDisplay(remainingTime);
-
-                if (remainingTime <= 0) {
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
-                    timerWidget.textContent = "✅ Timer Completed!";
-                    setTimeout(() => {
-                        timerWidget.style.display = "none";
-                    }, 3000);
-                }
-            }, 1000);
+  </div>
+  <!-- END MODAL -->
+  
+  <!-- Notification popups -->
+  <div id="saveNotification" class="notification">✅ Settings saved successfully!</div>
+  <div id="timerStartPopup" class="notification">⏳ Study timer started!</div>
+  <div id="ultradianStartPopup" class="notification">⏳ 90-minute study session started!</div>
+  <div id="ultradianEndPopup" class="notification">✅ 90-minute study completed. Please take a 30-minute break.</div>
+  <div id="breakEndPopup" class="notification">⏳ Break over! Time to resume your study session.</div>
+  <div id="timerWidget" class="timer-widget"></div>
+  
+  <!-- Vendor JS Files -->
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <!-- Main JS File -->
+  <script src="{% static 'js/main.js' %}"></script>
+  <!-- Additional JS -->
+  <script src="{% static 'js/TimerFunction.js' %}"></script>
+  <script src="{% static 'js/LearnedFunction.js' %}"></script>
+  
+  <script>
+    /***** Global Timer Variables *****/
+    let countdownInterval = null;
+    let isTimerRunning = false;
+  
+    // Stop any running timer and hide the timer widget.
+    function stopCountdownTimer() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      isTimerRunning = false;
+      document.getElementById("timerWidget").style.display = "none";
+    }
+  
+    // Start the timer using the saved setting from localStorage.
+    function startCountdownTimer() {
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
+      if (!savedSettings || savedSettings.timer === "none") return;
+      stopCountdownTimer();
+      isTimerRunning = true;
+      let remainingTime = parseInt(savedSettings.timer, 10) * 60;
+      if (isNaN(remainingTime) || remainingTime <= 0) return;
+      const timerWidget = document.getElementById("timerWidget");
+      timerWidget.style.display = "block";
+      updateTimerDisplay(remainingTime);
+      countdownInterval = setInterval(() => {
+        remainingTime--;
+        updateTimerDisplay(remainingTime);
+        if (remainingTime <= 0) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+          isTimerRunning = false;
+          timerWidget.textContent = "✅ Timer Completed!";
+          setTimeout(() => {
+            timerWidget.style.display = "none";
+          }, 3000);
         }
-
-        function updateTimerDisplay(seconds) {
-            const timerWidget = document.getElementById("timerWidget");
-            let min = Math.floor(seconds / 60);
-            let sec = seconds % 60;
-            timerWidget.textContent = `⏳ ${min}:${sec < 10 ? "0" : ""}${sec} remaining`;
+      }, 1000);
+    }
+  
+    // Start a timer with a custom duration (in minutes) for ultradian mode.
+    function startCountdownTimerCustom(minutes) {
+      stopCountdownTimer();
+      isTimerRunning = true;
+      let remainingTime = minutes * 60;
+      const timerWidget = document.getElementById("timerWidget");
+      timerWidget.style.display = "block";
+      updateTimerDisplay(remainingTime);
+      countdownInterval = setInterval(() => {
+        remainingTime--;
+        updateTimerDisplay(remainingTime);
+        if (remainingTime <= 0) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+          isTimerRunning = false;
+          timerWidget.textContent = "✅ Timer Completed!";
+          setTimeout(() => {
+            timerWidget.style.display = "none";
+          }, 3000);
         }
-
-        /***** Flashcard Navigation Logic (Encapsulated) *****/
-        (function () {
-            let currentIndex = 0;
-
-            function updateCards() {
-                const cards = document.querySelectorAll('.flashcard');
-                const totalCards = cards.length;
-                cards.forEach((card, index) => {
-                    card.style.display = (index === currentIndex) ? 'block' : 'none';
-                });
-                const cardCounter = document.getElementById('cardCounter');
-                if (cardCounter) {
-                    cardCounter.innerText = `${currentIndex + 1} / ${totalCards}`;
-                }
-            }
-            function bindFlashcardEvents() {
-                const cards = document.querySelectorAll('.flashcard');
-                cards.forEach(card => {
-                    card.addEventListener("click", function (e) {
-                        // Prevent flip if the edit button was clicked or card is in editing mode
-                        if (!e.target.classList.contains("edit-btn") && !card.classList.contains("editing")) {
-                            card.classList.toggle("flipped");
-                        }
-                    });
-                });
-            }
-
-            function shuffleFlashcards() {
-                const container = document.querySelector('.flashcard-container');
-                const flashcards = Array.from(container.querySelectorAll('.flashcard'));
-                // Fisher-Yates shuffle:
-                for (let i = flashcards.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
-                }
-                // Clear container and reappend flashcards in new order
-                container.innerHTML = '';
-                flashcards.forEach(card => container.appendChild(card));
-                updateCards();
-                bindFlashcardEvents();
-            }
-
-
-            // Bind navigation buttons:
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function () {
-                    currentIndex = Math.max(0, currentIndex - 1);
-                    updateCards();
-                });
-            }
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function () {
-                    const total = document.querySelectorAll('.flashcard').length;
-                    currentIndex = Math.min(total - 1, currentIndex + 1);
-                    updateCards();
-                });
-            }
-
-            // Initial binding:
-            bindFlashcardEvents();
-            updateCards();
-
-            // Expose functions globally:
-            window.updateCards = updateCards;
-            window.shuffleFlashcards = shuffleFlashcards;
-            window.bindFlashcardEvents = bindFlashcardEvents;
-        })();
-
-        /***** Global Modal and Settings Functions *****/
-        function openModal() {
-            document.getElementById('editLearnModeModal').style.display = 'block';
+      }, 1000);
+    }
+  
+    function updateTimerDisplay(seconds) {
+      const timerWidget = document.getElementById("timerWidget");
+      let min = Math.floor(seconds / 60);
+      let sec = seconds % 60;
+      timerWidget.textContent = `⏳ ${min}:${sec < 10 ? "0" : ""}${sec} remaining`;
+    }
+  
+    /***** Flashcard Flipping using Event Delegation *****/
+    document.querySelector('.flashcard-container').addEventListener("click", function(e) {
+      const card = e.target.closest(".flashcard");
+      if (!card) return;
+      if (e.target.classList.contains("edit-btn") || e.target.classList.contains("star-btn")) return;
+      if (card.classList.contains("editing")) return;
+      card.classList.toggle("flipped");
+    });
+  
+    /***** Flashcard Navigation and Shuffle *****/
+    (function () {
+      let currentIndex = 0;
+  
+      function updateCards() {
+        const cards = document.querySelectorAll('.flashcard');
+        const totalCards = cards.length;
+        cards.forEach((card, index) => {
+          card.style.display = (index === currentIndex) ? 'block' : 'none';
+        });
+        const cardCounter = document.getElementById('cardCounter');
+        if (cardCounter) {
+          cardCounter.innerText = `${currentIndex + 1} / ${totalCards}`;
         }
-        function closeModal() {
-            document.getElementById('editLearnModeModal').style.display = 'none';
+      }
+  
+      function shuffleFlashcards() {
+        const container = document.querySelector('.flashcard-container');
+        const flashcards = Array.from(container.querySelectorAll('.flashcard'));
+        // Fisher-Yates shuffle:
+        for (let i = flashcards.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
         }
-
-        function saveSettings() {
-            const starred = document.getElementById('starredToggle').checked;
-            const shuffle = document.getElementById('shuffleToggle').checked;
-            const timer = document.getElementById('timerSelect').value;
-            const ultradian = document.getElementById('ultradianToggle').checked;
-            const answerWithTerm = document.getElementById('termToggle').checked;
-            const answerWithDefinition = document.getElementById('definitionToggle').checked;
-            const roundLength = document.getElementById('roundLength').value;
-
-            // Retrieve existing settings from localStorage:
-            let savedSettingsLS = JSON.parse(localStorage.getItem("studySettings")) || {};
-
-            fetch("{% url 'update_learn_settings' %}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": getCSRFToken()
-                },
-                body: JSON.stringify({
-                    starred: starred,
-                    shuffle: shuffle,
-                    timer: timer,
-                    ultradian: ultradian,
-                    answer_with_term: answerWithTerm,
-                    answer_with_definition: answerWithDefinition,
-                    round_length: roundLength
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log("✅ Settings saved on the server!");
-                        showPopup('saveNotification');
-                        if (shuffle) {
-                            shuffleFlashcards();
-                        }
-                        if (timer !== "none") {
-                            savedSettingsLS.timer = timer;
-                            savedSettingsLS.ultradian = ultradian;
-                            localStorage.setItem("studySettings", JSON.stringify(savedSettingsLS));
-                            startCountdownTimer();
-                        }
-                    } else {
-                        console.error("❌ Error saving settings:", data);
-                    }
-                })
-                .catch(err => console.error("❌ API Error:", err));
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
         }
-
-        function getCSRFToken() {
-            return document.querySelector("[name=csrfmiddlewaretoken]").value;
-        }
-
-        function applyTimerSetting() {
-            const timer = document.getElementById('timerSelect').value;
-            const ultradian = document.getElementById('ultradianToggle').checked;
-            localStorage.setItem("studySettings", JSON.stringify({ timer: timer, ultradian: ultradian }));
-            showPopup('timerStartPopup');
-            if (ultradian) {
-                showPopup('ultradianStartPopup');
-                setTimeout(() => {
-                    showPopup('ultradianEndPopup');
-                    setTimeout(() => {
-                        showPopup('breakEndPopup');
-                    }, 30 * 60 * 1000);
-                }, 90 * 60 * 1000);
-            }
-        }
-
-        function loadSettings() {
-            const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
-            if (savedSettings) {
-                document.getElementById('timerSelect').value = savedSettings.timer;
-                document.getElementById('ultradianToggle').checked = savedSettings.ultradian;
-            }
-        }
-
-        function showPopup(id) {
-            const popup = document.getElementById(id);
-            popup.classList.add('show');
+        flashcards.forEach(card => {
+          card.classList.remove("flipped");
+          container.appendChild(card);
+        });
+        // Reset current index to 0 for new order
+        currentIndex = 0;
+        updateCards();
+      }
+  
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+          currentIndex = Math.max(0, currentIndex - 1);
+          updateCards();
+        });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          const total = document.querySelectorAll('.flashcard').length;
+          currentIndex = Math.min(total - 1, currentIndex + 1);
+          updateCards();
+        });
+      }
+  
+      updateCards();
+      window.updateCards = updateCards;
+      window.shuffleFlashcards = shuffleFlashcards;
+    })();
+  
+    /***** Global Modal and Settings Functions *****/
+    function openModal() {
+      document.getElementById('editLearnModeModal').style.display = 'block';
+    }
+    function closeModal() {
+      document.getElementById('editLearnModeModal').style.display = 'none';
+    }
+  
+    function saveSettings() {
+      const starred = document.getElementById('starredToggle').checked;
+      const shuffle = document.getElementById('shuffleToggle').checked;
+      const timer = document.getElementById('timerSelect').value;
+      const ultradian = document.getElementById('ultradianToggle').checked;
+      const answerWithTerm = document.getElementById('termToggle').checked;
+      const answerWithDefinition = document.getElementById('definitionToggle').checked;
+      const roundLength = document.getElementById('roundLength').value;
+  
+      let savedSettingsLS = JSON.parse(localStorage.getItem("studySettings")) || {};
+  
+      fetch("{% url 'update_learn_settings' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify({
+          starred: starred,
+          shuffle: shuffle,
+          timer: timer,
+          ultradian: ultradian,
+          answer_with_term: answerWithTerm,
+          answer_with_definition: answerWithDefinition,
+          round_length: roundLength
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log("✅ Settings saved on the server!");
+          showPopup('saveNotification');
+          if (shuffle) {
+            shuffleFlashcards();
+          }
+          stopCountdownTimer();
+          savedSettingsLS.timer = timer;
+          savedSettingsLS.ultradian = ultradian;
+          savedSettingsLS.answer_with_definition = answerWithDefinition;
+          localStorage.setItem("studySettings", JSON.stringify(savedSettingsLS));
+          if (timer !== "none") {
+            startCountdownTimer();
+          }
+          if (ultradian) {
+            startCountdownTimerCustom(90);
+            showPopup('ultradianStartPopup');
             setTimeout(() => {
-                popup.classList.remove('show');
-            }, 5000);
+              showPopup('ultradianEndPopup');
+              setTimeout(() => {
+                showPopup('breakEndPopup');
+              }, 30 * 60 * 1000);
+            }, 90 * 60 * 1000);
+          }
+          // Update the question format after settings save.
+          updateQuestionFormat();
+        } else {
+          console.error("❌ Error saving settings:", data);
         }
-
-        function checkIfOnTimerPage() {
-            const currentPath = window.location.pathname;
-            if (currentPath.includes('/flashcards/') || currentPath.includes('/studypage/')) {
-                displayTimer();
-            }
-        }
-
-        function displayTimer() {
-            const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
-            if (savedSettings && savedSettings.timer !== "none") {
-                document.getElementById("timerWidget").style.display = "block";
-                document.getElementById("timerWidget").textContent = "⏳ Timer Running: " + savedSettings.timer + " min";
-            }
-        }
-
-        // Bind timer-related functions on DOMContentLoaded
-        document.addEventListener("DOMContentLoaded", function () {
-            loadSettings();
-            checkIfOnTimerPage();
+      })
+      .catch(err => console.error("❌ API Error:", err));
+    }
+  
+    function applyTimerSetting() {
+      const timer = document.getElementById('timerSelect').value;
+      const ultradian = document.getElementById('ultradianToggle').checked;
+      localStorage.setItem("studySettings", JSON.stringify({ timer: timer, ultradian: ultradian }));
+      showPopup('timerStartPopup');
+      stopCountdownTimer();
+      if (ultradian) {
+        startCountdownTimerCustom(90);
+        showPopup('ultradianStartPopup');
+        setTimeout(() => {
+          showPopup('ultradianEndPopup');
+          setTimeout(() => {
+            showPopup('breakEndPopup');
+          }, 30 * 60 * 1000);
+        }, 90 * 60 * 1000);
+      } else if (timer !== "none") {
+        startCountdownTimer();
+      }
+    }
+  
+    function getCSRFToken() {
+      return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
+  
+    function loadSettings() {
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
+      if (savedSettings) {
+        document.getElementById('timerSelect').value = savedSettings.timer;
+        document.getElementById('ultradianToggle').checked = savedSettings.ultradian;
+        document.getElementById('definitionToggle').checked = savedSettings.answer_with_definition || false;
+      }
+    }
+  
+    function showPopup(id) {
+      const popup = document.getElementById(id);
+      popup.classList.add('show');
+      setTimeout(() => {
+        popup.classList.remove('show');
+      }, 5000);
+    }
+  
+    function checkIfOnTimerPage() {
+      const currentPath = window.location.pathname;
+      if (currentPath.includes('/flashcards/') || currentPath.includes('/studypage/')) {
+        displayTimer();
+      }
+    }
+  
+    function displayTimer() {
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
+      if (savedSettings && savedSettings.timer !== "none") {
+        document.getElementById("timerWidget").style.display = "block";
+        document.getElementById("timerWidget").textContent = "⏳ Timer Running: " + savedSettings.timer + " min";
+      }
+    }
+  
+    document.addEventListener("DOMContentLoaded", function () {
+      loadSettings();
+      checkIfOnTimerPage();
+      updateQuestionFormat();
+    });
+  
+    window.addEventListener("pageshow", function () {
+      // Event delegation remains active.
+    });
+  
+    /* toggleEdit() with server save */
+    function toggleEdit(button, event) {
+      event.stopPropagation();
+      const card = button.closest('.flashcard');
+      const fields = card.querySelectorAll('.card-title, .card-term');
+      const isEditing = card.classList.contains('editing');
+  
+      if (isEditing) {
+        fields.forEach(el => {
+          el.contentEditable = "false";
+          el.classList.remove('editable');
         });
-
-        // Rebind flashcard flip events on pageshow (for browser back/forward navigation)
-        window.addEventListener("pageshow", function () {
-            if (typeof window.bindFlashcardEvents === "function") {
-                window.bindFlashcardEvents();
+        card.classList.remove('editing');
+        button.textContent = "Edit";
+  
+        // Save changes
+        const flashcardId = card.id.replace("card", "");
+        const newTerm = card.querySelector('.card-title').innerText;
+        const newDefinition = card.querySelector('.card-term').innerText;
+  
+        fetch(`/update_flashcard_text/${flashcardId}/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+          },
+          body: JSON.stringify({ term: newTerm, definition: newDefinition })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              console.log(`✅ Updated flashcard ${flashcardId}`);
+              card.setAttribute("data-term", newTerm);
+              card.setAttribute("data-definition", newDefinition);
+              updateQuestionFormat();
+            } else {
+              console.error("❌ Error updating flashcard text:", data.error);
             }
+          })
+          .catch(error => console.error("❌ API Error:", error));
+      } else {
+        fields.forEach(el => {
+          el.contentEditable = "true";
+          el.classList.add('editable');
         });
-    </script> 
-    
-    
-
-
-
-
+        card.classList.add('editing');
+        button.textContent = "Save";
+      }
+    }
+  
+    function updateQuestionFormat() {
+      const useDefinition = document.getElementById('definitionToggle').checked;
+      let savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+      savedSettings.answer_with_definition = useDefinition;
+      localStorage.setItem("studySettings", JSON.stringify(savedSettings));
+  
+      document.querySelectorAll('.flashcard').forEach(card => {
+        const term = card.getAttribute("data-term");
+        const definition = card.getAttribute("data-definition");
+        const front = card.querySelector('.front');
+        const back = card.querySelector('.back');
+        if (useDefinition) {
+          // Show definition on the front, term on the back
+          front.innerHTML = `<h2 class="card-title">${definition}</h2>`;
+          back.innerHTML = `<h2 class="card-term">${term}</h2>`;
+        } else {
+          // Default: term on the front, definition on the back
+          front.innerHTML = `<h2 class="card-title">${term}</h2>`;
+          back.innerHTML = `<h2 class="card-term">${definition}</h2>`;
+        }
+      });
+    }
+  
+    document.getElementById('definitionToggle')?.addEventListener('change', updateQuestionFormat);
+  </script>
 </body>
-
 </html>
