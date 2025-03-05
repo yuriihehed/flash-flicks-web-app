@@ -34,7 +34,7 @@ from django.urls import reverse
 from django.contrib.auth import update_session_auth_hash
 
 def landing_page(request):
-    ensure_superuser()
+    #ensure_superuser()
     return render(request, 'landing.html')
 
 def base_page(request):
