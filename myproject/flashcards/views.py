@@ -400,6 +400,7 @@ def edit_flashcard_set(request, pk):
     context = {
         'set_form': set_form,
         'formset': formset,
+        'set_id': flashcard_set.id,
         'flashcard_set': flashcard_set,
         'user_folders': user_folders
     }
