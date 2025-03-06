@@ -25,6 +25,10 @@
         border-radius: 5px;
         margin-top: 10px;
         text-align: center;
+        
+    }
+    .button-yes{
+
     }
 
     /* Glowing Effect */
@@ -66,14 +70,19 @@
         
         <div class="text-end mt-3">
            <!-- Study Space& Edit Flashcard set Buttons -->
-            <button type="button" class="btn btn-success" onclick="window.location.href='{% url 'studypage' flashcard_set.id %}'">
-                Study Space
-            </button>
-
-            <button type="button" class="btn btn-danger"
-                onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">
-                Edit Flashcard Set
-            </button>          
+           <button type="button" class="btn" 
+           style="background-color: #5b9bfb; border-color: #5b9bfb; color: #000;" 
+           onclick="window.location.href='{% url 'studypage' flashcard_set.id %}'">
+           Study Space
+       </button>
+       
+       <button type="button" class="btn" 
+           style="background-color: #616eff; border-color: #616eff; color: #000;" 
+           onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">
+           Edit Flashcard Set
+       </button>
+       
+         
         </div>
 </section>
 
@@ -119,8 +128,8 @@
 
         <!-- Learn/Not Learned Buttons -->
         <div class="learning-buttons text-center mt-3">
-            <button id="learned-btn" class="btn btn-success"> Yes (Learned)</button>
-            <button id="not-learned-btn" class="btn btn-danger"> No (Not Learned)</button>
+            <button id="learned-btn" style="background-color: #616eff; border-color: #616eff; color: #fffdfd;" > Yes (Learned)</button>
+            <button id="not-learned-btn" style="background-color: #5b9bfb; border-color: #99C2FF; color: #ffffff;" > No (Not Learned)</button>
         </div>
         <br>
 
