@@ -25,5 +25,5 @@ EXPOSE 8000
 
 # Start the Django development server
 # CMD ["python3", "myproject/manage.py", "runserver", "0.0.0.0:8000"]
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"] 
+CMD ["python3", "myproject/manage.py", "runserver", "0.0.0.0:8000"] 
 
