@@ -81,7 +81,7 @@
         <h2 class="text-white">Start Learning with FlashFlicks Today!</h2>
         <p class="text-white-75">Join thousands of students and professionals improving their learning experience.</p>
         {% if not user.is_authenticated %}
-            <a href="/register" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="/register/" class="btn btn-primary btn-lg">Get Started</a>
         {% else %}
             <a href="/homepage/" class="btn btn-primary btn-lg">Go to Dashboard</a>
         {% endif %}

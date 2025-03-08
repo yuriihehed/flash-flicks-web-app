@@ -240,6 +240,48 @@ def folder_view(request):
         'flashcard_sets_without_folder': flashcard_sets_without_folder
     })
 
+# @require_POST
+# def create_folder(request):
+#     """View for creating a new folder via AJAX"""
+#     if not request.user.is_authenticated:
+#         return JsonResponse({'success': False, 'error': 'Authentication required'})
+    
+#     try:
+#         name = request.POST.get('name', '').strip()
+        
+#         # Validate folder name
+#         if not name:
+#             return JsonResponse({'success': False, 'error': 'Folder name is required'})
+        
+#         # Generate a slug from the name
+#         base_slug = slugify(name)
+#         slug = base_slug
+        
+#         # If slug already exists, make it unique
+#         counter = 1
+#         while Folder.objects.filter(slug=slug, user=request.user).exists():
+#             slug = f"{base_slug}-{counter}"
+#             counter += 1
+        
+#         # Create the folder
+#         folder = Folder.objects.create(
+#             name=name,
+#             slug=slug,
+#             user=request.user
+#         )
+        
+#         return JsonResponse({
+#             'success': True, 
+#             'folder_name': folder.name,
+#             'folder_slug': folder.slug,
+#             'redirect_url': f'/folder/{folder.slug}/'  # Include redirect URL if needed
+#         })
+        
+#     except Exception as e:
+#         # Log the error for debugging
+#         print(f"Folder creation error: {str(e)}")
+#         return JsonResponse({'success': False, 'error': str(e)})
+
 @require_POST
 def create_folder(request):
     """View for creating a new folder via AJAX"""
@@ -249,17 +291,16 @@ def create_folder(request):
     try:
         name = request.POST.get('name', '').strip()
         
-        # Validate folder name
         if not name:
             return JsonResponse({'success': False, 'error': 'Folder name is required'})
         
         # Generate a slug from the name
         base_slug = slugify(name)
         slug = base_slug
-        
-        # If slug already exists, make it unique
         counter = 1
-        while Folder.objects.filter(slug=slug, user=request.user).exists():
+
+        # Ensure slug is unique per user
+        while Folder.objects.filter(user=request.user, slug=slug).exists():
             slug = f"{base_slug}-{counter}"
             counter += 1
         
@@ -274,13 +315,14 @@ def create_folder(request):
             'success': True, 
             'folder_name': folder.name,
             'folder_slug': folder.slug,
-            'redirect_url': f'/folder/{folder.slug}/'  # Include redirect URL if needed
+            'redirect_url': f'/folder/{folder.slug}/'
         })
         
     except Exception as e:
-        # Log the error for debugging
         print(f"Folder creation error: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)})
+
+
 
 @login_required
 @require_POST

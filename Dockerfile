@@ -18,7 +18,7 @@ COPY requirements.txt /app/
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of your project code into the container
-COPY . /
+COPY . /app/
 
 # Expose the port Django will run on (default is 8000)
 EXPOSE 8000
