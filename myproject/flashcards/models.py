@@ -38,24 +38,48 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
-# Folder model for grouping decks 
+# # Folder model for grouping decks 
+# class Folder(models.Model):
+#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="folders")
+#     name = models.CharField(max_length=100)
+#     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subfolders')
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     slug = models.SlugField(unique=True, blank=True)
+
+#     def save(self, *args, **kwargs):
+#         if not self.slug:
+#             self.slug = slugify(self.name)  # Generate slug from the name
+#             # Ensure slug uniqueness
+#             while Folder.objects.filter(slug=self.slug).exists():
+#                 self.slug += "-" + str(Folder.objects.filter(slug__startswith=self.slug).count())
+#         super().save(*args, **kwargs)
+
+#     def __str__(self):
+#         return self.name
 class Folder(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="folders")
     name = models.CharField(max_length=100)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subfolders')
     created_at = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(blank=True)  # Remove unique constraint
+
+    class Meta:
+        unique_together = ('user', 'name')  # Ensures uniqueness per user
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)  # Generate slug from the name
-            # Ensure slug uniqueness
-            while Folder.objects.filter(slug=self.slug).exists():
-                self.slug += "-" + str(Folder.objects.filter(slug__startswith=self.slug).count())
+            base_slug = slugify(self.name)
+            self.slug = base_slug
+            # Ensure slug uniqueness for the user
+            count = 1
+            while Folder.objects.filter(user=self.user, slug=self.slug).exists():
+                self.slug = f"{base_slug}-{count}"
+                count += 1
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.user.username})"
+
     
 # The flashcard set model hold the overall title and description of the flashcard set
 # class FlashcardSet(models.Model):
