@@ -639,42 +639,46 @@
       TOGGLE STAR
     ---------------------------------------------*/
     function toggleStar(button, event) {
-      event.stopPropagation();
-      const card = button.closest(".flashcard");
-      const flashcardId = card.id.replace("card", "");
-      let newStarredState;
-      if (button.classList.contains("active-star")) {
+    event.stopPropagation();
+    const card = button.closest(".flashcard");
+    const flashcardId = card.id.replace("card", "");
+    let isStarred = button.classList.contains("active-star");
+
+    // Toggle UI state immediately
+    if (isStarred) {
         button.classList.remove("active-star");
         card.classList.remove("starred");
-        newStarredState = false;
-      } else {
+        button.style.color = "darkgray"; // Change icon to dark gray when not starred
+    } else {
         button.classList.add("active-star");
         card.classList.add("starred");
-        newStarredState = true;
-        // Glow effect
+        button.style.color = "gold"; // Change icon to yellow when starred
+
+        // Force reflow to ensure animation applies correctly
+        card.offsetWidth; // This line forces a reflow
+
+        // Apply glow effect
         card.classList.add("flash");
         setTimeout(() => card.classList.remove("flash"), 500);
-      }
-      fetch(`/update_star_status/${flashcardId}/`, {
+    }
+
+    // Send the updated status to the backend
+    fetch(`/update_star_status/${flashcardId}/`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCSRFToken()
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
         },
-        body: JSON.stringify({ starred: newStarredState })
-      })
-      .then(res => res.json())
-      .then(data => {
+        body: JSON.stringify({ starred: !isStarred }) // Send the toggled state
+    })
+    .then(response => response.json())
+    .then(data => {
         if (!data.success) {
-          console.error("Error toggling star:", data.error);
-        } else {
-          if (isStarredOnly && !newStarredState) {
-            updateCards();
-          }
+            console.error("Error toggling star:", data.error);
         }
-      })
-      .catch(err => console.error(err));
-    }
+    })
+    .catch(error => console.error("API Error:", error));
+  }
 
     /*---------------------------------------------
       LEARNED BUTTONS
