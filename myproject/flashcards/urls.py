@@ -68,6 +68,9 @@ urlpatterns = [
     # Update Learn Settings
     path('update_learn_settings/', views.update_learn_settings, name='update_learn_settings'),
     
+    
+    path('create-test-flashcard-set/', views.create_test_flashcard_set, name='create_test_flashcard_set'),
+    
 
 ]
 
