@@ -675,5 +675,19 @@
     });
   }
   document.getElementById("definitionToggle")?.addEventListener("change", updateQuestionFormat);
+
+  /*---------------------------------------------
+    Rounds
+  ---------------------------------------------*/
+  function saveSettings() {
+  const roundLength = document.getElementById("roundLength").value;
+  let savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+  
+  savedSettings.roundLength = roundLength;  // Save round length
+  localStorage.setItem("studySettings", JSON.stringify(savedSettings));
+
+  showPopup("saveNotification");
+}
+
 </script>
 {% endblock %}
