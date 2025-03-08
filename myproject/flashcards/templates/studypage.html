@@ -46,8 +46,7 @@
       padding: 0 5px;
     }
 
-    /* MAIN CONTENT AREA */
-    /* Flashcard Layout */
+    /* FLASHCARD LAYOUT */
     .flashcard-container {
       display: flex;
       justify-content: center;
@@ -91,8 +90,6 @@
       background-color: #66a3ff;
       transform: rotateY(180deg);
     }
-
-    
     .card-title {
       font-size: 30px; 
       line-height: 1.2;
@@ -102,7 +99,7 @@
       line-height: 1.2;
     }
 
-    /* Buttons - Edit & Star */
+    /* EDIT & STAR BUTTONS */
     .top-buttons {
       position: absolute;
       top: 10px;
@@ -128,24 +125,18 @@
       color: gold;
     }
 
-    /* Flashcard Glow Effect */
+    /* FLASHCARD GLOW EFFECT */
     .flashcard.flash {
       animation: flash 0.5s ease-in-out;
       box-shadow: 0 0 20px 10px rgb(243, 230, 159);
     }
     @keyframes flash {
-      0% {
-        box-shadow: 0 0 20px 10px rgb(243, 230, 159);
-      }
-      50% {
-        box-shadow: 0 0 30px 20px rgb(237, 190, 163);
-      }
-      100% {
-        box-shadow: none;
-      }
+      0% { box-shadow: 0 0 20px 10px rgb(243, 230, 159); }
+      50% { box-shadow: 0 0 30px 20px rgb(237, 190, 163); }
+      100% { box-shadow: none; }
     }
 
-    /* NAVIGATION (arrows and counter) */
+    /* NAVIGATION */
     .navigation {
       display: flex;
       justify-content: center;
@@ -163,7 +154,7 @@
       font-size: 16px;
     }
 
-    /* Basic Modal Styles */
+    /* MODAL STYLES */
     .modal {
       display: none;
       position: fixed;
@@ -206,6 +197,8 @@
       cursor: pointer;
       color: #fff;
     }
+
+    /* SWITCHES & TOGGLES */
     .switch {
       position: relative;
       display: inline-block;
@@ -220,10 +213,7 @@
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background-color: #ccc;
       transition: 0.4s;
       border-radius: 24px;
@@ -245,6 +235,8 @@
     input:checked + .slider:before {
       transform: translateX(26px);
     }
+
+    /* NOTIFICATION */
     .notification {
       display: none;
       position: fixed;
@@ -278,9 +270,13 @@
       margin-left: auto;
     }
 
-    /* Timer Widget for Flashcard & Study Page */
+    /* TIMER WIDGET + START/PAUSE BUTTON */
     .timer-widget {
-      display: none;
+      display: none; /* Initially hidden; shown when a timer is selected */
+      min-width: 200px; /* Ensure full widget width */
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       position: fixed;
       bottom: 20px;
       left: 20px;
@@ -292,50 +288,57 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       z-index: 1000;
     }
-    
+    #timerDisplay {
+      margin-right: 10px;
+    }
+    #toggleTimerBtn {
+      background-color: #fff;
+      color: #002855;
+      font-weight: bold;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #toggleTimerBtn:hover {
+      background-color: #eee;
+    }
 
+    /* LEARNING BUTTONS */
     .learning-buttons {
-        display: flex;
-        justify-content: center; 
-        gap: 20px; 
-        margin-top: 30px;
+      display: flex;
+      justify-content: center; 
+      gap: 20px; 
+      margin-top: 30px;
     }
-
     .learning-btn {
-        font-size: 22px; 
-        padding: 15px 40px; 
-        border-radius: 10px; 
-        border: none;
-        cursor: pointer;
-        font-weight: bold;
-        transition: background-color 0.3s ease-in-out, transform 0.2s;
+      font-size: 22px; 
+      padding: 15px 40px; 
+      border-radius: 10px; 
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease-in-out, transform 0.2s;
     }
-
-      /* Yes (Learned) Button */
-      #learned-btn {
-          background-color: #616eff; 
-          color: white;
-      }
-
-      #learned-btn:hover {
-          background-color: #4a5bd3; 
-          transform: scale(1.05); 
-      }
-
-      /* No (Not Learned) Button */
-      #not-learned-btn {
-          background-color: #5b9bfb; 
-          color: white;
-      }
-
-      #not-learned-btn:hover {
-          background-color: #4a8cfb; 
-          transform: scale(1.05); 
-      }
-
-
+    #learned-btn {
+      background-color: #616eff; 
+      color: white;
+    }
+    #learned-btn:hover {
+      background-color: #4a5bd3; 
+      transform: scale(1.05); 
+    }
+    #not-learned-btn {
+      background-color: #5b9bfb; 
+      color: white;
+    }
+    #not-learned-btn:hover {
+      background-color: #4a8cfb; 
+      transform: scale(1.05); 
+    }
   </style>
 </head>
+
 <body>
   <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
   
@@ -348,16 +351,17 @@
         onclick="window.location.href='{% url 'flashcard_set_details' flashcard_set.id %}'">X</button>
     </div>
   </div>
-  
+
   <!-- MAIN CONTENT -->
   <div class="container py-5">
-    <!-- Flashcard container using event delegation for flipping -->
+    <!-- Flashcard container -->
     <div class="flashcard-container" id="flashcardContainer">
       {% for term in terms %}
-      <div class="flashcard" id="card{{ term.id }}"
-        data-term="{{ term.term }}"
-        data-definition="{{ term.definition }}"
-        {% if not forloop.first %}style="display: none;"{% endif %}>
+      <div class="flashcard"
+           id="card{{ term.id }}"
+           data-term="{{ term.term }}"
+           data-definition="{{ term.definition }}"
+           {% if not forloop.first %}style="display: none;"{% endif %}>
         
         <div class="card-inner">
           <div class="front">
@@ -370,7 +374,7 @@
 
         <div class="top-buttons">
           <button class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}"
-            onclick="toggleStar(this, event)">&#9733;</button>
+                  onclick="toggleStar(this, event)">&#9733;</button>
           <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
         </div>
       </div>
@@ -383,25 +387,25 @@
       <button id="nextBtn" class="nav-btn">&#8594;</button>
     </div>
   </div>
+
   <!-- Learn/Not Learned Buttons -->
-    <div class="learning-buttons text-center mt-3">
-      <button id="learned-btn" class="learning-btn">Yes (Learned)</button>
-      <button id="not-learned-btn" class="learning-btn">No (Not Learned)</button>
-    </div>
-
-
-  
-  <!-- Timer Widget (Initially Hidden) -->
-  <div id="timer-widget" class="timer-widget">
-    <span id="timerDisplay">00:00</span>
+  <div class="learning-buttons text-center mt-3">
+    <button id="learned-btn" class="learning-btn">Yes (Learned)</button>
+    <button id="not-learned-btn" class="learning-btn">No (Not Learned)</button>
   </div>
-  
+
+  <!-- TIMER WIDGET -->
+  <div id="timer-widget" class="timer-widget">
+    <span id="timerDisplay">No Timer Set</span>
+    <button id="toggleTimerBtn" onclick="toggleTimer()">Start</button>
+  </div>
+
   <!-- MODAL -->
   <div id="editLearnModeModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <span class="close-modal" onclick="closeModal()">&times;</span>
-        <h2 class="text-center mb-4" style="text-align:center;">Edit Flashcards</h2>
+        <h2 class="text-center mb-4">Edit Flashcards</h2>
       </div>
       <div class="modal-body">
         <div class="setting d-flex justify-content-between align-items-center mb-3">
@@ -428,6 +432,7 @@
           </select>
         </div>
         <button class="btn btn-primary w-100 mb-3" onclick="applyTimerSetting()">Apply Timer</button>
+
         <div class="setting d-flex justify-content-between align-items-center mb-3">
           <div>
             <label class="mb-1"><strong>Ultradian Rhythm</strong></label>
@@ -439,6 +444,7 @@
           </label>
         </div>
         <hr class="border-light">
+
         <!-- QUESTION FORMAT -->
         <div class="mb-3"><strong>Question Format:</strong></div>
         <div class="setting d-flex justify-content-between align-items-center mb-3">
@@ -460,7 +466,7 @@
           <label>Length of rounds:</label>
           <select id="roundLength" class="form-select mt-2">
             {% for i in "123456789"|make_list %}
-            <option value="{{ i }}">{{ i }} Round{{ i|pluralize }}</option>
+              <option value="{{ i }}">{{ i }} Round{{ i|pluralize }}</option>
             {% endfor %}
             <option value="10">10 Rounds</option>
           </select>
@@ -472,126 +478,142 @@
     </div>
   </div>
   <!-- END MODAL -->
-  
-  <!-- Notification popups -->
+
+  <!-- NOTIFICATION POPUPS -->
   <div id="saveNotification" class="notification">✅ Settings saved successfully!</div>
   <div id="timerStartPopup" class="notification">⏳ Study timer started!</div>
-  <div id="ultradianStartPopup" class="notification">⏳ 90-minute study session started!</div>
+  <div id="ultradianStartPopup" class="notification">⏳ 90-minute study session toggled on!</div>
   <div id="ultradianEndPopup" class="notification">✅ 90-minute study completed. Please take a 30-minute break.</div>
   <div id="breakEndPopup" class="notification">⏳ Break over! Time to resume your study session.</div>
   <div id="timerWidget" class="timer-widget"></div>
-  
-  <!-- Vendor JS Files -->
+
+  <!-- VENDOR JS FILES -->
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'vendor/aos/aos.js' %}"></script>
   <script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
   <script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
-  <!-- Main JS File -->
+  <!-- MAIN JS FILE -->
   <script src="{% static 'js/main.js' %}"></script>
-  <!-- Additional JS -->
+  <!-- ADDITIONAL JS (IF NEEDED) -->
   <script src="{% static 'js/TimerFunction.js' %}"></script>
   <script src="{% static 'js/LearnedFunction.js' %}"></script>
-  
+
   <script>
     /***** Global Timer Variables *****/
     let countdownInterval = null;
     let isTimerRunning = false;
-  
-    // Stop any running timer and hide the timer widget.
+    let remainingTime = 0;
+
+   
     function stopCountdownTimer() {
       if (countdownInterval) {
         clearInterval(countdownInterval);
         countdownInterval = null;
       }
       isTimerRunning = false;
-      document.getElementById("timerWidget").style.display = "none";
     }
-  
-    // Start the timer using the saved setting from localStorage.
+
+    // startCountdownTimer now only displays the chosen time without auto-starting
     function startCountdownTimer() {
-      const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
-      if (!savedSettings || savedSettings.timer === "none") return;
-      stopCountdownTimer();
-      isTimerRunning = true;
-      let remainingTime = parseInt(savedSettings.timer, 10) * 60;
-      if (isNaN(remainingTime) || remainingTime <= 0) return;
-      const timerWidget = document.getElementById("timerWidget");
-      timerWidget.style.display = "block";
-      updateTimerDisplay(remainingTime);
-      countdownInterval = setInterval(() => {
-        remainingTime--;
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+      // If ultradian is toggled on, always use 90 minutes
+      if (savedSettings.ultradian) {
+        document.getElementById("timer-widget").style.display = "flex";
+        remainingTime = 90 * 60;
         updateTimerDisplay(remainingTime);
-        if (remainingTime <= 0) {
-          clearInterval(countdownInterval);
-          countdownInterval = null;
-          isTimerRunning = false;
-          timerWidget.textContent = "✅ Timer Completed!";
-          setTimeout(() => {
-            timerWidget.style.display = "none";
-          }, 3000);
-        }
-      }, 1000);
+      } else if (!savedSettings.timer || savedSettings.timer === "none") {
+        document.getElementById("timer-widget").style.display = "none";
+      } else {
+        document.getElementById("timer-widget").style.display = "flex";
+        remainingTime = parseInt(savedSettings.timer, 10) * 60;
+        updateTimerDisplay(remainingTime);
+      }
     }
-  
-    // Start a timer with a custom duration (in minutes) for ultradian mode.
+
     function startCountdownTimerCustom(minutes) {
-      stopCountdownTimer();
-      isTimerRunning = true;
-      let remainingTime = minutes * 60;
-      const timerWidget = document.getElementById("timerWidget");
-      timerWidget.style.display = "block";
+      // This function is available if you want to set custom time manually
+      remainingTime = minutes * 60;
+      document.getElementById("timer-widget").style.display = "flex";
       updateTimerDisplay(remainingTime);
-      countdownInterval = setInterval(() => {
-        remainingTime--;
-        updateTimerDisplay(remainingTime);
-        if (remainingTime <= 0) {
-          clearInterval(countdownInterval);
-          countdownInterval = null;
-          isTimerRunning = false;
-          timerWidget.textContent = "✅ Timer Completed!";
-          setTimeout(() => {
-            timerWidget.style.display = "none";
-          }, 3000);
-        }
-      }, 1000);
     }
-  
+
+   
     function updateTimerDisplay(seconds) {
-      const timerWidget = document.getElementById("timerWidget");
+      const timerDisplay = document.getElementById("timerDisplay");
       let min = Math.floor(seconds / 60);
       let sec = seconds % 60;
-      timerWidget.textContent = `⏳ ${min}:${sec < 10 ? "0" : ""}${sec} remaining`;
+      timerDisplay.textContent = `⏳ ${min}:${sec < 10 ? "0" : ""}${sec} remaining`;
     }
-  
-    /***** Flashcard Flipping using Event Delegation *****/
-    document.querySelector('.flashcard-container').addEventListener("click", function(e) {
+
+
+    function toggleTimer() {
+      const toggleBtn = document.getElementById("toggleTimerBtn");
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+      // If ultradian is toggled on, ignore timer value and use 90 minutes
+      if (!savedSettings.ultradian && (!savedSettings.timer || savedSettings.timer === "none")) {
+        document.getElementById("timer-widget").style.display = "none";
+        return;
+      }
+      if (isTimerRunning) {
+        // Pause
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+        isTimerRunning = false;
+        toggleBtn.textContent = "Start";
+      } else {
+        // Resume or start fresh
+        if (remainingTime <= 0) {
+          if (savedSettings.ultradian) {
+            remainingTime = 90 * 60;
+          } else {
+            remainingTime = parseInt(savedSettings.timer, 10) * 60;
+          }
+        }
+        if (remainingTime <= 0) return;
+        isTimerRunning = true;
+        toggleBtn.textContent = "Pause";
+        countdownInterval = setInterval(() => {
+          remainingTime--;
+          updateTimerDisplay(remainingTime);
+          if (remainingTime <= 0) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            isTimerRunning = false;
+            document.getElementById("timerDisplay").textContent = "✅ Timer Completed!";
+            setTimeout(() => {
+              // Optionally hide widget
+            }, 3000);
+          }
+        }, 1000);
+      }
+    }
+
+    document.querySelector(".flashcard-container").addEventListener("click", function(e) {
       const card = e.target.closest(".flashcard");
       if (!card) return;
       if (e.target.classList.contains("edit-btn") || e.target.classList.contains("star-btn")) return;
       if (card.classList.contains("editing")) return;
       card.classList.toggle("flipped");
     });
-  
-    /***** Flashcard Navigation and Shuffle *****/
+
     (function () {
       let currentIndex = 0;
-  
+
       function updateCards() {
-        const cards = document.querySelectorAll('.flashcard');
+        const cards = document.querySelectorAll(".flashcard");
         const totalCards = cards.length;
         cards.forEach((card, index) => {
-          card.style.display = (index === currentIndex) ? 'block' : 'none';
+          card.style.display = (index === currentIndex) ? "block" : "none";
         });
-        const cardCounter = document.getElementById('cardCounter');
+        const cardCounter = document.getElementById("cardCounter");
         if (cardCounter) {
           cardCounter.innerText = `${currentIndex + 1} / ${totalCards}`;
         }
       }
-  
+
       function shuffleFlashcards() {
-        const container = document.querySelector('.flashcard-container');
-        const flashcards = Array.from(container.querySelectorAll('.flashcard'));
-        // Fisher-Yates shuffle:
+        const container = document.querySelector(".flashcard-container");
+        const flashcards = Array.from(container.querySelectorAll(".flashcard"));
         for (let i = flashcards.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
@@ -603,51 +625,50 @@
           card.classList.remove("flipped");
           container.appendChild(card);
         });
-        // Reset current index to 0 for new order
         currentIndex = 0;
         updateCards();
       }
-  
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
+
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
       if (prevBtn) {
-        prevBtn.addEventListener('click', function () {
+        prevBtn.addEventListener("click", function () {
           currentIndex = Math.max(0, currentIndex - 1);
           updateCards();
         });
       }
       if (nextBtn) {
-        nextBtn.addEventListener('click', function () {
-          const total = document.querySelectorAll('.flashcard').length;
+        nextBtn.addEventListener("click", function () {
+          const total = document.querySelectorAll(".flashcard").length;
           currentIndex = Math.min(total - 1, currentIndex + 1);
           updateCards();
         });
       }
-  
+
       updateCards();
       window.updateCards = updateCards;
       window.shuffleFlashcards = shuffleFlashcards;
     })();
-  
-    /***** Global Modal and Settings Functions *****/
+
+
     function openModal() {
-      document.getElementById('editLearnModeModal').style.display = 'block';
+      document.getElementById("editLearnModeModal").style.display = "block";
     }
     function closeModal() {
-      document.getElementById('editLearnModeModal').style.display = 'none';
+      document.getElementById("editLearnModeModal").style.display = "none";
     }
-  
+
     function saveSettings() {
-      const starred = document.getElementById('starredToggle').checked;
-      const shuffle = document.getElementById('shuffleToggle').checked;
-      const timer = document.getElementById('timerSelect').value;
-      const ultradian = document.getElementById('ultradianToggle').checked;
-      const answerWithTerm = document.getElementById('termToggle').checked;
-      const answerWithDefinition = document.getElementById('definitionToggle').checked;
-      const roundLength = document.getElementById('roundLength').value;
-  
+      const starred = document.getElementById("starredToggle").checked;
+      const shuffle = document.getElementById("shuffleToggle").checked;
+      const timer = document.getElementById("timerSelect").value;
+      const ultradian = document.getElementById("ultradianToggle").checked;
+      const answerWithTerm = document.getElementById("termToggle").checked;
+      const answerWithDefinition = document.getElementById("definitionToggle").checked;
+      const roundLength = document.getElementById("roundLength").value;
+
       let savedSettingsLS = JSON.parse(localStorage.getItem("studySettings")) || {};
-  
+
       fetch("{% url 'update_learn_settings' %}", {
         method: "POST",
         headers: {
@@ -668,7 +689,7 @@
       .then(data => {
         if (data.success) {
           console.log("✅ Settings saved on the server!");
-          showPopup('saveNotification');
+          showPopup("saveNotification");
           if (shuffle) {
             shuffleFlashcards();
           }
@@ -677,20 +698,25 @@
           savedSettingsLS.ultradian = ultradian;
           savedSettingsLS.answer_with_definition = answerWithDefinition;
           localStorage.setItem("studySettings", JSON.stringify(savedSettingsLS));
-          if (timer !== "none") {
-            startCountdownTimer();
+
+          // Determine widget display:
+          if ((timer === "none" && !ultradian)) {
+            document.getElementById("timer-widget").style.display = "none";
+          } else {
+            document.getElementById("timer-widget").style.display = "flex";
+            if (ultradian) {
+              updateTimerDisplay(90 * 60);
+            } else {
+              const totalSeconds = parseInt(timer, 10) * 60;
+              if (!isNaN(totalSeconds) && totalSeconds > 0) {
+                updateTimerDisplay(totalSeconds);
+              }
+            }
           }
+
           if (ultradian) {
-            startCountdownTimerCustom(90);
-            showPopup('ultradianStartPopup');
-            setTimeout(() => {
-              showPopup('ultradianEndPopup');
-              setTimeout(() => {
-                showPopup('breakEndPopup');
-              }, 30 * 60 * 1000);
-            }, 90 * 60 * 1000);
+            showPopup("ultradianStartPopup");
           }
-          // Update the question format after settings save.
           updateQuestionFormat();
         } else {
           console.error("❌ Error saving settings:", data);
@@ -698,93 +724,94 @@
       })
       .catch(err => console.error("❌ API Error:", err));
     }
-  
+
     function applyTimerSetting() {
-      const timer = document.getElementById('timerSelect').value;
-      const ultradian = document.getElementById('ultradianToggle').checked;
+      const timer = document.getElementById("timerSelect").value;
+      const ultradian = document.getElementById("ultradianToggle").checked;
       localStorage.setItem("studySettings", JSON.stringify({ timer: timer, ultradian: ultradian }));
-      showPopup('timerStartPopup');
+      showPopup("timerStartPopup");
       stopCountdownTimer();
+
+      if ((timer === "none" && !ultradian)) {
+        document.getElementById("timer-widget").style.display = "none";
+        return;
+      }
+      document.getElementById("timer-widget").style.display = "flex";
       if (ultradian) {
-        startCountdownTimerCustom(90);
-        showPopup('ultradianStartPopup');
-        setTimeout(() => {
-          showPopup('ultradianEndPopup');
-          setTimeout(() => {
-            showPopup('breakEndPopup');
-          }, 30 * 60 * 1000);
-        }, 90 * 60 * 1000);
-      } else if (timer !== "none") {
-        startCountdownTimer();
+        updateTimerDisplay(90 * 60);
+        showPopup("ultradianStartPopup");
+      } else {
+        const totalSeconds = parseInt(timer, 10) * 60;
+        if (!isNaN(totalSeconds) && totalSeconds > 0) {
+          updateTimerDisplay(totalSeconds);
+        }
       }
     }
-  
+
     function getCSRFToken() {
       return document.querySelector("[name=csrfmiddlewaretoken]").value;
     }
-  
+
+
     function loadSettings() {
       const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
       if (savedSettings) {
-        document.getElementById('timerSelect').value = savedSettings.timer;
-        document.getElementById('ultradianToggle').checked = savedSettings.ultradian;
-        document.getElementById('definitionToggle').checked = savedSettings.answer_with_definition || false;
+        document.getElementById("timerSelect").value = savedSettings.timer;
+        document.getElementById("ultradianToggle").checked = savedSettings.ultradian;
+        document.getElementById("definitionToggle").checked = savedSettings.answer_with_definition || false;
       }
     }
-  
+
     function showPopup(id) {
       const popup = document.getElementById(id);
-      popup.classList.add('show');
+      popup.classList.add("show");
       setTimeout(() => {
-        popup.classList.remove('show');
+        popup.classList.remove("show");
       }, 5000);
     }
-  
+
     function checkIfOnTimerPage() {
-      const currentPath = window.location.pathname;
-      if (currentPath.includes('/flashcards/') || currentPath.includes('/studypage/')) {
-        displayTimer();
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+      if ((!savedSettings.timer || savedSettings.timer === "none") && !savedSettings.ultradian) {
+        document.getElementById("timer-widget").style.display = "none";
+      } else {
+        document.getElementById("timer-widget").style.display = "flex";
+        if (savedSettings.ultradian) {
+          updateTimerDisplay(90 * 60);
+        } else {
+          const totalSeconds = parseInt(savedSettings.timer, 10) * 60;
+          if (!isNaN(totalSeconds) && totalSeconds > 0) {
+            updateTimerDisplay(totalSeconds);
+          }
+        }
       }
     }
-  
-    function displayTimer() {
-      const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
-      if (savedSettings && savedSettings.timer !== "none") {
-        document.getElementById("timerWidget").style.display = "block";
-        document.getElementById("timerWidget").textContent = "⏳ Timer Running: " + savedSettings.timer + " min";
-      }
-    }
-  
+
     document.addEventListener("DOMContentLoaded", function () {
       loadSettings();
       checkIfOnTimerPage();
       updateQuestionFormat();
     });
-  
-    window.addEventListener("pageshow", function () {
-      // Event delegation remains active.
-    });
-  
-    /* toggleEdit() with server save */
+
+
     function toggleEdit(button, event) {
       event.stopPropagation();
-      const card = button.closest('.flashcard');
-      const fields = card.querySelectorAll('.card-title, .card-term');
-      const isEditing = card.classList.contains('editing');
-  
+      const card = button.closest(".flashcard");
+      const fields = card.querySelectorAll(".card-title, .card-term");
+      const isEditing = card.classList.contains("editing");
+
       if (isEditing) {
         fields.forEach(el => {
           el.contentEditable = "false";
-          el.classList.remove('editable');
+          el.classList.remove("editable");
         });
-        card.classList.remove('editing');
+        card.classList.remove("editing");
         button.textContent = "Edit";
-  
-        // Save changes
+
         const flashcardId = card.id.replace("card", "");
-        const newTerm = card.querySelector('.card-title').innerText;
-        const newDefinition = card.querySelector('.card-term').innerText;
-  
+        const newTerm = card.querySelector(".card-title").innerText;
+        const newDefinition = card.querySelector(".card-term").innerText;
+
         fetch(`/update_flashcard_text/${flashcardId}/`, {
           method: "POST",
           headers: {
@@ -793,141 +820,129 @@
           },
           body: JSON.stringify({ term: newTerm, definition: newDefinition })
         })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              console.log(`✅ Updated flashcard ${flashcardId}`);
-              card.setAttribute("data-term", newTerm);
-              card.setAttribute("data-definition", newDefinition);
-              updateQuestionFormat();
-            } else {
-              console.error("❌ Error updating flashcard text:", data.error);
-            }
-          })
-          .catch(error => console.error("❌ API Error:", error));
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            console.log(`✅ Updated flashcard ${flashcardId}`);
+            card.setAttribute("data-term", newTerm);
+            card.setAttribute("data-definition", newDefinition);
+            updateQuestionFormat();
+          } else {
+            console.error("❌ Error updating flashcard text:", data.error);
+          }
+        })
+        .catch(error => console.error("❌ API Error:", error));
       } else {
         fields.forEach(el => {
           el.contentEditable = "true";
-          el.classList.add('editable');
+          el.classList.add("editable");
         });
-        card.classList.add('editing');
+        card.classList.add("editing");
         button.textContent = "Save";
       }
     }
 
+    document.addEventListener("DOMContentLoaded", function () {
+      const cards = document.querySelectorAll(".flashcard");
+      let currentIndex = 0;
+      const totalCards = cards.length;
+      const learnedBtn = document.getElementById("learned-btn");
+      const notLearnedBtn = document.getElementById("not-learned-btn");
+      const cardCounter = document.getElementById("cardCounter");
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const cards = document.querySelectorAll(".flashcard");
-    let currentIndex = 0;
-    const totalCards = cards.length;
-    const learnedBtn = document.getElementById("learned-btn");
-    const notLearnedBtn = document.getElementById("not-learned-btn");
-    const cardCounter = document.getElementById("cardCounter");
-
-    function updateCards() {
+      function updateCards() {
         cards.forEach((card, index) => {
-            card.style.display = index === currentIndex ? "block" : "none";
+          card.style.display = index === currentIndex ? "block" : "none";
         });
         cardCounter.innerText = `${currentIndex + 1} / ${totalCards}`;
-    }
+      }
 
-    function markLearned(learned) {
+      function markLearned(learned) {
         const flashcardId = cards[currentIndex].id.replace("card", "");
 
         fetch(`/update_flashcard_status/${flashcardId}/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken(),
-            },
-            body: JSON.stringify({ learned: learned }),
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),
+          },
+          body: JSON.stringify({ learned: learned }),
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                console.log(`✅ Flashcard ${flashcardId} marked as ${learned ? "Learned" : "Not Learned"}`);
-
-                // Update Local Storage for Set Page Sync
-                window.localStorage.setItem(`flashcard_${flashcardId}_learned`, learned);
-                window.dispatchEvent(new Event("flashcardStatusUpdated"));
-
-                // Move to the next flashcard
-                currentIndex = Math.min(totalCards - 1, currentIndex + 1);
-                updateCards();
-            } else {
-                console.error("❌ Error updating status:", data.error);
-            }
+          if (data.success) {
+            console.log(`✅ Flashcard ${flashcardId} marked as ${learned ? "Learned" : "Not Learned"}`);
+            window.localStorage.setItem(`flashcard_${flashcardId}_learned`, learned);
+            window.dispatchEvent(new Event("flashcardStatusUpdated"));
+            currentIndex = Math.min(totalCards - 1, currentIndex + 1);
+            updateCards();
+          } else {
+            console.error("❌ Error updating status:", data.error);
+          }
         })
         .catch(error => console.error("❌ API Error:", error));
-    }
+      }
 
-    learnedBtn.addEventListener("click", () => markLearned(true));
-    notLearnedBtn.addEventListener("click", () => markLearned(false));
+      learnedBtn.addEventListener("click", () => markLearned(true));
+      notLearnedBtn.addEventListener("click", () => markLearned(false));
 
-    function getCSRFToken() {
+      function getCSRFToken() {
         return document.querySelector("[name=csrfmiddlewaretoken]").value;
-    }
+      }
 
-    updateCards();
-});
+      updateCards();
+    });
 
 
-document.addEventListener("DOMContentLoaded", function () {
-    function syncFlashcardStatus() {
+    document.addEventListener("DOMContentLoaded", function () {
+      function syncFlashcardStatus() {
         document.querySelectorAll(".term-box").forEach(termBox => {
-            const flashcardId = termBox.getAttribute("data-flashcard-id");
-            const learnedStatus = window.localStorage.getItem(`flashcard_${flashcardId}_learned`);
-
-            if (learnedStatus !== null) {
-                const statusSpan = termBox.querySelector(".learned-status span");
-                if (statusSpan) {
-                    if (learnedStatus === "true") {
-                        statusSpan.innerText = "Learned";
-                        statusSpan.classList.remove("text-danger");
-                        statusSpan.classList.add("text-success");
-                    } else {
-                        statusSpan.innerText = "Not Learned";
-                        statusSpan.classList.remove("text-success");
-                        statusSpan.classList.add("text-danger");
-                    }
-                }
+          const flashcardId = termBox.getAttribute("data-flashcard-id");
+          const learnedStatus = window.localStorage.getItem(`flashcard_${flashcardId}_learned`);
+          if (learnedStatus !== null) {
+            const statusSpan = termBox.querySelector(".learned-status span");
+            if (statusSpan) {
+              if (learnedStatus === "true") {
+                statusSpan.innerText = "Learned";
+                statusSpan.classList.remove("text-danger");
+                statusSpan.classList.add("text-success");
+              } else {
+                statusSpan.innerText = "Not Learned";
+                statusSpan.classList.remove("text-success");
+                statusSpan.classList.add("text-danger");
+              }
             }
+          }
         });
-    }
+      }
 
-    // Listen for changes from Study Page
-    window.addEventListener("flashcardStatusUpdated", syncFlashcardStatus);
+      window.addEventListener("flashcardStatusUpdated", syncFlashcardStatus);
+      syncFlashcardStatus();
+    });
 
-    // Initial sync in case updates happened before this page loaded
-    syncFlashcardStatus();
-});
-
-
-  
+ 
     function updateQuestionFormat() {
-      const useDefinition = document.getElementById('definitionToggle').checked;
+      const useDefinition = document.getElementById("definitionToggle").checked;
       let savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
       savedSettings.answer_with_definition = useDefinition;
       localStorage.setItem("studySettings", JSON.stringify(savedSettings));
-  
-      document.querySelectorAll('.flashcard').forEach(card => {
+
+      document.querySelectorAll(".flashcard").forEach(card => {
         const term = card.getAttribute("data-term");
         const definition = card.getAttribute("data-definition");
-        const front = card.querySelector('.front');
-        const back = card.querySelector('.back');
+        const front = card.querySelector(".front");
+        const back = card.querySelector(".back");
+
         if (useDefinition) {
-          // Show definition on the front, term on the back
           front.innerHTML = `<h2 class="card-title">${definition}</h2>`;
           back.innerHTML = `<h2 class="card-term">${term}</h2>`;
         } else {
-          // Default: term on the front, definition on the back
           front.innerHTML = `<h2 class="card-title">${term}</h2>`;
           back.innerHTML = `<h2 class="card-term">${definition}</h2>`;
         }
       });
     }
-  
-    document.getElementById('definitionToggle')?.addEventListener('change', updateQuestionFormat);
+    document.getElementById("definitionToggle")?.addEventListener("change", updateQuestionFormat);
   </script>
 </body>
 </html>
