@@ -18,17 +18,18 @@
     /* HEADER */
     .header {
       position: relative;
-      background-color: #f2f2f2;
+      background-color: #002855;
       height: 60px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 20px;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid #030888;
     }
     .header h1 {
       font-size: 20px;
       font-weight: normal;
+      color: white;
     }
     .header .header-right {
       display: flex;
@@ -40,6 +41,7 @@
       background: none;
       font-size: 16px;
       cursor: pointer;
+      color: white;
     }
     .header .close-btn {
       font-size: 20px;
@@ -139,22 +141,52 @@
       100% { box-shadow: none; }
     }
 
-    /* NAVIGATION */
+    /* NAVIGATION CONTAINER */
     .navigation {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       margin-top: 20px;
-      gap: 20px;
+      gap: 10px;
+      background-color: #d3d3d3; /* Light gray background */
+      border-radius: 25px; /* More oval but not too fat */
+      padding: 12px 25px; /* Reduce padding to make it slimmer */
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      max-width: 350px; /* Adjust length of the navigation */
+      height: 50px; /* Reduce height */
+      margin-left: auto;
+      margin-right: auto;
     }
+
+    /* Navigation Buttons */
     .nav-btn {
-      background: none;
+      background-color: transparent;
       border: none;
-      font-size: 24px;
+      color: black; /* Black arrows */
+      font-size: 22px; /* Slightly smaller arrows */
+      font-weight: bold;
+      padding: 8px 12px; /* Reduce padding inside buttons */
       cursor: pointer;
+      transition: background-color 0.3s ease-in-out, transform 0.2s;
+      border-radius: 40px; /* Keep buttons rounded but slimmer */
     }
+
+    /* Hover Effect */
+    .nav-btn:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(1.1);
+    }
+
+    /* Card Counter */
     .card-counter {
-      font-size: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      color: black;
+      padding: 6px 12px; /* Adjust padding to reduce size */
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 30px;
+      text-align: center;
+      min-width: 80px; /* Keep counter centered */
     }
 
     /* LEARN/NOT LEARNED BUTTONS */
