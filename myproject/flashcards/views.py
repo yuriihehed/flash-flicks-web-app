@@ -1,29 +1,23 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
-
 from .forms import FlashcardSetForm, FlashcardForm, FlashcardFormSet
 from django.forms.models import modelformset_factory 
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.models import User
-from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak, FlashcardSet, UserProfile
+from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak, FlashcardSet
 from django.db.models import Count
 import json
-from .models import Folder
 from django.views.decorators.http import require_POST
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .models import Event
 from datetime import datetime, timedelta
-from .models import Flashcard
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.contrib import messages
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
@@ -31,7 +25,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
-from django.contrib.auth import update_session_auth_hash
 
 def landing_page(request):
     #ensure_superuser()
@@ -53,7 +46,6 @@ def studypage(request, set_id):
 
 def edit_learn_mode(request):
     return render(request, 'edit_learn_mode.html')
-
 
 #Forgot Password
 
@@ -239,48 +231,6 @@ def folder_view(request):
         'folders': folders,
         'flashcard_sets_without_folder': flashcard_sets_without_folder
     })
-
-# @require_POST
-# def create_folder(request):
-#     """View for creating a new folder via AJAX"""
-#     if not request.user.is_authenticated:
-#         return JsonResponse({'success': False, 'error': 'Authentication required'})
-    
-#     try:
-#         name = request.POST.get('name', '').strip()
-        
-#         # Validate folder name
-#         if not name:
-#             return JsonResponse({'success': False, 'error': 'Folder name is required'})
-        
-#         # Generate a slug from the name
-#         base_slug = slugify(name)
-#         slug = base_slug
-        
-#         # If slug already exists, make it unique
-#         counter = 1
-#         while Folder.objects.filter(slug=slug, user=request.user).exists():
-#             slug = f"{base_slug}-{counter}"
-#             counter += 1
-        
-#         # Create the folder
-#         folder = Folder.objects.create(
-#             name=name,
-#             slug=slug,
-#             user=request.user
-#         )
-        
-#         return JsonResponse({
-#             'success': True, 
-#             'folder_name': folder.name,
-#             'folder_slug': folder.slug,
-#             'redirect_url': f'/folder/{folder.slug}/'  # Include redirect URL if needed
-#         })
-        
-#     except Exception as e:
-#         # Log the error for debugging
-#         print(f"Folder creation error: {str(e)}")
-#         return JsonResponse({'success': False, 'error': str(e)})
 
 @require_POST
 def create_folder(request):
