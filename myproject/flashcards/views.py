@@ -1,29 +1,23 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
-
 from .forms import FlashcardSetForm, FlashcardForm, FlashcardFormSet
 from django.forms.models import modelformset_factory 
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.models import User
-from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak, FlashcardSet, UserProfile
+from .models import Folder, Flashcard, UserProfile, Category, Progress, StudyStreak, FlashcardSet
 from django.db.models import Count
 import json
-from .models import Folder
 from django.views.decorators.http import require_POST
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .models import Event
 from datetime import datetime, timedelta
-from .models import Flashcard
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.contrib import messages
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
@@ -31,7 +25,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
-from django.contrib.auth import update_session_auth_hash
 
 def landing_page(request):
     #ensure_superuser()
@@ -53,7 +46,6 @@ def studypage(request, set_id):
 
 def edit_learn_mode(request):
     return render(request, 'edit_learn_mode.html')
-
 
 #Forgot Password
 
@@ -249,17 +241,16 @@ def create_folder(request):
     try:
         name = request.POST.get('name', '').strip()
         
-        # Validate folder name
         if not name:
             return JsonResponse({'success': False, 'error': 'Folder name is required'})
         
         # Generate a slug from the name
         base_slug = slugify(name)
         slug = base_slug
-        
-        # If slug already exists, make it unique
         counter = 1
-        while Folder.objects.filter(slug=slug, user=request.user).exists():
+
+        # Ensure slug is unique per user
+        while Folder.objects.filter(user=request.user, slug=slug).exists():
             slug = f"{base_slug}-{counter}"
             counter += 1
         
@@ -274,13 +265,14 @@ def create_folder(request):
             'success': True, 
             'folder_name': folder.name,
             'folder_slug': folder.slug,
-            'redirect_url': f'/folder/{folder.slug}/'  # Include redirect URL if needed
+            'redirect_url': f'/folder/{folder.slug}/'
         })
         
     except Exception as e:
-        # Log the error for debugging
         print(f"Folder creation error: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)})
+
+
 
 @login_required
 @require_POST
@@ -536,21 +528,28 @@ def update_flashcard(request, term_id):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
+
+            # Validate input
             term = data.get("term", "").strip()
             definition = data.get("definition", "").strip()
+            if not term or not definition:
+                return JsonResponse({"success": False, "error": "Term and definition cannot be empty"}, status=400)
 
-            flashcard = Flashcard.objects.get(id=term_id)
+            # Fetch the flashcard and update fields
+            flashcard = get_object_or_404(Flashcard, id=term_id)
             flashcard.term = term
             flashcard.definition = definition
             flashcard.save()
 
             return JsonResponse({"success": True})
-        except Flashcard.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Flashcard not found"})
+        
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON format"}, status=400)
+        
         except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    
-    return JsonResponse({"success": False, "error": "Invalid request"})
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
 
 
 User = get_user_model()
@@ -835,23 +834,24 @@ def update_flashcard_status(request, flashcard_id):
     return JsonResponse({"success": False, "error": "Invalid request"})
 
 
-@csrf_exempt
+
+
+
+
+
+@require_POST
 def update_star_status(request, term_id):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            favorite = data.get("favorite", False)  # True/False from the JS
-
-            flashcard = Flashcard.objects.get(id=term_id)
-            flashcard.is_favorite = favorite
-            flashcard.save()
-
-            return JsonResponse({"success": True})
-        except Flashcard.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Flashcard not found"})
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    return JsonResponse({"success": False, "error": "Invalid request"})
+    try:
+        data = json.loads(request.body)
+        new_status = data.get("starred")  # Expecting true/false from JS
+        flashcard = Flashcard.objects.get(id=term_id)
+        flashcard.is_starred = new_status
+        flashcard.save()
+        return JsonResponse({"success": True})
+    except Flashcard.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Flashcard not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
 
 def search_terms(request, set_id):
     # Get the flashcard set by ID (or 404 if not found)
@@ -905,5 +905,7 @@ def update_learn_settings(request):
     # user_settings.save()
 
     return JsonResponse({"success": True})
+
+
     
     

@@ -1,3 +1,4 @@
+version: '3.8'
 
 services:
   db:
@@ -23,7 +24,9 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://postgres:postgres@flashflicks_database:5432/postgres
+      #DATABASE_URL: postgres://postgres:postgres@flashflicks_database:5432/postgres
+      DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
+
 
 
 volumes:

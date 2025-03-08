@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.utils.text import slugify 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.conf import settings  # ✅ This ensures we use the correct user model
+from django.conf import settings 
 
 
 # Custom user model
@@ -13,7 +13,6 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     
-    # Explicitly remove the username field
     username = None  
 
     profile_picture = models.ImageField(upload_to="profiles/", blank=True, null=True)
@@ -38,37 +37,30 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
-# Folder model for grouping decks 
 class Folder(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="folders")
     name = models.CharField(max_length=100)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subfolders')
     created_at = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(blank=True) 
+
+    class Meta:
+        unique_together = ('user', 'name')  
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)  # Generate slug from the name
-            # Ensure slug uniqueness
-            while Folder.objects.filter(slug=self.slug).exists():
-                self.slug += "-" + str(Folder.objects.filter(slug__startswith=self.slug).count())
+            base_slug = slugify(self.name)
+            self.slug = base_slug
+            count = 1
+            while Folder.objects.filter(user=self.user, slug=self.slug).exists():
+                self.slug = f"{base_slug}-{count}"
+                count += 1
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
-    
-# The flashcard set model hold the overall title and description of the flashcard set
-# class FlashcardSet(models.Model):
-#     title = models.CharField(max_length=200)  # required text for flashcard
-#     description = models.TextField(blank=True, null = True) # optional description for flashcard (can be blank)
-#     created_at = models.DateTimeField(auto_now_add=True)  # auto set the created date
-#     updated_at = models.DateTimeField(auto_now=True)  # auto set the updated date
-#     folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='flashcard_sets') # added by Gulbanu
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
-    # returns the title of the flashcard set
-    # def __str__(self):
-    #     return self.title
-    
+        return f"{self.name} ({self.user.username})"
+
+
 class FlashcardSet(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
@@ -94,17 +86,17 @@ class Flashcard(models.Model):
     definition = models.TextField()  
     image = models.ImageField(upload_to='images/', blank=True, null=True)  
     is_favorite = models.BooleanField(default=False)  
+    is_starred = models.BooleanField(default=False)
     learned_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="learned_flashcards", blank=True)
 
     def has_been_learned(self, user):
         """Checks if the flashcard has been marked as learned by the given user."""
         is_learned = self.learned_by.filter(id=user.id).exists()
-        print(f"🔍 Checking learned status for {self.term}: {user.email} -> {is_learned}")  # Debugging
+        print(f" Checking learned status for {self.term}: {user.email} -> {is_learned}")  
         return is_learned
 
     def __str__(self):
         return f"{self.term}: {self.definition}"
-  # flashcard term and answer
     
 # User profile model
 class UserProfile(models.Model):
@@ -144,12 +136,10 @@ class StudyStreak(models.Model):
     streak_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'{self.user.username}\'s study streak'  # User's study streak
+        return f'{self.user.username}\'s study streak' 
     
 
 #Calender
-
-
 class Event(models.Model):
     title = models.CharField(max_length=200)
     class_name = models.CharField(max_length=100, blank=True, null=True)
