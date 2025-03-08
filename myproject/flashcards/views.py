@@ -412,21 +412,28 @@ def update_flashcard(request, term_id):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
+
+            # Validate input
             term = data.get("term", "").strip()
             definition = data.get("definition", "").strip()
+            if not term or not definition:
+                return JsonResponse({"success": False, "error": "Term and definition cannot be empty"}, status=400)
 
-            flashcard = Flashcard.objects.get(id=term_id)
+            # Fetch the flashcard and update fields
+            flashcard = get_object_or_404(Flashcard, id=term_id)
             flashcard.term = term
             flashcard.definition = definition
             flashcard.save()
 
             return JsonResponse({"success": True})
-        except Flashcard.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Flashcard not found"})
+        
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON format"}, status=400)
+        
         except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    
-    return JsonResponse({"success": False, "error": "Invalid request"})
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
 
 
 User = get_user_model()
