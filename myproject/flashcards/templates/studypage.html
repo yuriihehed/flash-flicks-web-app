@@ -123,10 +123,10 @@
       background-color: #0056b3;
       color: white;
     }
-    /* STARRED STYLE */
+    /* STARRED STYLE   We might not need this. It creates container that does not flip with a card
     .flashcard.starred {
       border: 3px solid gold;
-    }
+    }*/
 
     /* FLASHCARD GLOW EFFECT */
     .flashcard.flash {
@@ -200,20 +200,19 @@
       width: 100%;
       height: 100%;
       overflow: auto;
-      background-color: rgba(0, 0, 0, 0.4);
+      background-color: rgba(0, 0, 0, 0.7);
     }
     .modal-content {
-      display: flex;
-      flex-direction: column;
-      height: 80vh;
-      max-height: 90vh;
-      overflow: hidden;
-      border-radius: 15px;
-      background-color: #004c99;
-      color: white;
-      position: relative;
-      width: 600px;
-      margin: 5% auto;
+    max-width: 700px;  /* Limits pop-up width */
+    width: 90%;  /* Responsive */
+    min-height: 500px;  /* Prevents too much stretching */
+    max-height: 100vh;  /* Ensures it doesn't take full screen */
+    overflow: hidden;
+    border-radius: 25px;
+    background-color: #054789;
+    color: rgb(255, 255, 255);
+    position: relative;
+    margin: 10% auto;
     }
     .modal-header, .modal-footer {
       padding: 20px;
@@ -328,6 +327,59 @@
     #toggleTimerBtn:hover {
       background-color: #eee;
     }
+    
+    /* Save Updates IMPROVED */
+    .btn-primary {
+    background-color: #3584f3; /* Light Blue */
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 10px;
+    transition: background-color 0.3s ease-in-out, transform 0.2s;
+    border: none;
+    }
+
+    .btn-primary:hover {
+    background-color: #3584f3;
+    transform: scale(1.05);
+    }
+    /*  New Styles for Select Boxes */
+    .form-select {
+    background-color: #3584f3;  /* Light Blue */
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 7px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s;
+    }
+
+  /* Hover effect */
+  .form-select:hover {
+    background-color: #4a8cfb;
+  }
+
+  /* When the dropdown is focused (clicked) */
+  .form-select:focus {
+    border: 2px solid white;
+    box-shadow: 0 0 10px rgba(91, 155, 251, 0.7);
+  }
+
+  /* Makes dropdown arrow more visible */
+  .form-select::-ms-expand {
+    display: none;
+  }
+
+  .form-select option {
+    background: white;
+    color: #98beea;
+    font-weight: bold;
+  }
+
   </style>
 </head>
 
@@ -420,7 +472,7 @@
             <option value="50">50 min study / 10 min break</option>
           </select>
         </div>
-        <button class="btn btn-primary w-100 mb-3" onclick="applyTimerSetting()">Apply Timer</button>
+        <!-- <button class="btn btn-primary w-100 mb-3" onclick="applyTimerSetting()">Apply Timer</button> -->
         <div class="setting d-flex justify-content-between align-items-center mb-3">
           <div>
             <label class="mb-1"><strong>Ultradian Rhythm</strong></label>
@@ -985,5 +1037,21 @@
     }
     document.getElementById("definitionToggle")?.addEventListener("change", updateQuestionFormat);
   </script>
+
+  <script>
+    //Updated code for flashcard flip
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        const flashcards = document.querySelectorAll(".flashcard");
+  
+        flashcards.forEach(card => {
+            card.addEventListener("click", function () {
+                this.classList.toggle("flipped");
+            });
+        });
+    });
+  </script>
+ 
+
 </body>
 </html>
