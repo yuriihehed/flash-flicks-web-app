@@ -94,6 +94,7 @@ class Flashcard(models.Model):
     definition = models.TextField()  
     image = models.ImageField(upload_to='images/', blank=True, null=True)  
     is_favorite = models.BooleanField(default=False)  
+    is_starred = models.BooleanField(default=False)
     learned_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="learned_flashcards", blank=True)
 
     def has_been_learned(self, user):
