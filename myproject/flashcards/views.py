@@ -718,23 +718,24 @@ def update_flashcard_status(request, flashcard_id):
     return JsonResponse({"success": False, "error": "Invalid request"})
 
 
-@csrf_exempt
+
+
+
+
+
+@require_POST
 def update_star_status(request, term_id):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            favorite = data.get("favorite", False)  # True/False from the JS
-
-            flashcard = Flashcard.objects.get(id=term_id)
-            flashcard.is_favorite = favorite
-            flashcard.save()
-
-            return JsonResponse({"success": True})
-        except Flashcard.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Flashcard not found"})
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    return JsonResponse({"success": False, "error": "Invalid request"})
+    try:
+        data = json.loads(request.body)
+        new_status = data.get("starred")  # Expecting true/false from JS
+        flashcard = Flashcard.objects.get(id=term_id)
+        flashcard.is_starred = new_status
+        flashcard.save()
+        return JsonResponse({"success": True})
+    except Flashcard.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Flashcard not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
 
 def search_terms(request, set_id):
     # Get the flashcard set by ID (or 404 if not found)
@@ -788,5 +789,7 @@ def update_learn_settings(request):
     # user_settings.save()
 
     return JsonResponse({"success": True})
+
+
     
     
