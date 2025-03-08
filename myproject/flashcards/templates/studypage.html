@@ -347,8 +347,7 @@
   <div class="container py-5">
     <div class="flashcard-container" id="flashcardContainer">
       {% for term in terms %}
-      <div class="flashcard
-           {% if term.is_starred %}starred{% endif %}"
+      <div class="flashcard {% if term.is_starred %}starred{% endif %}"
            id="card{{ term.id }}"
            data-term="{{ term.term }}"
            data-definition="{{ term.definition }}"
@@ -363,7 +362,7 @@
         </div>
         <div class="top-buttons">
           <button class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}"
-            onclick="toggleStar(this, event)">&#9733;</button>
+                  onclick="toggleStar(this, event)">&#9733;</button>
           <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
         </div>
       </div>
@@ -492,6 +491,8 @@
     let remainingTime = 0;
     let currentIndex = 0;
     let isStarredOnly = false;
+    let currentRound = 1;
+    let totalRounds = 1; 
 
     /*---------------------------------------------
       ON DOMContentLoaded
@@ -535,29 +536,31 @@
       UPDATE CARDS (SHOW/HIDE)
     ---------------------------------------------*/
     function updateCards() {
-      const allCards = document.querySelectorAll(".flashcard");
       const visibleCards = getVisibleCards();
-
-      // Hide all
-      allCards.forEach(c => c.style.display = "none");
-
-      const cardCounter = document.getElementById("cardCounter");
       if (visibleCards.length === 0) {
-        cardCounter.innerText = "0 / 0";
+        document.getElementById("cardCounter").innerText = "0 / 0";
         return;
       }
-
-      // Bound currentIndex
+      if (currentIndex >= visibleCards.length) {
+        if (currentRound < totalRounds) {
+          currentRound++;
+          currentIndex = 0;  // Restart the round
+        } else {
+          alert("✅ Study session completed!");
+          return;
+        }
+      }
       if (currentIndex >= visibleCards.length) {
         currentIndex = visibleCards.length - 1;
       }
       if (currentIndex < 0) {
         currentIndex = 0;
       }
-
-      // Show only the currentIndex card
-      visibleCards[currentIndex].style.display = "block";
-      cardCounter.innerText = `${currentIndex + 1} / ${visibleCards.length}`;
+      visibleCards.forEach((card, index) => {
+        card.style.display = (index === currentIndex) ? "block" : "none";
+      });
+      document.getElementById("cardCounter").innerText =
+        `Round ${currentRound} - ${currentIndex + 1} / ${visibleCards.length}`;
     }
 
     /*---------------------------------------------
@@ -588,7 +591,6 @@
       const card = button.closest(".flashcard");
       const flashcardId = card.id.replace("card", "");
       let newStarredState;
-
       if (button.classList.contains("active-star")) {
         button.classList.remove("active-star");
         card.classList.remove("starred");
@@ -597,12 +599,10 @@
         button.classList.add("active-star");
         card.classList.add("starred");
         newStarredState = true;
-        // Glow
+        // Glow effect
         card.classList.add("flash");
         setTimeout(() => card.classList.remove("flash"), 500);
       }
-
-      // Persist to server
       fetch(`/update_star_status/${flashcardId}/`, {
         method: "POST",
         headers: {
@@ -616,8 +616,6 @@
         if (!data.success) {
           console.error("Error toggling star:", data.error);
         } else {
-          // If user is in starred-only mode and we unstar a card,
-          // remove it from the visible set
           if (isStarredOnly && !newStarredState) {
             updateCards();
           }
@@ -642,10 +640,8 @@
     function markLearned(learned) {
       const visibleCards = getVisibleCards();
       if (visibleCards.length === 0) return;
-
       const card = visibleCards[currentIndex];
       const flashcardId = card.id.replace("card", "");
-
       fetch(`/update_flashcard_status/${flashcardId}/`, {
         method: "POST",
         headers: {
@@ -658,7 +654,7 @@
       .then(data => {
         if (data.success) {
           console.log(`Flashcard ${flashcardId} marked as ${learned ? "Learned" : "Not Learned"}`);
-          currentIndex = Math.min(visibleCards.length - 1, currentIndex + 1);
+          currentIndex = Math.min(getVisibleCards().length - 1, currentIndex + 1);
           updateCards();
         } else {
           console.error("Error updating status:", data.error);
@@ -668,7 +664,7 @@
     }
 
     /*---------------------------------------------
-      TIMER LOGIC (NO AUTO-START)
+      TIMER LOGIC
     ---------------------------------------------*/
     function stopCountdownTimer() {
       if (countdownInterval) {
@@ -677,8 +673,6 @@
       }
       isTimerRunning = false;
     }
-
-    // Show the chosen timer (or 90 min if ultradian) but do not start
     function startCountdownTimer() {
       const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
       if (savedSettings.ultradian) {
@@ -693,31 +687,25 @@
         updateTimerDisplay(remainingTime);
       }
     }
-
     function updateTimerDisplay(seconds) {
       const timerDisplay = document.getElementById("timerDisplay");
       let min = Math.floor(seconds / 60);
       let sec = seconds % 60;
       timerDisplay.textContent = `⏳ ${min}:${sec < 10 ? "0" : ""}${sec} remaining`;
     }
-
     function toggleTimer() {
       const toggleBtn = document.getElementById("toggleTimerBtn");
       const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
-
-      // If no timer is set and ultradian is off, hide widget
       if (!savedSettings.ultradian && (!savedSettings.timer || savedSettings.timer === "none")) {
         document.getElementById("timer-widget").style.display = "none";
         return;
       }
       if (isTimerRunning) {
-        // Pause
         clearInterval(countdownInterval);
         countdownInterval = null;
         isTimerRunning = false;
         toggleBtn.textContent = "Start";
       } else {
-        // Start or resume
         if (remainingTime <= 0) {
           if (savedSettings.ultradian) {
             remainingTime = 90 * 60;
@@ -753,9 +741,9 @@
         document.getElementById("timerSelect").value = savedSettings.timer;
         document.getElementById("ultradianToggle").checked = savedSettings.ultradian;
         document.getElementById("definitionToggle").checked = savedSettings.answer_with_definition || false;
+        totalRounds = savedSettings.roundLength ? parseInt(savedSettings.roundLength, 10) : 1;
       }
     }
-
     function checkIfOnTimerPage() {
       const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
       if ((!savedSettings.timer || savedSettings.timer === "none") && !savedSettings.ultradian) {
@@ -774,7 +762,6 @@
         }
       }
     }
-
     window.addEventListener("pageshow", function () {
       // Re-bind events if needed
     });
@@ -788,7 +775,6 @@
     function closeModal() {
       document.getElementById("editLearnModeModal").style.display = "none";
     }
-
     function saveSettings() {
       const starred = document.getElementById("starredToggle").checked;
       const shuffle = document.getElementById("shuffleToggle").checked;
@@ -797,7 +783,6 @@
       const answerWithTerm = document.getElementById("termToggle").checked;
       const answerWithDefinition = document.getElementById("definitionToggle").checked;
       const roundLength = document.getElementById("roundLength").value;
-
       let savedSettingsLS = JSON.parse(localStorage.getItem("studySettings")) || {};
 
       fetch("{% url 'update_learn_settings' %}", {
@@ -829,8 +814,6 @@
           savedSettingsLS.ultradian = ultradian;
           savedSettingsLS.answer_with_definition = answerWithDefinition;
           localStorage.setItem("studySettings", JSON.stringify(savedSettingsLS));
-
-          // If no timer & not ultradian, hide
           if ((timer === "none") && !ultradian) {
             document.getElementById("timer-widget").style.display = "none";
           } else {
@@ -856,7 +839,6 @@
       })
       .catch(err => console.error("❌ API Error:", err));
     }
-
     function applyTimerSetting() {
       const timer = document.getElementById("timerSelect").value;
       const ultradian = document.getElementById("ultradianToggle").checked;
@@ -889,7 +871,9 @@
       const card = button.closest(".flashcard");
       const fields = card.querySelectorAll(".card-title, .card-term");
       const isEditing = card.classList.contains("editing");
+
       if (isEditing) {
+        // Currently editing => save changes
         fields.forEach(el => {
           el.contentEditable = "false";
           el.classList.remove("editable");
@@ -897,11 +881,12 @@
         card.classList.remove("editing");
         button.textContent = "Edit";
 
-        // Save changes
+        // Grab new text
         const flashcardId = card.id.replace("card", "");
         const newTerm = card.querySelector(".card-title").innerText;
         const newDefinition = card.querySelector(".card-term").innerText;
 
+        // Send changes to server
         fetch(`/update_flashcard_text/${flashcardId}/`, {
           method: "POST",
           headers: {
@@ -914,11 +899,16 @@
         .then(data => {
           if (!data.success) {
             console.error("Error updating flashcard text:", data.error);
+          } else {
+            // IMPORTANT: update the data attributes so question format toggles won't revert
+            card.setAttribute("data-term", newTerm);
+            card.setAttribute("data-definition", newDefinition);
           }
         })
         .catch(error => console.error("API Error:", error));
 
       } else {
+        // Not editing => switch to edit mode
         fields.forEach(el => {
           el.contentEditable = "true";
           el.classList.add("editable");
@@ -929,43 +919,31 @@
     }
 
     /*---------------------------------------------
-      LEARNED/NOT LEARNED
+      FLIPPING FUNCTION: Event Delegation on Container
     ---------------------------------------------*/
-    function setupLearnedButtons() {
-      const learnedBtn = document.getElementById("learned-btn");
-      const notLearnedBtn = document.getElementById("not-learned-btn");
-      if (learnedBtn) {
-        learnedBtn.addEventListener("click", () => markLearned(true));
+    document.getElementById("flashcardContainer").addEventListener("click", function(e) {
+      // Ignore clicks on elements within .top-buttons
+      if (e.target.closest(".top-buttons")) return;
+      const flashcard = e.target.closest(".flashcard");
+      if (flashcard && !flashcard.classList.contains("editing")) {
+        flashcard.classList.toggle("flipped");
       }
-      if (notLearnedBtn) {
-        notLearnedBtn.addEventListener("click", () => markLearned(false));
-      }
-    }
-    function markLearned(learned) {
-      const visibleCards = getVisibleCards();
-      if (visibleCards.length === 0) return;
-      const card = visibleCards[currentIndex];
-      const flashcardId = card.id.replace("card", "");
+    });
 
-      fetch(`/update_flashcard_status/${flashcardId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCSRFToken()
-        },
-        body: JSON.stringify({ learned: learned })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          console.log(`Flashcard ${flashcardId} marked as ${learned ? "Learned" : "Not Learned"}`);
-          currentIndex = Math.min(getVisibleCards().length - 1, currentIndex + 1);
-          updateCards();
-        } else {
-          console.error("Error updating status:", data.error);
-        }
-      })
-      .catch(error => console.error("API Error:", error));
+    /*---------------------------------------------
+      HELPER: Shuffle Flashcards
+    ---------------------------------------------*/
+    function shuffleFlashcards() {
+      const container = document.querySelector(".flashcard-container");
+      const flashcards = Array.from(container.querySelectorAll(".flashcard"));
+      for (let i = flashcards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+      }
+      container.innerHTML = "";
+      flashcards.forEach(card => container.appendChild(card));
+      // After shuffle, ensure only the "currentIndex" card is visible
+      updateCards();
     }
 
     /*---------------------------------------------
@@ -974,7 +952,6 @@
     function getCSRFToken() {
       return document.querySelector("[name=csrfmiddlewaretoken]").value;
     }
-
     function showPopup(id) {
       const popup = document.getElementById(id);
       popup.classList.add("show");
