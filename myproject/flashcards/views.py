@@ -100,6 +100,7 @@ def forgot_password_view(request):
         return redirect('forgot_password')
 
     return render(request, 'forgot_password.html')
+
 def reset_password_view(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -906,6 +907,11 @@ def update_learn_settings(request):
 
     return JsonResponse({"success": True})
 
-
+def delete_flashcard_set(request, set_id):
+    flashcard_set = get_object_or_404(FlashcardSet, pk=set_id)
+    if request.method == 'POST':
+        flashcard_set.delete()
+        return redirect('home')  
+    return redirect('flashcard_set_details', set_id=set_id)
     
     

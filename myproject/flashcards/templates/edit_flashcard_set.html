@@ -34,13 +34,19 @@ Edit Flashcard Set
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0">Edit Flashcard Set</h2>
             <div>
-                <button type="button"  style="background-color: #616eff; border-color: #616eff; color: #ffffff;" 
-                    onclick="window.location.href='{% url 'flashcard_set_details' set_id %}'">Cancel</button>
-                <button type="submit" form="edit-flashcard-form" style="background-color: #5b9bfb; border-color: #5b9bfb; color: #ffffff;" >
+                <button type="button" class="btn" style="background-color: #616eff; border-color: #616eff; color: #ffffff;" 
+                    onclick="window.location.href='{% url 'flashcard_set_details' set_id %}'">
+                    Cancel
+                </button>
+                <button type="submit" form="edit-flashcard-form" class="btn ms-1" style="background-color: #5b9bfb; border-color: #5b9bfb; color: #ffffff;">
                     Save Changes
+                </button>
+                <button type="button" class="btn btn-danger ms-1" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    Delete
                 </button>
             </div>
         </div>
+        
 
         <!-- Edit Form -->
         <form id="edit-flashcard-form" method="POST" enctype="multipart/form-data">
@@ -71,7 +77,41 @@ Edit Flashcard Set
         </form>
     </div> <!-- End .container -->
 </section>
-
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+          <!-- Bootstrap 5 close button -->
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+  
+        <!-- Modal Body -->
+        <div class="modal-body">
+          Are you sure you want to delete this flashcard set? This action cannot be undone.
+        </div>
+  
+        <!-- Modal Footer with form to delete -->
+        <div class="modal-footer">
+          <!-- "Cancel" just closes the modal -->
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+  
+          <!-- "Yes, Delete" submits the deletion form -->
+          <form method="POST" action="{% url 'delete_flashcard_set' set_id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+              Yes, Delete
+            </button>
+          </form>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+  
 <!-- Inline JavaScript for dynamic card addition -->
 <script>
     document.getElementById("add-card-btn").addEventListener("click", function () {
