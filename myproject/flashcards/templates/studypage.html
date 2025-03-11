@@ -675,6 +675,8 @@
 
  <script>
    document.addEventListener("DOMContentLoaded", function() {
+    const correctSound = new Audio("{% static 'sounds/correct.mp3' %}");
+    const incorrectSound = new Audio("{% static 'sounds/incorrect.mp3' %}");
      /*******************************************
        GLOBAL VARS
      *******************************************/
@@ -996,8 +998,10 @@
        if (selected === correctAnswer) {
          correctCount++;
          button.style.backgroundColor = "green";
+         correctSound.play(); // play correct sound
        } else {
          button.style.backgroundColor = "red";
+         incorrectSound.play(); // play wrong sound
        }
        setTimeout(() => {
          currentIndex++;
