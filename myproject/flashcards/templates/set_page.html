@@ -166,7 +166,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
    window.onload = function () {
-       // Capture the set id to namespace storage keys
        const setId = "{{ flashcard_set.id }}";
       
        const progressElement = document.querySelector(".study-progress p");
@@ -178,8 +177,6 @@
        const learnedBtn = document.getElementById("learned-btn");
        const notLearnedBtn = document.getElementById("not-learned-btn");
 
-
-       // Initialize the doughnut chart with four segments.
        const ctx = document.getElementById('myProgressChart').getContext('2d');
        const myChart = new Chart(ctx, {
            type: 'doughnut',
@@ -187,7 +184,7 @@
                labels: ['Learned', 'Not Learned', 'Correct (MC)', 'Incorrect (MC)'],
                datasets: [{
                    label: 'Overall Study Progress',
-                   data: [0, 0, 0, 0], // initial values
+                   data: [0, 0, 0, 0],
                    backgroundColor: [
                        'rgba(75, 192, 192, 0.6)',   // Learned
                        'rgba(255, 99, 132, 0.6)',   // Not Learned
@@ -212,8 +209,6 @@
            }
        });
 
-
-       // Count flashcards' learned statuses from the DOM.
         function countLearnedStatus() {
             let learnedCount = 0, notLearnedCount = 0;
             document.querySelectorAll('.learned-status span').forEach(span => {
@@ -226,8 +221,6 @@
             return [learnedCount, notLearnedCount];
         }
 
-
-       // Update chart by reading flashcard statuses and MC progress from localStorage (using namespaced keys)
         function updateChart() {
             const [learnedCount, notLearnedCount] = countLearnedStatus();
             const mcCorrect = parseInt(localStorage.getItem("overallLearnedCount_" + setId), 10) || 0;
@@ -237,8 +230,6 @@
             updateProgress(learnedCount, notLearnedCount);
         }
 
-
-       // Update progress text (percentage based on flashcard statuses).
         function updateProgress(learnedCount, notLearnedCount) {
             const mcCorrect = parseInt(localStorage.getItem("overallLearnedCount_" + setId), 10) || 0;
             const mcIncorrect = parseInt(localStorage.getItem("overallNotLearnedCount_" + setId), 10) || 0;
@@ -260,26 +251,26 @@
                card.style.display = (index === currentIndex) ? "block" : "none";
            });
            document.getElementById("cardCounter").innerText = `${currentIndex + 1} / ${totalCards}`;
-       }
-       prevBtn.addEventListener("click", () => {
-           currentIndex = Math.max(0, currentIndex - 1);
-           updateCards();
-       });
-       nextBtn.addEventListener("click", () => {
-           currentIndex = Math.min(totalCards - 1, currentIndex + 1);
-           updateCards();
-       });
-       learnedBtn.addEventListener("click", () => markLearned(true));
-       notLearnedBtn.addEventListener("click", () => markLearned(false));
-       cards.forEach(card => {
-           card.addEventListener("click", function(e) {
-               if (!e.target.classList.contains("star-btn") && !card.classList.contains("editing")) {
-                   this.classList.toggle("flipped");
-               }
-           });
-       });
-       updateCards();
-       updateChart();
+        }
+            prevBtn.addEventListener("click", () => {
+                currentIndex = Math.max(0, currentIndex - 1);
+                updateCards();
+            });
+            nextBtn.addEventListener("click", () => {
+                currentIndex = Math.min(totalCards - 1, currentIndex + 1);
+                updateCards();
+            });
+            learnedBtn.addEventListener("click", () => markLearned(true));
+            notLearnedBtn.addEventListener("click", () => markLearned(false));
+            cards.forEach(card => {
+                card.addEventListener("click", function(e) {
+                    if (!e.target.classList.contains("star-btn") && !card.classList.contains("editing")) {
+                        this.classList.toggle("flipped");
+                    }
+                });
+            });
+            updateCards();
+            updateChart();
 
 
        function markLearned(learned) {
@@ -355,14 +346,12 @@
                if (termBox) {
                    let cornerStarSpan = termBox.querySelector(".corner-star");
                    if (!cornerStarSpan) {
-                       // Create and append the star element if not already present
                        cornerStarSpan = document.createElement("span");
                        cornerStarSpan.classList.add("corner-star");
                        cornerStarSpan.innerText = "★";
                        const heading = termBox.querySelector("h3");
                        heading.appendChild(cornerStarSpan);
                    }
-                   // Show or hide the star based on new state
                    cornerStarSpan.style.display = newStarredState ? "inline" : "none";
                }
            } else {
