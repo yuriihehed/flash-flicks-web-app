@@ -1004,35 +1004,49 @@
        }, 1000);
      };
 
-      window.restoreFlashcard = function(card) {
+     window.restoreFlashcard = function(card) {
       const term = card.getAttribute("data-term");
       const definition = card.getAttribute("data-definition");
       const imageUrl = card.getAttribute("data-image-url");
-      const isStarred = card.classList.contains("starred");
-      const starBtnClass = isStarred ? "oval-button star-btn active-star" : "oval-button star-btn";
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+      const answerWithDefinition = savedSettings.answer_with_definition; // true means answer with definition
 
-      let imageHtml = "";
-      if (imageUrl) {
-      imageHtml = `<img src="${imageUrl}" alt="${term}" style="max-width:200px; margin:1em 0; border-radius:8px;">`;
+      let frontContent, backContent;
+      if (answerWithDefinition) {
+        // Show definition on the front and term on the back
+        frontContent = `<h2 class="card-term">${definition}</h2>`;
+        backContent = `<h2 class="card-title">${term}</h2>`;
+      } else {
+        // Default: term on the front and definition on the back
+        frontContent = `<h2 class="card-title">${term}</h2>`;
+        backContent = `<h2 class="card-term">${definition}</h2>`;
       }
 
+      let imageHtml = "";
+      // Optionally show the image only on the front if in default mode
+      if (imageUrl && !answerWithDefinition) {
+        imageHtml = `<img src="${imageUrl}" alt="${term}" style="max-width:200px; margin:1em 0; border-radius:8px;">`;
+      }
+
+      // Render the flashcard with the determined content
       card.innerHTML = `
         <div class="card-inner">
           <div class="front">
-            <h2 class="card-title">${term}</h2>
+            ${frontContent}
             ${imageHtml}
           </div>
           <div class="back">
-            <h2 class="card-term">${definition}</h2>
+            ${backContent}
           </div>
         </div>
         <div class="top-buttons">
-          <button class="${starBtnClass}" onclick="toggleStar(this, event)">&#9733;</button>
+          <button class="oval-button star-btn" onclick="toggleStar(this, event)">&#9733;</button>
           <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
         </div>
       `;
+      
       card.classList.remove("flipped");
-      };
+    };
 
 
 
@@ -1125,17 +1139,37 @@
 
      /*LEARN MODE SETTINGS / MODAL*/
      function forceFlashcardFrontBack() {
-       document.querySelectorAll(".flashcard").forEach(card => {
-         const term = card.getAttribute("data-term");
-         const definition = card.getAttribute("data-definition");
-         const front = card.querySelector(".front");
-         const back = card.querySelector(".back");
-         if (front && back) {
-           front.innerHTML = `<h2 class="card-title">${term}</h2>`;
-           back.innerHTML = `<h2 class="card-term">${definition}</h2>`;
-         }
-       });
-     }
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+      const answerWithTerm = savedSettings.answer_with_term;
+      const answerWithDefinition = savedSettings.answer_with_definition;
+
+      document.querySelectorAll(".flashcard").forEach(card => {
+        const term = card.getAttribute("data-term");
+        const definition = card.getAttribute("data-definition");
+        const front = card.querySelector(".front");
+        const back = card.querySelector(".back");
+
+        if (front && back) {
+          // If user wants the definition on the front:
+          if (answerWithDefinition && !answerWithTerm) {
+            front.innerHTML = `<h2 class="card-title">${definition}</h2>`;
+            back.innerHTML = `<h2 class="card-term">${term}</h2>`;
+          }
+          // If user wants the term on the front:
+          else if (answerWithTerm && !answerWithDefinition) {
+            front.innerHTML = `<h2 class="card-title">${term}</h2>`;
+            back.innerHTML = `<h2 class="card-term">${definition}</h2>`;
+          }
+          // If both toggles are on or off, decide on a default:
+          else {
+            // Default: Term on the front, Definition on the back
+            front.innerHTML = `<h2 class="card-title">${term}</h2>`;
+            back.innerHTML = `<h2 class="card-term">${definition}</h2>`;
+          }
+        }
+      });
+}
+
 
      window.saveSettings = function() {
        const starred = document.getElementById("starredToggle").checked;
@@ -1369,16 +1403,23 @@
 
      /*SHUFFLE FLASHCARDS*/
      function shuffleFlashcards() {
-       const container = document.querySelector(".flashcard-container");
-       const flashcards = Array.from(container.querySelectorAll(".flashcard"));
-       for (let i = flashcards.length - 1; i > 0; i--) {
-         const j = Math.floor(Math.random() * (i + 1));
-         [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
-       }
-       container.innerHTML = "";
-       flashcards.forEach(card => container.appendChild(card));
-       updateCards();
-     }
+      const container = document.getElementById("flashcardContainer");
+      const flashcards = Array.from(container.querySelectorAll(".flashcard"));
+      
+      // Restore each flashcard to its original HTML
+      flashcards.forEach(card => restoreFlashcard(card));
+      
+      // Shuffle the flashcards (Fisher–Yates)
+      for (let i = flashcards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+      }
+      
+      // Reorder the container's children with the shuffled cards
+      container.replaceChildren(...flashcards);
+      updateCards();
+}
+
 
 
      /*LOAD SETTINGS*/
