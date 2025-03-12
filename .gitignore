@@ -25,7 +25,7 @@ logs/
 
 # Static & compiled files
 staticfiles/
-static/
+#static/
 
 # Docker
 .dockerignore
