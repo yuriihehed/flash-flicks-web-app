@@ -301,8 +301,12 @@
                                statusSpan.classList.add("text-danger");
                            }
                        }
-                   }
-                   updateChart();
+                    }
+                    updateChart();
+                    if (currentIndex < totalCards - 1) {
+                        currentIndex++;
+                        updateCards();
+                    }
                } else {
                    console.error("Error updating status:", data.error);
                }
