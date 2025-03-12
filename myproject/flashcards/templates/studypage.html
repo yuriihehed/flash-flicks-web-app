@@ -574,21 +574,21 @@
 
  <!-- MODAL (Edit Learn Mode) -->
  <div id="editLearnModeModal" class="modal">
-   <div class="modal-content">
-     <div class="modal-header">
-       <span class="close-modal" onclick="closeModal()">&times;</span>
-       <h2 class="text-center mb-4">Edit Flashcards</h2>
-     </div>
-     <div class="modal-body">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 class="text-center">Edit Flashcards</h2>
+      </div>
+    <div class="modal-body">
 
 
-       <div class="setting d-flex justify-content-between align-items-center mb-3">
+    <div class="setting d-flex justify-content-between align-items-center mb-3">
          <label>Study only starred items:</label>
-         <label class="switch">
-           <input type="checkbox" id="starredToggle">
-           <span class="slider"></span>
-         </label>
-       </div>
+          <label class="switch">
+              <input type="checkbox" id="starredToggle">
+              <span class="slider"></span>
+          </label>
+    </div>
 
 
        <div class="setting d-flex justify-content-between align-items-center mb-3">
@@ -599,6 +599,7 @@
          </label>
        </div>
        <hr class="border-light">
+       <br>
        <div class="setting mb-3">
          <label>Set study timer (Pomodoro):</label>
          <select id="timerSelect" class="form-select mt-2">
@@ -618,6 +619,7 @@
          </label>
        </div>
        <hr class="border-light">
+       <br>
        <div class="mb-3"><strong>Question Format:</strong></div>
        <div class="setting d-flex justify-content-between align-items-center mb-3">
          <label>Answer with Term:</label>
@@ -644,7 +646,7 @@
          </label>
        </div>
        <!-- Length of rounds applies only in MC mode -->
-       <div class="mb-3">
+       <div class="setting mb-3">
          <label>Length of rounds:</label>
          <select id="roundLength" class="form-select mt-2">
            {% for i in "123456789"|make_list %}
@@ -655,7 +657,7 @@
        </div>
        <br>
 
-        <div class="mb-3">
+        <div class="setting mb-3">
           <label>Cards per Round:</label>
           <select id="cardsPerRound" class="form-select mt-2">
             <option value="5">5 Cards</option>
@@ -666,7 +668,7 @@
         </div>
 
      </div>
-     <div class="modal-footer" style="text-align: center; margin-top: 20px;">
+     <div class="modal-footer" style="text-align: center;">
        <button class="btn-primary w-100" onclick="saveSettings()">Save Updates</button>
      </div>
    </div>
