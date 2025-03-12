@@ -699,6 +699,8 @@
     
      /*GLOBAL VARS*/
      const setId = "{{ flashcard_set.id }}";
+     const correctSound = new Audio("{% static 'sounds/correct.mp3' %}");
+     const incorrectSound = new Audio("{% static 'sounds/incorrect.mp3' %}");
 
 
      let countdownInterval = null;
@@ -713,6 +715,7 @@
      let totalAnswered = 0;
      let myProgressChart = null;
      let sessionCompleteFlag = false;
+    
 
 
      /*OPEN/CLOSE MODAL FUNCTIONS*/
