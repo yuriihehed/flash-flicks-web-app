@@ -1,0 +1,220 @@
+/* Hero background */
+.hero-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+.hero.section.dark-background {
+    position: relative;
+    background: #141414; /* fallback if hero image fails */
+    padding: 100px 0 80px; 
+}
+
+/* Reduce hero section height ONLY for this page */
+#hero {
+    min-height: 50vh; 
+    padding: 60px 0; 
+}
+.light-background {
+    background-color: #f5f5f5;
+}
+
+.learned-status {
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+.learned-status span {
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+/* Flashcard Layout */
+.flashcard-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flashcard {
+    position: relative;
+    width: 700px;
+    height: 400px;
+    perspective: 1000px;
+}
+
+.card-inner {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    position: relative;
+}
+
+.flashcard.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.front, .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #99c2ff;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.back {
+    background-color: #66a3ff;
+    transform: rotateY(180deg);
+}
+
+.starred {
+    color: gold !important;
+}
+
+/* Buttons on top right of flashcard */
+.top-buttons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.oval-button {
+    background-color: #ccc;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.oval-button:hover {
+    background-color: #aaa;
+}
+
+/* Navigation */
+.navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ccc;
+    border-radius: 60px;
+    padding: 5px 20px;
+    gap: 10px;
+    margin-top: 20px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.nav-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+/* Flash (Star Button) Effect */
+.flash {
+    animation: flash 0.5s ease-in-out;
+}
+
+@keyframes flash {
+    0% { box-shadow: 0 0 20px 10px rgb(243, 230, 159); }
+    50% { box-shadow: 0 0 30px 20px rgb(237, 190, 163); }
+    100% { box-shadow: none; }
+}
+
+.editable {
+    border: 2px solid rgb(20, 50, 136);
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+/* Term Boxes Outline */
+.term-box {
+    border: 1px solid #666;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #fff;
+}
+
+.term-box h3 {
+    margin: 0 0 5px;
+    font-weight: bold;
+}
+
+.term-box p {
+    margin: 0;
+}
+.active-star {
+    color: gold; 
+    /* or text-shadow: 0 0 5px gold; etc. */
+}
+/* Example styling for 'editable' fields */
+.editable {
+    outline: 2px dashed red;
+}
+/* Example flash effect */
+.flash {
+    animation: flashEffect 0.5s ease;
+}
+@keyframes flashEffect {
+    from {
+        background-color: yellow;
+    }
+    to {
+        background-color: inherit;
+    }
+}
+.search-box {
+    border: 1px solid #000000;         /* A light gray border */
+    padding: 16px;                  /* Spacing inside the box */
+    border-radius: 8px;             /* Slightly rounded corners */
+    background-color: #f8f9fa;      /* A light background color (optional) */
+    max-width: 450px;     /* limits the box width */
+}
+
+.search-container input[type="text"]{
+    width: 300px; /* or whatever width you prefer */
+}
+
+/* Three horizontal boxes for the learn, study, flashcards */
+.three-box-container {
+    display: flex;
+    gap: 10px;
+    /* spacing between boxes */
+    margin-bottom: 20px;
+}
+.box {
+    background-color: #e5e5e5;
+    border: 1px solid #ccc;
+    flex: 1;
+    /* each box shares available space */
+    height: 120px;
+    /* approximate height, tweak as needed */
+    padding: 10px;
+    overflow: hidden; /* Prevent text from overflowing */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content vertically */
+    align-items: center; /* Centers content horizontally */
+    word-wrap: break-word;
+    white-space: normal;
+    max-width: 100%; /* Ensures no overflow */
+}
