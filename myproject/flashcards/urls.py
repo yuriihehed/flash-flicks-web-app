@@ -72,8 +72,8 @@ urlpatterns = [
     
     
     path('create-test-flashcard-set/', views.create_test_flashcard_set, name='create_test_flashcard_set'),
-    
 
+    path('about/', views.about_page, name='about'),
 ]
 
 #if settings.DEBUG:path('learning-styles/', views.learning_page, name='learning')
