@@ -1013,13 +1013,7 @@
 
       let imageHtml = "";
       if (imageUrl) {
-        imageHtml = `
-          <img
-            src="${imageUrl}"
-            alt="${term}"
-            style="max-width:200px; margin:1em 0; border-radius:8px;"
-          >
-        `;
+      imageHtml = `<img src="${imageUrl}" alt="${term}" style="max-width:200px; margin:1em 0; border-radius:8px;">`;
       }
 
       card.innerHTML = `
