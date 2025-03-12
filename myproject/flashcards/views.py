@@ -32,6 +32,9 @@ def landing_page(request):
 
 def base_page(request):
     return render(request, 'base.html')
+    
+def about_page(request):
+    return render(request, 'about.html')
 
 def studypage(request, set_id):
     flashcard_set = get_object_or_404(FlashcardSet, id=set_id)
