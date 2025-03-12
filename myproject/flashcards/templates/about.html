@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+About Developers - Flash Flicks
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section id="hero" class="hero section dark-background">
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="Hero Background" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">About</h1>
+        <p class="text-white-75">
+            We set out to develop a simple study app that allows users to create flashcards through their own inputs. Our goal is to make this app accessible to everyone.
+        </p>
+    </div>
+</section>
+
+<!-- DASHBOARD SECTION -->
+<section class="dashboard section py-5 light-background">
+    <div class="container">
+        <h2 class="text-center mb-4">Meet the Developers </h2>
+
+        <div class="text-center mb-4">
+            <p class="flip-instruction">
+                🔄 <strong>Flip each learning card to learn more!</strong>  🔄
+            </p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Kanchanjit Bandesha</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                <br><strong>Documentation Manager</strong><br>
+                                Kanchanjit is a senior studying Computer Science. She worked hard to keep the code well-documented and organized. She put in late nights to make sure things got done and always delivered on her commitments.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Gulbanu Madiyarova</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                <br><strong>Project Manager</strong><br>
+                                Gulbanu is a junior studying Computer Science and Business. She is curious about the world and loves exploring new ideas. For this project, she enjoyed learning new technologies, experimenting, and helping her team members wherever she could.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Vanessa Wartemberg</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                               <br><strong>Design Manager </strong><br>
+                               Vanessa is a senior studying Computer Science. She enjoys solving complex problems and thinking creatively. She played a key role in designing the app, helping to bring ideas to life. She took on new challenges and worked tirelessly to solve problems.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Yurii Hehediush</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                <br><strong>Testing Manager </strong><br>
+                                Yurii is a senior studying Computer Science. He is dedicated to building effective solutions and brought valuable experience to the team. He helped keep us on track, especially when it came to testing and refining our work. He worked diligently to ensure everything functioned as expected.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>John Le</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                <br><strong>Requirements &amp; Testing Manager </strong><br>
+                                John is a senior studying Computer Science. He enjoys exploring new technologies and expanding his skill set. He also brought great energy to the team, keeping the mood light with his humor.
+                                He worked late nights, tackling bugs and helping to improve the project.                              
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Asad Bakhtiari</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                <br><strong>Presentation Manager</strong><br>
+                                Asad is a senior studying Computer Science. He had a busy schedule but supported the team whenever he could. His insights and presence were appreciated throughout the project.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".flip-card").forEach(card => {
+            card.addEventListener("click", function() {
+                this.classList.toggle("flipped");
+            });
+        });
+    });
+</script>
+{% endblock %}
