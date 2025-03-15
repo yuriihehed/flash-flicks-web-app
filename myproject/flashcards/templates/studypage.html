@@ -560,11 +560,11 @@
    <!-- STUDY PROGRESS (only used in MC mode) -->
    <div class="study-progress" id="studyProgress">
      <h2>Studying Progress:</h2>
+     <br>
      <p id="progressText">Progress: 0%</p>
      <div class="chart-container">
        <canvas id="myProgressChart"></canvas>
      </div>
-     <br>
      <button class="btn-primary mt-3" onclick="resetSession()">Start Another Round</button>
    </div>
  </div>
@@ -1381,7 +1381,6 @@
            plugins: {
              title: {
                display: true,
-               text: 'Study Progress'
              }
            }
          }
