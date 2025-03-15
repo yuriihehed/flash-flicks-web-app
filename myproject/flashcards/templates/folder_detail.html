@@ -50,7 +50,7 @@
             <h3><b>Flashcard Sets</b></h3>
             <div class="row mt-4">
                 {% for flashcard in flashcard_sets %}
-                <div class="col-md-3 ">
+                <div class="col-md-3 pb-4">
                     <div class="card shadow-sm p-4 h-100 d-flex flex-column">
                         <!-- Flashcard details link -->
                         <a href="{% url 'flashcard_set_details' flashcard.id %}" class="text-black text-decoration-none d-block">
