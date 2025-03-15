@@ -10,6 +10,9 @@
         border-radius: 8px;
         transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
     }
+    .card:hover { 
+        background-color: rgba(240, 240, 240, 0.9); /* Light background on hover */
+    }
 </style>
 
 <!-- HERO SECTION (Optional) -->
@@ -42,29 +45,32 @@
             </div>
         </div>
 
-        <!-- Flashcard Sets in this Folder -->
+        <!-- Flashcard Sets Section -->
         <div class="mb-3">
-            <h3>Flashcard Sets:</h3>
-            <div class="d-flex flex-wrap gap-3">
-                {% for set in flashcard_sets %}
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">📚 {{ set.title }}</h5>
-                            <p class="card-text">{{ set.description|truncatechars:50 }}</p>
-                            <div class="d-flex justify-content-between">
-                                <a href="{% url 'flashcard_set_details' set_id=set.id %}" class="btn btn-primary">
-                                    View
-                                </a>
-                                <a href="{% url 'edit_flashcard_set' pk=set.id %}" class="btn btn-outline-secondary">
-                                    Edit
-                                </a>
-                            </div>
-                        </div>
+            <h3><b>Flashcard Sets</b></h3>
+            <div class="row mt-4">
+                {% for flashcard in flashcard_sets %}
+                <div class="col-md-3 ">
+                    <div class="card shadow-sm p-4 h-100 d-flex flex-column">
+                        <!-- Flashcard details link -->
+                        <a href="{% url 'flashcard_set_details' flashcard.id %}" class="text-black text-decoration-none d-block">
+                            <h5 class="card-title">📖 <b>{{ flashcard.title }}</b></h5>
+                            <p class="card-text">
+                                <em>{{ flashcard.description|truncatechars:50 }}</em>
+                            </p>
+                            <p class="card-text">Contains {{ flashcard.flashcard_count }} cards</p>
+                            <p class="card-text">Folder: {{ flashcard.folder }}</p>
+                        </a>
+                        <!-- Small edit button positioned at bottom right -->
+                        <a href="{% url 'edit_flashcard_set' pk=flashcard.id %}" 
+                        class="btn btn-outline-secondary btn-sm position-absolute" 
+                        style="bottom: 10px; right: 10px;">
+                            Edit
+                        </a>
                     </div>
                 </div>
                 {% empty %}
-                <p class="text-muted">This folder has no flashcard sets yet.</p>
+                <p class="text-muted">No flashcard sets found.</p>
                 {% endfor %}
             </div>
         </div>

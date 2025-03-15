@@ -213,11 +213,13 @@ def folder_detail(request, slug):
         # Get the specific folder (no special case for General anymore)
         folder = get_object_or_404(Folder, slug=slug, user=request.user)
         
-        flashcard_sets = FlashcardSet.objects.filter(folder=folder, user=request.user)
+        flashcard_sets = FlashcardSet.objects.filter(folder=folder, user=request.user) \
+        .annotate(flashcard_count=Count('flashcards'))
         
         context = {
             'folder': folder,
             'flashcard_sets': flashcard_sets,
+            
             'folders': Folder.objects.filter(user=request.user)  # For sidebar
         }
         return render(request, 'folder_detail.html', context)

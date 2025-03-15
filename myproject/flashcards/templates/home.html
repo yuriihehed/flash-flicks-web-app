@@ -11,11 +11,10 @@
 <style>
     .card {
         border-radius: 8px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .card:hover { 
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Add shadow effect */
-        background-color: rgba(240, 240, 240, 0.9); /* Light background on hover */
+        background-color: rgba(240, 240, 240, 0.9);
     }
 </style>
 
@@ -35,112 +34,64 @@
     </style>
 </section>
 
-<!--
-<section class="dashboard section light-background py-5">
-    <div class="container">
-        <div class="row gy-4">
--->
-            <!-- Progress Tracker 
-            <div class="col-lg-4 col-md-6">
-                <div class="card shadow-sm text-center p-4">
-                    <h5 class="card-title">Progress Tracker</h5>
-                    <p class="card-text">Track your study progress here.</p>
-                </div>
-            </div>
--->
-            <!-- Calendar
-            <div class="col-lg-4 col-md-6">
-                <div class="card shadow-sm text-center p-4">
-                    <h5 class="card-title">Calendar</h5>
-                    <p class="card-text">Manage your study schedule.</p>
-                </div>
-            </div> -->
-            <!-- My Account 
-            <div class="col-lg-4 col-md-6">
-                <div class="card shadow-sm text-center p-4">
-                    <h5 class="card-title">My Account</h5>
-                    <p class="card-text">Manage your settings.</p>
-                </div>
-            </div> 
-        </div>
-    </div>
-</section>
--->
 
 <!-- Folders and Flashcards -->
-<section class="dashboard section py-5">
+<section class="dashboard section py-5 light-background">
     <div class="container">
-        <div class="row">
-            <!-- Folders Section -->
-            <div class="col-8 mb-4">
-                <h3 class="mb-3">📂<b> Folders</b></h3>
-                <!-- Trigger the Folder Modal -->
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#folderModal">
-                    + Create New Folder
-                </button>
-
-                <div class="row mt-4">
-                    {% for folder in user_folders %}
-                    <div class="col-lg-4 col-md-6 mb-3">
-                        <a href="{% url 'folder_detail' folder.slug %}" class="text-black text-decoration-none">
-                            <div class="card shadow-sm p-4">
-                                <h5 class="card-title"><b>{{ folder.name }}</b></h5>
-                                <p class="card-text">Manage your folder.</p>
-                                <p &nbsp;</p>
-                            </div>
-                        </a>
-                    </div>
-                    {% empty %}
-                    <p class="text-muted">You have no folders yet. Create one!</p>
-                    
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Flashcard Sets Section -->
-            <div class="col-8">
-                <h3 class="mb-3">📖 Flashcard Sets</h3>
-
+        
+        <!-- Flashcard Sets Section -->
+        <div class="mb-3">
+                <h3><b>Flashcard Sets</b></h3>
                 <a href="/create-flashcard-set" class="btn btn-primary btn-lg">+ Create New Study Set</a>
-                
                 <div class="row mt-4">
                     {% for flashcard in flashcard_sets %}
-                    <div class="col-lg-4 col-md-6 mb-3">
+                    <div class="col-md-3">
                         <a href="{% url 'flashcard_set_details' flashcard.id %}" class="text-black text-decoration-none">
                             <div class="card shadow-sm p-4">
-                                <h5 class="card-title"><b>{{ flashcard.title }}</b></h5>
+                                <h5 class="card-title">📖 <b>{{ flashcard.title }}</b></h5>
                                 <p class="card-text">Contains {{ flashcard.flashcard_count }} cards</p>
                                 <p class="card-text">Folder: {{ flashcard.folder }}</p>
-                                <p &nbsp;</p>
                             </div>
                         </a>
                     </div>
                     {% empty %}
                     <p class="text-muted">No flashcard sets found.</p>
-                    <!-- <button href="/create-flashcard-set" class="btn btn-primary" data-bs-toggle="modal" >
-                        + Create New Study Set
-                    </button> -->
                     {% endfor %}
                 </div>
-            </div>
         </div>
+
+
+        <!-- Folders Listing Section -->
+        <div class="mb-3">
+            <h3><b>Folders</b></h3>
+            <!-- Trigger the Folder Modal -->
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#folderModal">
+                + Create New Folder
+            </button>
+            <div class="row mt-4">
+                {% for folder in user_folders %}
+                <div class="col-md-3">
+                    <a href="{% url 'folder_detail' folder.slug %}" class="text-black text-decoration-none">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📂 <b>{{ folder.name }}</b></h5>
+                            <p class="card-text">Manage your folder.</p>
+                            <br/>
+                            <br/>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-muted">You have no folders yet. Create one!</p>
+                {% endfor %}
+            </div>
+        </div> 
+            
+
     </div>
 </section>
 
-<!-- Calendar Modal 
-<div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="calendarModalLabel">Calendar</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="miniCalendar"></div>
-            </div>
-        </div>
-    </div>
-</div> -->
 
 <!-- Folder Creation Modal -->
 <div class="modal fade" id="folderModal" tabindex="-1" aria-labelledby="folderModalLabel" aria-hidden="true">

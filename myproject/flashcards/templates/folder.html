@@ -12,6 +12,9 @@ folder
         border-radius: 8px;
         transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
     }
+    .card:hover { 
+        background-color: rgba(240, 240, 240, 0.9); /* Light background on hover */
+    }
 </style>
 
 
@@ -38,19 +41,21 @@ folder
         
         <!-- Folders Listing Section -->
         <div class="mb-3">
-            <h3>Folders:</h3>
-            <div class="d-flex flex-wrap gap-3">
+            <h3><b>Folders</b></h3>
+            <div class="row mt-4">
                 {% for folder in user_folders %}
                 <div class="col-md-3">
+                    <a href="{% url 'folder_detail' folder.slug %}" class="text-black text-decoration-none">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">📁 {{ folder.name }}</h5>
+                            <h5 class="card-title">📁 <b>{{ folder.name }}</b></h5>
                             <p class="card-text">Manage your folder.</p>
-                            <a href="{% url 'folder_detail' folder.slug %}" class="btn btn-primary">
-                                Open
-                            </a>
+                            <br/>
+                            <br/>
+                    
                         </div>
                     </div>
+                    </a>
                 </div>
                 {% empty %}
                 <p class="text-muted">You have no folders yet. Create one!</p>
