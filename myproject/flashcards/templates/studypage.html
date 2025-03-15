@@ -122,9 +122,14 @@
      font-weight: bold;
    }
    .star-btn {
-     font-size: 16px;
-     color: gold;
-   }
+      font-size: 16px;
+      color: black; /* default color for not starred */
+    }
+
+    .star-btn.active-star {
+      color: gold;  /* color when starred */
+    }
+
    .edit-btn:hover {
      background-color: #0056b3;
      color: white;
@@ -869,17 +874,15 @@
 
 
        if (isStarred) {
-         button.classList.remove("active-star");
-         card.classList.remove("starred");
-         button.style.color = "darkgray";
-       } else {
-         button.classList.add("active-star");
-         card.classList.add("starred");
-         button.style.color = "gold";
-         card.offsetWidth;
-         card.classList.add("flash");
-         setTimeout(() => card.classList.remove("flash"), 500);
-       }
+          button.classList.remove("active-star");
+          card.classList.remove("starred");
+        } else {
+          button.classList.add("active-star");
+          card.classList.add("starred");
+          card.offsetWidth;
+          card.classList.add("flash");
+          setTimeout(() => card.classList.remove("flash"), 500);
+        }
 
        fetch(`/update_star_status/${flashcardId}/`, {
          method: "POST",
@@ -1044,6 +1047,9 @@
           <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
         </div>
       `;
+      if (card.classList.contains("starred")) {
+        card.querySelector(".star-btn").classList.add("active-star");
+      }
       
       card.classList.remove("flipped");
     };
