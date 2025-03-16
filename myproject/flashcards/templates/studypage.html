@@ -1171,110 +1171,128 @@
 }
 
 
-     window.saveSettings = function() {
-       const starred = document.getElementById("starredToggle").checked;
-       const shuffle = document.getElementById("shuffleToggle").checked;
-       const timer = document.getElementById("timerSelect").value;
-       const ultradian = document.getElementById("ultradianToggle").checked;
-       const answerWithTerm = document.getElementById("termToggle").checked;
-       const answerWithDefinition = document.getElementById("definitionToggle").checked;
-       const mcMode = document.getElementById("mcToggle").checked;
-       const roundLength = document.getElementById("roundLength").value;
-       const cardsPerRound = document.getElementById('cardsPerRound').value;
+window.saveSettings = function() {
+    const starredToggle = document.getElementById("starredToggle");
+    const shuffleToggle = document.getElementById("shuffleToggle");
+    const timerSelect = document.getElementById("timerSelect");
+    const ultradianToggle = document.getElementById("ultradianToggle");
+    const definitionToggle = document.getElementById("definitionToggle");
+    const mcToggle = document.getElementById("mcToggle");
+    const roundLengthSelect = document.getElementById("roundLength");
+    const cardsPerRoundSelect = document.getElementById("cardsPerRound");
 
-       let savedSettingsLS = JSON.parse(localStorage.getItem("studySettings")) || {};
+    // 🛑 Fix: Handle missing `termToggle` to avoid null reference error
+    const termToggle = document.getElementById("termToggle");
+    const answerWithTerm = termToggle ? termToggle.checked : false; // Default to `false`
 
-       const timerChanged =
-         savedSettingsLS.timer !== timer || savedSettingsLS.ultradian !== ultradian;
+    if (!starredToggle || !shuffleToggle || !timerSelect || !ultradianToggle || 
+        !definitionToggle || !mcToggle || !roundLengthSelect || !cardsPerRoundSelect) {
+        console.error("❌ One or more required elements are missing in the DOM.");
+        return;
+    }
 
-       fetch("{% url 'update_learn_settings' %}", {
-         method: "POST",
-         headers: {
-           "Content-Type": "application/json",
-           "X-CSRFToken": getCSRFToken()
-         },
-         body: JSON.stringify({
-           starred: starred,
-           shuffle: shuffle,
-           timer: timer,
-           ultradian: ultradian,
-           answer_with_term: answerWithTerm,
-           answer_with_definition: answerWithDefinition,
-           multiple_choice: mcMode,
-           round_length: roundLength
-         })
-       })
-       .then(response => response.json())
-       .then(data => {
-         if (data.success) {
-           console.log("✅ Settings saved on the server!");
-           showPopup("saveNotification");
+    const starred = starredToggle.checked;
+    const shuffle = shuffleToggle.checked;
+    const timer = timerSelect.value;
+    const ultradian = ultradianToggle.checked;
+    const answerWithDefinition = definitionToggle.checked;
+    const mcMode = mcToggle.checked;
+    const roundLength = roundLengthSelect.value;
+    const cardsPerRound = cardsPerRoundSelect.value;
 
-           if (shuffle) {
-             shuffleFlashcards();
-           }
+    let savedSettingsLS = JSON.parse(localStorage.getItem("studySettings")) || {};
 
-           if (timerChanged) {
-             stopCountdownTimer();
-           }
+    const timerChanged =
+        savedSettingsLS.timer !== timer || savedSettingsLS.ultradian !== ultradian;
 
-           savedSettingsLS.timer = timer;
-           savedSettingsLS.ultradian = ultradian;
-           savedSettingsLS.answer_with_definition = answerWithDefinition;
-           savedSettingsLS.multiple_choice = mcMode;
-           savedSettingsLS.timerChanged = timerChanged;
-           localStorage.setItem("studySettings", JSON.stringify(savedSettingsLS));
-   
-           if ((timer === "none") && !ultradian) {
-             document.getElementById("timer-widget").style.display = "none";
-           } else {
-             document.getElementById("timer-widget").style.display = "flex";
-             if (timerChanged) {
-               stopCountdownTimer();
-               if (ultradian) {
-                 remainingTime = 90 * 60;
-               } else {
-                 const totalSeconds = parseInt(timer, 10) * 60;
-                 if (!isNaN(totalSeconds) && totalSeconds > 0) {
-                   remainingTime = totalSeconds;
-                 }
-               }
-               updateTimerDisplay(remainingTime);
-               document.getElementById("toggleTimerBtn").textContent = "Start";
-             }
-           }
+    fetch("{% url 'update_learn_settings' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify({
+            starred: starred,
+            shuffle: shuffle,
+            timer: timer,
+            ultradian: ultradian,
+            answer_with_term: answerWithTerm, // Fix: Now optional
+            answer_with_definition: answerWithDefinition,
+            multiple_choice: mcMode,
+            round_length: roundLength
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("✅ Settings saved on the server!");
+            showPopup("saveNotification");
 
-           if (ultradian) {
-             showPopup("ultradianStartPopup");
-           }
-          
-           if (!mcMode && sessionCompleteFlag) {
-             document.getElementById("studyProgress").style.display = "none";
-             document.getElementById("flashcardContainer").style.display = "flex";
-             document.getElementById("navigation").style.display = "flex";
-             document.getElementById("learningButtons").style.display = "flex";
-             sessionCompleteFlag = false;
-           }
+            if (shuffle) {
+                shuffleFlashcards();
+            }
 
-           if (!mcMode) {
-             isMCMode = false;
-             document.querySelectorAll(".flashcard").forEach(card => restoreFlashcard(card));
-             forceFlashcardFrontBack();
-             currentIndex = 0;
-             updateCards();
-           } else {
-             isMCMode = true;
-             totalRounds = parseInt(roundLength, 10) || 1;
-             resetSession();
-           }
+            if (timerChanged) {
+                stopCountdownTimer();
+            }
 
-           closeModal();
-         } else {
-           console.error("❌ Error saving settings:", data);
-         }
-       })
-       .catch(err => console.error("❌ API Error:", err));
-     };
+            savedSettingsLS.timer = timer;
+            savedSettingsLS.ultradian = ultradian;
+            savedSettingsLS.answer_with_definition = answerWithDefinition;
+            savedSettingsLS.multiple_choice = mcMode;
+            savedSettingsLS.timerChanged = timerChanged;
+            localStorage.setItem("studySettings", JSON.stringify(savedSettingsLS));
+
+            if ((timer === "none") && !ultradian) {
+                document.getElementById("timer-widget").style.display = "none";
+            } else {
+                document.getElementById("timer-widget").style.display = "flex";
+                if (timerChanged) {
+                    stopCountdownTimer();
+                    if (ultradian) {
+                        remainingTime = 90 * 60;
+                    } else {
+                        const totalSeconds = parseInt(timer, 10) * 60;
+                        if (!isNaN(totalSeconds) && totalSeconds > 0) {
+                            remainingTime = totalSeconds;
+                        }
+                    }
+                    updateTimerDisplay(remainingTime);
+                    document.getElementById("toggleTimerBtn").textContent = "Start";
+                }
+            }
+
+            if (ultradian) {
+                showPopup("ultradianStartPopup");
+            }
+
+            if (!mcMode && sessionCompleteFlag) {
+                document.getElementById("studyProgress").style.display = "none";
+                document.getElementById("flashcardContainer").style.display = "flex";
+                document.getElementById("navigation").style.display = "flex";
+                document.getElementById("learningButtons").style.display = "flex";
+                sessionCompleteFlag = false;
+            }
+
+            if (!mcMode) {
+                isMCMode = false;
+                document.querySelectorAll(".flashcard").forEach(card => restoreFlashcard(card));
+                forceFlashcardFrontBack();
+                currentIndex = 0;
+                updateCards();
+            } else {
+                isMCMode = true;
+                totalRounds = parseInt(roundLength, 10) || 1;
+                resetSession();
+            }
+
+            closeModal();
+        } else {
+            console.error("❌ Error saving settings:", data);
+        }
+    })
+    .catch(err => console.error("❌ API Error:", err));
+};
 
 
      /*FLASHCARD EDIT*/
