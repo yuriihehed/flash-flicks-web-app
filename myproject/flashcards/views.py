@@ -280,32 +280,54 @@ def create_folder(request):
 
 
 
+# @login_required
+# @require_POST
+# def delete_folder(request):
+#     """View for deleting a folder and its contents"""
+#     try:
+#         # Decode JSON request body
+#         data = json.loads(request.body)
+#         folder_id = data.get('folder_id')  # Get the folder_id from the request body
+
+#         # Ensure folder exists and belongs to current user
+#         folder = get_object_or_404(Folder, id=folder_id, user=request.user)
+        
+#         folder_name = folder.name
+#         folder.delete()
+        
+#         messages.success(request, f'Folder "{folder_name}" was successfully deleted.')
+        
+#         return JsonResponse({
+#             'success': True,
+#             'redirect_url': reverse('folder_list')  # Redirect to folder list
+#         })
+#     except Folder.DoesNotExist:
+#         return JsonResponse({'success': False, 'error': 'Folder not found.'})
+#     except Exception as e:
+#         return JsonResponse({'success': False, 'error': str(e)})
+
 @login_required
 @require_POST
 def delete_folder(request):
     """View for deleting a folder and its contents"""
     try:
-        # Decode JSON request body
         data = json.loads(request.body)
-        folder_id = data.get('folder_id')  # Get the folder_id from the request body
+        folder_id = data.get('folder_id')
 
-        # Ensure folder exists and belongs to current user
         folder = get_object_or_404(Folder, id=folder_id, user=request.user)
-        
         folder_name = folder.name
         folder.delete()
-        
-        messages.success(request, f'Folder "{folder_name}" was successfully deleted.')
-        
+
         return JsonResponse({
             'success': True,
-            'redirect_url': reverse('folder_list')  # Redirect to folder list
+            'message': f'Folder "{folder_name}" was successfully deleted.',
+            'redirect_url': reverse('folder_list')
         })
     except Folder.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Folder not found.'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
-    
+
     
 @login_required
 def create_flashcard_set(request):
