@@ -148,30 +148,54 @@ document.addEventListener("DOMContentLoaded", function () {
       }
   };
 
-  // Handle AJAX Form Submission
-  document.getElementById("deleteForm").addEventListener("submit", function (event) {
-      event.preventDefault(); // Prevent traditional form submission
-      var formData = new FormData(this);
+//   // Handle AJAX Form Submission
+//   document.getElementById("deleteForm").addEventListener("submit", function (event) {
+//       event.preventDefault(); // Prevent traditional form submission
+//       var formData = new FormData(this);
 
-      fetch(folderDeleteUrl, {
-          method: "POST",
-          body: JSON.stringify({
-              folder_id: folderIdInput.value
-          }),
-          headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": csrfToken
-          }
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.success) {
-              window.location.href = data.redirect_url; // Redirect to folder list
-          } else {
-              alert("Error: " + data.error);
-          }
-      });
-  });
+//       fetch(folderDeleteUrl, {
+//           method: "POST",
+//           body: JSON.stringify({
+//               folder_id: folderIdInput.value
+//           }),
+//           headers: {
+//               "Content-Type": "application/json",
+//               "X-CSRFToken": csrfToken
+//           }
+//       })
+//       .then(response => response.json())
+//       .then(data => {
+//           if (data.success) {
+//               window.location.href = data.redirect_url; // Redirect to folder list
+//           } else {
+//               alert("Error: " + data.error);
+//           }
+//       });
+//   });
+// });
+document.getElementById("deleteForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    fetch(folderDeleteUrl, {
+        method: "POST",
+        body: JSON.stringify({
+            folder_id: folderIdInput.value
+        }),
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);  // Show success message in an alert
+            window.location.href = data.redirect_url;
+        } else {
+            alert("Error: " + data.error);
+        }
+    });
+});
 });
 </script>
 {% endblock %}
