@@ -1,0 +1,515 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}Set Page{% endblock %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/set_page.css' %}">
+<style>
+    /* Hero Section Updates */
+    #hero {
+        min-height: 40vh;
+        padding: 100px 0;
+    }
+
+    /* Timer Widget */
+    .hero-timer-widget {
+        display: none;
+        font-size: 24px;
+        color: white;
+        font-weight: bold;
+        background: rgba(0, 40, 85, 0.8);
+        padding: 15px 20px;
+        border-radius: 5px;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    /* LEARN/NOT LEARNED BUTTONS */
+    .learning-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 20px;
+    }
+
+    .learning-btn {
+        font-size: 15px;
+        padding: 15px 40px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease-in-out, transform 0.2s;
+    }
+
+    #learned-btn {
+        background-color: #616eff;
+        color: white;
+    }
+
+    #learned-btn:hover {
+        background-color: #4a5bd3;
+        transform: scale(1.05);
+    }
+
+    #not-learned-btn {
+        background-color: #5b9bfb;
+        color: white;
+    }
+
+    #not-learned-btn:hover {
+        background-color: #4a8cfb;
+        transform: scale(1.05);
+    }
+
+    /* STUDY PAGE /EDIT PAGE BUTTONS */
+   .header-buttons {
+     display: flex;
+     justify-content: center;
+     gap: 5px;
+     margin-top: 20px;
+   }
+   .header-btn {
+     font-size: 15px;
+     padding: 15px 40px;
+     border-radius: 10px;
+     border: none;
+     cursor: pointer;
+     font-weight: bold;
+     transition: background-color 0.3s ease-in-out, transform 0.2s;
+   }
+   #studyspace-btn {
+     background-color: #616eff;
+     color: white;
+   }
+   #studyspace-btn:hover {
+     background-color: #4a5bd3;
+     transform: scale(1.05);
+   }
+   #edit-flashcard-btn {
+     background-color: #5b9bfb;
+     color: white;
+   }
+   #edit-flashcard-btn:hover {
+     background-color: #4a8cfb;
+     transform: scale(1.05);
+   }
+
+    /* Glowing Effect */
+    .flash {
+        animation: flash 0.5s ease-in-out;
+    }
+
+    @keyframes flash {
+        0% {
+            box-shadow: 0 0 20px 10px rgb(243, 230, 159);
+        }
+
+        50% {
+            box-shadow: 0 0 30px 20px rgb(237, 190, 163);
+        }
+
+        100% {
+            box-shadow: none;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<!-- HERO SECTION (Dark Background) -->
+<section id="hero" class="hero section dark-background position-relative">
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">{{ flashcard_set.title }}</h1>
+        <p class="text-white-75">{{ flashcard_set.description }}</p> <!-- Description -->
+        <!-- Timer Widget (Initially Hidden) -->
+        <div id="heroTimerWidget" class="hero-timer-widget">
+            <span id="timerDisplay">00:00</span>
+        </div>
+        <div class="header-buttons text-end mt-3">
+            <!-- Study Space & Edit Flashcard Set Buttons -->
+            <button id ="studyspace-btn" class="header-btn"
+                onclick="window.location.href='{% url 'studypage' flashcard_set.id %}'">
+                Study Space
+            </button>
+            <button id="edit-flashcard-btn" class="header-btn"
+                onclick="window.location.href='{% url 'edit_flashcard_set' flashcard_set.id %}'">
+                Edit Flashcard Set
+            </button>
+        </div>
+    </div>
+</section>
+
+
+<!-- MAIN SET SECTION -->
+<section class="set-section py-5 light-background">
+    <div class="container">
+        <!-- Flashcard Display Section -->
+        <div class="flashcard-area d-flex justify-content-center">
+            {% for term in terms %}
+            <div class="flashcard" id="card{{ term.id }}" {% if not forloop.first %}style="display: none;" {% endif %}>
+                <div class="card-inner">
+                    <div class="front">
+                        <h2 contenteditable="false" class="card-title">{{ term.term }}</h2>
+                    </div>
+                    <div class="back">
+                        <h2 contenteditable="false" class="card-term">{{ term.definition }}</h2>
+                    </div>
+                </div>
+                <!-- Buttons (Star + Edit) -->
+                <div class="top-buttons">
+                    <button class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}"
+                        onclick="toggleStar(this, event)">
+                        &#9733;
+                    </button>
+                    <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+        <!-- Navigation -->
+        <div class="navigation mt-3">
+            <button id="prevBtn" class="nav-btn">&#8592;</button>
+            <span id="cardCounter">1 / {{ terms|length }}</span>
+            <button id="nextBtn" class="nav-btn">&#8594;</button>
+        </div>
+
+
+        <!-- LEARN/NOT LEARNED BUTTONS (flashcard mode only) -->
+        <div class="learning-buttons text-center mt-3" id="learningButtons">
+            <button id="learned-btn" class="learning-btn">Learned</button>
+            <button id="not-learned-btn" class="learning-btn">Not Learned</button>
+        </div>
+
+
+        <!-- Study Progress -->
+        <div class="study-progress mt-4">
+            <h2>Studying Progress:</h2>
+            <p id="progressText">Progress: 0%</p>
+            <!-- Chart Container -->
+            <div class="chart-container" style="width: 300px; margin: 0 auto;">
+                <canvas id="myProgressChart"></canvas>
+            </div>
+        </div>
+
+
+        <!-- Search Terms & Definitions Section -->
+        <section id="search-terms">
+            <p class="term-count">{{ terms|length }} Terms</p>
+            <div class="search-box">
+                <form method="GET" action="{% url 'search_terms' flashcard_set.id %}">
+                    <div class="search-container">
+                        <input type="text" id="term-search" name="q" placeholder="Search for a term or definition..."
+                            value="{{ query }}" />
+                        <button type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+
+        <!-- Terms and Definitions List -->
+        {% for term in terms %}
+        <div class="term-box" data-flashcard-id="{{ term.id }}">
+            <h3>
+                {{ term.term }}
+                {% if term.is_starred %}
+                <span class="corner-star">★</span>
+                {% endif %}
+            </h3>
+            <p>{{ term.definition }}</p>
+            {% if term.image %}
+            <img src="{{ term.image.url }}" alt="{{ term.term }}" style="max-width:200px; display:block; margin:1em 0;">
+            {% endif %}
+            <p class="learned-status">
+                Status:
+                {% if term.is_learned %}
+                <span class="text-success fw-bold">Learned</span>
+                {% else %}
+                <span class="text-danger fw-bold">Not Learned</span>
+                {% endif %}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    window.onload = function () {
+        const setId = "{{ flashcard_set.id }}";
+
+        const progressElement = document.querySelector(".study-progress p");
+        const cards = document.querySelectorAll(".flashcard");
+        let currentIndex = 0;
+        const totalCards = cards.length;
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const learnedBtn = document.getElementById("learned-btn");
+        const notLearnedBtn = document.getElementById("not-learned-btn");
+
+        const ctx = document.getElementById('myProgressChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Learned', 'Not Learned', 'Correct (MC)', 'Incorrect (MC)'],
+                datasets: [{
+                    label: 'Overall Study Progress',
+                    data: [0, 0, 0, 0],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.6)',   // Learned
+                        'rgba(255, 99, 132, 0.6)',   // Not Learned
+                        'rgba(54, 162, 235, 0.6)',   // Correct (MC)
+                        'rgba(255, 159, 64, 0.6)'    // Incorrect (MC)
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    title: { display: true, text: 'Overall Study Progress' }
+                }
+            }
+        });
+
+        function countLearnedStatus() {
+            let learnedCount = 0, notLearnedCount = 0;
+            document.querySelectorAll('.learned-status span').forEach(span => {
+                if (span.innerText.trim() === "Learned") {
+                    learnedCount++;
+                } else if (span.innerText.trim() === "Not Learned") {
+                    notLearnedCount++;
+                }
+            });
+            return [learnedCount, notLearnedCount];
+        }
+
+        function updateChart() {
+            const [learnedCount, notLearnedCount] = countLearnedStatus();
+            const mcCorrect = parseInt(localStorage.getItem("overallLearnedCount_" + setId), 10) || 0;
+            const mcIncorrect = parseInt(localStorage.getItem("overallNotLearnedCount_" + setId), 10) || 0;
+            myChart.data.datasets[0].data = [learnedCount, notLearnedCount, mcCorrect, mcIncorrect];
+            myChart.update();
+            updateProgress(learnedCount, notLearnedCount);
+        }
+
+        function updateProgress(learnedCount, notLearnedCount) {
+            const mcCorrect = parseInt(localStorage.getItem("overallLearnedCount_" + setId), 10) || 0;
+            const mcIncorrect = parseInt(localStorage.getItem("overallNotLearnedCount_" + setId), 10) || 0;
+            const totalFlashcard = learnedCount + notLearnedCount;
+            const totalMCQ = mcCorrect + mcIncorrect;
+
+
+            const totalOverall = totalFlashcard + totalMCQ;
+
+
+            let percentage = totalOverall > 0 ? Math.round(((learnedCount + mcCorrect) / totalOverall) * 100) : 0;
+            progressElement.innerText = `Progress: ${percentage}%`;
+        }
+
+
+
+        function updateCards() {
+            cards.forEach((card, index) => {
+                card.style.display = (index === currentIndex) ? "block" : "none";
+            });
+            document.getElementById("cardCounter").innerText = `${currentIndex + 1} / ${totalCards}`;
+        }
+        prevBtn.addEventListener("click", () => {
+            currentIndex = Math.max(0, currentIndex - 1);
+            updateCards();
+        });
+        nextBtn.addEventListener("click", () => {
+            currentIndex = Math.min(totalCards - 1, currentIndex + 1);
+            updateCards();
+        });
+        learnedBtn.addEventListener("click", () => markLearned(true));
+        notLearnedBtn.addEventListener("click", () => markLearned(false));
+        cards.forEach(card => {
+            card.addEventListener("click", function (e) {
+                if (!e.target.classList.contains("star-btn") && !card.classList.contains("editing")) {
+                    this.classList.toggle("flipped");
+                }
+            });
+        });
+        updateCards();
+        updateChart();
+
+
+        function markLearned(learned) {
+            const flashcardId = cards[currentIndex].id.replace("card", "");
+            fetch(`/update_flashcard_status/${flashcardId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: JSON.stringify({ learned: learned })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log(`Flashcard ${flashcardId} marked as ${learned ? "Learned" : "Not Learned"}`);
+                        const termBox = document.querySelector(`.term-box[data-flashcard-id='${flashcardId}']`);
+                        if (termBox) {
+                            const statusSpan = termBox.querySelector(".learned-status span");
+                            if (statusSpan) {
+                                if (learned) {
+                                    statusSpan.innerText = "Learned";
+                                    statusSpan.classList.remove("text-danger");
+                                    statusSpan.classList.add("text-success");
+                                } else {
+                                    statusSpan.innerText = "Not Learned";
+                                    statusSpan.classList.remove("text-success");
+                                    statusSpan.classList.add("text-danger");
+                                }
+                            }
+                        }
+                        updateChart();
+                        if (currentIndex < totalCards - 1) {
+                            currentIndex++;
+                            updateCards();
+                        }
+                    } else {
+                        console.error("Error updating status:", data.error);
+                    }
+                })
+                .catch(error => console.error("API Error:", error));
+        }
+
+
+        function getCSRFToken() {
+            return document.querySelector("[name=csrfmiddlewaretoken]").value;
+        }
+    };
+
+
+    function toggleStar(button, event) {
+        event.stopPropagation();
+        flashEffect(button);
+        const card = button.closest('.flashcard');
+        const flashcardId = card.id.replace("card", "");
+        const isCurrentlyStarred = button.classList.contains("active-star");
+        const newStarredState = !isCurrentlyStarred;
+
+
+        // Toggle star class on button
+        button.classList.toggle("active-star", newStarredState);
+
+
+        fetch(`/update_star_status/${flashcardId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: JSON.stringify({ starred: newStarredState })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`Flashcard ${flashcardId} star set to ${newStarredState}`);
+                    const termBox = document.querySelector(`.term-box[data-flashcard-id='${flashcardId}']`);
+                    if (termBox) {
+                        let cornerStarSpan = termBox.querySelector(".corner-star");
+                        if (!cornerStarSpan) {
+                            cornerStarSpan = document.createElement("span");
+                            cornerStarSpan.classList.add("corner-star");
+                            cornerStarSpan.innerText = "★";
+                            const heading = termBox.querySelector("h3");
+                            heading.appendChild(cornerStarSpan);
+                        }
+                        cornerStarSpan.style.display = newStarredState ? "inline" : "none";
+                    }
+                } else {
+                    console.error("Error toggling star:", data.error);
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
+
+    function flashEffect(element) {
+        const card = element.closest('.flashcard');
+        card.classList.add('flash');
+        setTimeout(() => card.classList.remove('flash'), 500);
+    }
+
+
+    function toggleEdit(button, event) {
+        event.stopPropagation();
+        const card = button.closest('.flashcard');
+        const fields = card.querySelectorAll('.card-title, .card-term');
+        const isEditing = card.classList.contains('editing');
+
+
+        if (isEditing) {
+            fields.forEach(el => {
+                el.contentEditable = "false";
+                el.classList.remove('editable');
+            });
+            card.classList.remove('editing');
+            button.textContent = "Edit";
+            const flashcardId = card.id.replace("card", "");
+            const newTerm = card.querySelector('.card-title').innerText;
+            const newDefinition = card.querySelector('.card-term').innerText;
+
+
+            fetch(`/update_flashcard_text/${flashcardId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: JSON.stringify({ term: newTerm, definition: newDefinition })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log(`Updated text for flashcard ${flashcardId}`);
+                        const termBox = document.querySelector(`.term-box[data-flashcard-id='${flashcardId}']`);
+                        if (termBox) {
+                            const termHeading = termBox.querySelector('h3');
+                            const definitionParagraph = termBox.querySelector('p');
+                            if (termHeading && definitionParagraph) {
+                                termHeading.innerText = newTerm;
+                                definitionParagraph.innerText = newDefinition;
+                            }
+                        }
+                    } else {
+                        console.error("Error updating text:", data.error);
+                    }
+                })
+                .catch(error => console.error("API Error:", error));
+        } else {
+            fields.forEach(el => {
+                el.contentEditable = "true";
+                el.classList.add('editable');
+            });
+            card.classList.add('editing');
+            button.textContent = "Save";
+        }
+    }
+
+
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Edit Flashcard Set
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION (Dark Background) -->
+<section id="hero" class="hero section dark-background position-relative">
+    <!-- Example hero background image; update path as needed -->
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">Edit Flashcard Set</h1>
+        <p class="text-white-75">Modify your flashcards below.</p>
+    </div>
+    <style>
+        #hero {
+    min-height: 40vh; /* Reduced height */
+    padding: 60px 0; /* Less vertical padding */
+    }
+    </style>
+</section>
+
+<!-- MAIN EDIT SECTION (Light Background) -->
+<section class="py-5 light-background">
+    <div class="container">
+
+        {# Include a partial if needed; remove if you don’t use it #}
+        {% include 'partials/folder_modal.html' %}
+
+        <!-- Header / Buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Edit Flashcard Set</h2>
+            <div>
+                <button type="button" class="btn" style="background-color: #616eff; border-color: #616eff; color: #ffffff;" 
+                    onclick="window.location.href='{% url 'flashcard_set_details' set_id %}'">
+                    Cancel
+                </button>
+                <button type="submit" form="edit-flashcard-form" class="btn ms-1" style="background-color: #5b9bfb; border-color: #5b9bfb; color: #ffffff;">
+                    Save Changes
+                </button>
+                <button type="button" class="btn btn-danger ms-1" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    Delete
+                </button>
+            </div>
+        </div>
+        
+
+        <!-- Edit Form -->
+        <form id="edit-flashcard-form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ set_form.as_p }}
+            {{ formset.management_form }}
+
+            <div id="cards-container">
+                {% for form in formset %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Card {{ forloop.counter }}</h5>
+                        {{ form.as_p }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Hidden empty form for adding new cards -->
+            <div id="empty-form" class="d-none">
+                {{ formset.empty_form.as_p }}
+            </div>
+
+            <button type="button" id="add-card-btn" class="btn btn-secondary w-100 mb-3">
+                + Add a card
+            </button>
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+        </form>
+    </div> <!-- End .container -->
+</section>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+          <!-- Bootstrap 5 close button -->
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+  
+        <!-- Modal Body -->
+        <div class="modal-body">
+          Are you sure you want to delete this flashcard set? This action cannot be undone.
+        </div>
+  
+        <!-- Modal Footer with form to delete -->
+        <div class="modal-footer">
+          <!-- "Cancel" just closes the modal -->
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+  
+          <!-- "Yes, Delete" submits the deletion form -->
+          <form method="POST" action="{% url 'delete_flashcard_set' set_id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+              Yes, Delete
+            </button>
+          </form>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+  
+<!-- Inline JavaScript for dynamic card addition -->
+<script>
+    document.getElementById("add-card-btn").addEventListener("click", function () {
+        var container = document.getElementById('cards-container');
+        var totalFormsInput = document.querySelector('[name="form-TOTAL_FORMS"]');
+        var totalForms = parseInt(totalFormsInput.value);
+        var emptyFormHtml = document.getElementById('empty-form').innerHTML;
+        var newFormHtml = emptyFormHtml.replace(/__prefix__/g, totalForms);
+        var newFormDiv = document.createElement('div');
+        newFormDiv.className = 'card mb-3';
+        newFormDiv.innerHTML = `
+        <div class="card-body">
+            <h5 class="card-title">Card ${totalForms + 1}</h5>
+            ${newFormHtml}
+        </div>
+    `;
+        container.appendChild(newFormDiv);
+        totalFormsInput.value = totalForms + 1;
+    });
+</script>
+
+{% endblock %}

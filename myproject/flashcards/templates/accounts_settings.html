@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dashboard - FlashFlicks{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+{% block content %}
+
+<!-- Hero Section -->
+<section id="hero" class="hero section dark-background position-relative">
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="Hero Background" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">Account Settings</h1>
+        
+    </div>
+    <style>
+        #hero {
+    min-height: 40vh; /* Reduced height */
+    padding: 60px 0; /* Less vertical padding */
+    }
+
+    .go-back-btn {
+    display: block;
+    width: 100%;  /* Makes it full width */
+    max-width: 300px; /* Limits max width */
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    background-color: #09139b; /* Change this to your desired color */
+    color: white; /* Text color */
+    border-radius: 5px;
+    transition: background-color 0.3s ease-in-out, transform 0.2s;
+}
+
+    .go-back-btn:hover {
+        background-color: #0853eb; /* Slightly darker on hover */
+        transform: scale(1.02);
+    }
+
+    </style>
+</section>
+
+
+<!-- End Hero Section -->
+
+
+<!-- Main Content -->
+<section class="dashboard section py-5 light-background">
+    <div class="container col-10 ">
+        <div class="row justify-content-center">
+            
+            <!-- Settings CARD -->
+            <div class="col-lg-8 col-md-10">
+                {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success text-center">{{ message }}</div>
+                        {% endfor %}
+                {% endif %}
+            </div>
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow-sm p-4" style="background-color:rgb(16,5,140); border-radius: 15px;">
+                    
+                    <!-- Card Heading -->
+                    <h2 class="text-center mb-4" style="color: white;">Settings</h2>
+                    
+                    <!-- SETTINGS PANEL -->
+
+
+                    <!--  Username -->
+                    <div class="setting d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <label class="text-white">Username:</label>
+                            <small class="d-block text-white" style="font-size: 14px;">{{ user.first_name }}</small>
+                        </div>
+                        <button class="btn btn-outline-light btn-sm" onclick="openEditModal('username', '{{ user.first_name }}')">Edit</button>
+                    </div>
+
+
+                   <hr class="border-light">
+                   <!-- Change Password -->
+                    <div class="setting d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <label class="text-white">Change Password:</label>
+                            <small class="d-block text-white" style="font-size: 14px;">••••••••</small>
+                        </div>
+                        <button class="btn btn-outline-light btn-sm" onclick="openEditModal('password', '')">Edit</button>
+                    </div>
+
+
+                    <hr class="border-light">
+                    <!-- Email -->
+
+
+                    <div class="setting d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            
+                            <label class="text-white">Email:</label>
+                            <small class="d-block text-white" style="font-size: 14px;">{{ user }}</small>
+                        </div>
+                        <div style="height: 20px;"></div> 
+                    </div>
+                    <!-- Go Back Button -->
+                    <div class="d-flex justify-content-center mt-4">
+                        <a href="javascript:history.back()" class="btn btn-secondary go-back-btn">
+                            <i class="bi bi-arrow-left"></i> Take me back
+                        </a>
+                    </div>
+                   
+
+               
+                    <hr class="border-light">
+                   
+                    <div style="height: 20px;"></div> 
+
+                
+              
+                   
+                  
+                </div>
+           </div>
+          
+       </div>
+   </div>
+
+   <!-- Edit Modal -->
+   <!-- Edit Account Info Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Account Info</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="editForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="field" id="fieldInput">
+                        
+                        <div class="mb-3" id="valueFieldDiv">
+                            <label for="valueInput" class="form-label" id="valueLabel">New Username</label>
+                            <input type="text" name="value" id="valueInput" class="form-control" required>
+                        </div>
+                        
+                        <!-- Confirm password field; hidden by default -->
+                        <div class="mb-3" id="confirmPasswordDiv" style="display: none;">
+                            <label for="confirmPasswordInput" class="form-label">Confirm Password</label>
+                            <input type="password" name="confirm_password" id="confirmPasswordInput" class="form-control" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>                    
+                <div id="responseMessage" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        function openEditModal(field, value) {
+            document.getElementById("editModalLabel").innerText = "Edit " + field.charAt(0).toUpperCase() + field.slice(1);
+            document.getElementById("fieldInput").value = field;
+            
+            if(field === "password") {
+                // Set up for password editing
+                document.getElementById("valueLabel").innerText = "New Password";
+                document.getElementById("valueInput").setAttribute("type", "password");
+                document.getElementById("valueInput").value = "";
+                // Show and enable confirm password field
+                document.getElementById("confirmPasswordDiv").style.display = "block";
+                document.getElementById("confirmPasswordInput").removeAttribute("disabled");
+                document.getElementById("confirmPasswordInput").setAttribute("required", "required");
+                document.getElementById("confirmPasswordInput").value = "";
+            } else {
+                // Set up for username editing
+                document.getElementById("valueLabel").innerText = "New Username";
+                document.getElementById("valueInput").setAttribute("type", "text");
+                document.getElementById("valueInput").value = value;
+                // Hide and disable confirm password field
+                document.getElementById("confirmPasswordDiv").style.display = "none";
+                document.getElementById("confirmPasswordInput").setAttribute("disabled", "disabled");
+                document.getElementById("confirmPasswordInput").removeAttribute("required");
+            }
+            
+            // Show the modal
+            var editModal = new bootstrap.Modal(document.getElementById('editModal'));
+            editModal.show();
+        }
+     </script> 
+
+</section>
+
+
+{% endblock %}

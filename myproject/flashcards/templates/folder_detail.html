@@ -1,0 +1,280 @@
+<!-- folder_detail.html -->
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+{{ folder.name }} Folder
+{% endblock %}
+{% block content %}
+<style>
+    .card {
+        border-radius: 8px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+    }
+    .card:hover { 
+        background-color: rgba(240, 240, 240, 0.9); /* Light background on hover */
+    }
+</style>
+
+<!-- HERO SECTION (Optional) -->
+<section id="hero" class="hero section dark-background position-relative">
+  <img src="{% static 'img/hero-bg-2.jpg' %}" alt="Hero Background" class="hero-bg">
+  <div class="container text-center">
+      <h1 class="text-white">Your Folders</h1>
+      <p class="text-white-75">Manage your folders here.</p>
+  </div>
+  <style>
+      #hero {
+  min-height: 40vh; /* Reduced height */
+  padding: 60px 0; /* Less vertical padding */
+  }
+  </style>
+</section>
+
+<!-- MAIN DASHBOARD SECTION -->
+<section class="dashboard section py-5 light-background">
+    <div class="container">
+        <!-- Folder Actions -->
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <a href="{% url 'folder_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Folders
+            </a>
+            <div>
+                <a class="btn btn-danger" id="openDeleteModal" data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.name }}">
+                    <i class="bi bi-trash"></i> Delete Folder
+                </a>
+            </div>
+        </div>
+
+        <!-- Flashcard Sets Section -->
+        <div class="mb-3">
+            <h3><b>Flashcard Sets</b></h3>
+            <div class="row mt-4">
+                {% for flashcard in flashcard_sets %}
+                <div class="col-md-3 pb-4">
+                    <div class="card shadow-sm p-4 h-100 d-flex flex-column">
+                        <!-- Flashcard details link -->
+                        <a href="{% url 'flashcard_set_details' flashcard.id %}" class="text-black text-decoration-none d-block">
+                            <h5 class="card-title">📖 <b>{{ flashcard.title }}</b></h5>
+                            <p class="card-text">
+                                <em>{{ flashcard.description|truncatechars:50 }}</em>
+                            </p>
+                            <p class="card-text">Contains {{ flashcard.flashcard_count }} cards</p>
+                            <p class="card-text">Folder: {{ flashcard.folder }}</p>
+                        </a>
+                        <!-- Small edit button positioned at bottom right -->
+                        <a href="{% url 'edit_flashcard_set' pk=flashcard.id %}" 
+                        class="btn btn-outline-secondary btn-sm position-absolute" 
+                        style="bottom: 10px; right: 10px;">
+                            Edit
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">No flashcard sets found.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Action Button for Creating a New Flashcard Set -->
+        <div class="text-center mt-4">
+            <a href="{% url 'create_flashcard_set' %}" class="btn btn-secondary">
+                + Create New Flashcard Set
+            </a>
+        </div>
+    </div> <!-- End .container -->
+</section>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Delete Folder</h2>
+        <p>Are you sure you want to delete "<span id="folderName"></span>"?</p>
+        <form method="POST" id="deleteForm">
+            {% csrf_token %}
+            <input type="hidden" name="folder_id" id="folderId">
+            <div class="modal-buttons">
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-secondary" id="cancelDelete">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+  var folderDeleteUrl = "{% url 'delete_folder' %}";
+  var csrfToken = "{{ csrf_token }}";
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var deleteModal = document.getElementById("deleteModal");
+  var openDeleteModal = document.getElementById("openDeleteModal");
+  var closeDeleteModal = document.querySelector(".close");
+  var cancelDelete = document.getElementById("cancelDelete");
+  var folderNameSpan = document.getElementById("folderName");
+  var folderIdInput = document.getElementById("folderId");
+
+  // Open Delete Modal
+  if (openDeleteModal) {
+      openDeleteModal.onclick = function () {
+          var folderId = openDeleteModal.getAttribute("data-folder-id");
+          var folderName = openDeleteModal.getAttribute("data-folder-name");
+          folderNameSpan.textContent = folderName;
+          folderIdInput.value = folderId;
+          deleteModal.style.display = "block";
+      };
+  }
+
+  // Close Delete Modal
+  if (closeDeleteModal) {
+      closeDeleteModal.onclick = function () {
+          deleteModal.style.display = "none";
+      };
+  }
+
+  // Cancel Delete
+  if (cancelDelete) {
+      cancelDelete.onclick = function () {
+          deleteModal.style.display = "none";
+      };
+  }
+
+  // Close Modal When Clicking Outside the Modal
+  window.onclick = function (event) {
+      if (event.target === deleteModal) {
+          deleteModal.style.display = "none";
+      }
+  };
+
+//   // Handle AJAX Form Submission
+//   document.getElementById("deleteForm").addEventListener("submit", function (event) {
+//       event.preventDefault(); // Prevent traditional form submission
+//       var formData = new FormData(this);
+
+//       fetch(folderDeleteUrl, {
+//           method: "POST",
+//           body: JSON.stringify({
+//               folder_id: folderIdInput.value
+//           }),
+//           headers: {
+//               "Content-Type": "application/json",
+//               "X-CSRFToken": csrfToken
+//           }
+//       })
+//       .then(response => response.json())
+//       .then(data => {
+//           if (data.success) {
+//               window.location.href = data.redirect_url; // Redirect to folder list
+//           } else {
+//               alert("Error: " + data.error);
+//           }
+//       });
+//   });
+// });
+document.getElementById("deleteForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    fetch(folderDeleteUrl, {
+        method: "POST",
+        body: JSON.stringify({
+            folder_id: folderIdInput.value
+        }),
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);  // Show success message in an alert
+            window.location.href = data.redirect_url;
+        } else {
+            alert("Error: " + data.error);
+        }
+    });
+});
+});
+</script>
+{% endblock %}
+
+
+{% block extra_css %}
+<style>
+#deleteModal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; /* More width for a square shape */
+    height: 300px; /* Shorter height */
+    background-color: white;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Modal content with even spacing */
+.modal-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+/* Heading with balanced spacing */
+.modal-content h2 {
+    font-size: 25px;
+    margin-top: 10px;
+}
+
+/* Shorter paragraph */
+.modal-content p {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+/* Close button positioned inside */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Buttons centered and evenly spaced */
+#deleteForm {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+#deleteForm button {
+    margin: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#deleteForm .confirm {
+    background-color: #e74c3c;
+    color: white;
+}
+
+#deleteForm .cancel {
+    background-color: #ccc;
+    color: black;
+}
+
+</style>
+{% endblock %}

@@ -1,0 +1,130 @@
+<!-- folder.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+folder
+{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        border-radius: 8px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+    }
+    .card:hover { 
+        background-color: rgba(240, 240, 240, 0.9); /* Light background on hover */
+    }
+    
+</style>
+
+
+
+
+<!-- HERO SECTION (Optional) -->
+<section id="hero" class="hero section dark-background position-relative">
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="Hero Background" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">Your Folders</h1>
+        <p class="text-white-75">Manage your folders here.</p>
+    </div>
+    <style>
+        #hero {
+    min-height: 60vh; /* KEEP THIS AT 60 SO ITS CONSISTENT */
+    padding: 60px 0; /* Less vertical padding */
+    }
+    </style>
+</section>
+
+<!-- MAIN DASHBOARD SECTION -->
+<section class="dashboard section py-5 light-background">
+    <div class="container">
+        
+        <!-- Folders Listing Section -->
+        <div class="mb-3">
+            <h3><b>Folders</b></h3>
+            <div class="row mt-4">
+                {% for folder in user_folders %}
+                <div class="col-md-3 pb-4">
+                    <a href="{% url 'folder_detail' folder.slug %}" class="text-black text-decoration-none">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📁 <b>{{ folder.name }}</b></h5>
+                            <p class="card-text">Manage your folder.</p>
+                            <br/>
+                            <br/>
+                    
+                        </div>
+                    </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-muted">You have no folders yet. Create one!</p>
+                {% endfor %}
+            </div>
+        </div> 
+        
+
+        <!-- Action Button for Creating a New Folder -->
+        <div class="text-center mt-4">
+            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#folderModal">
+                + Create New Folder
+            </button>
+        </div>
+    </div> <!-- End .container -->
+</section>
+
+
+<!-- Folder Creation Modal -->
+<div class="modal fade" id="folderModal" tabindex="-1" aria-labelledby="folderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="folderModalLabel">Create a New Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="folderForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="text" name="name" placeholder="Enter folder name" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+                <div id="responseMessage" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AJAX Script for Folder Creation -->
+<script>
+    document.getElementById("folderForm").addEventListener("submit", function(event) {
+        event.preventDefault();  // Prevent traditional form submission
+        var formData = new FormData(this);
+
+        fetch("{% url 'create_folder' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            var responseMessage = document.getElementById("responseMessage");
+            if (data.success) {
+                responseMessage.innerHTML = "Folder created: " + data.folder_name;
+                // Optionally, you might want to update the folder list here or close the modal. 
+                setTimeout(() => {
+                    location.reload(); // Reload the page to show the new folder
+                }, 2000);
+            } else {
+                responseMessage.innerHTML = "Folder creation failed.";
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+</script>
+
+{% endblock %}

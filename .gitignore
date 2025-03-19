@@ -1,0 +1,54 @@
+# Virtual environment
+venv/
+.env
+*.venv
+.envrc
+
+# Python Compiled Files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyc
+
+# Django & SQLite
+db.sqlite3
+*.sqlite3
+/media/
+
+# Logs
+logs/
+*.log
+*.out
+*.pid
+*.swp
+
+# Static & compiled files
+staticfiles/
+#static/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+*.dockerfile
+
+# Environment Configuration
+*.env
+*.local
+settings_local.py
+config/settings/local.py
+
+# OS & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+Pipfile
+Pipfile.lock

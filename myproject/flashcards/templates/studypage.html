@@ -1,0 +1,1504 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Study Page</title>
+ <style>
+   /* RESET */
+   * {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+   }
+   body {
+     font-family: Arial, sans-serif;
+   }
+
+
+   /* HEADER */
+   .header {
+     position: relative;
+     background-color:rgb(16,5,140);
+     height: 60px;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     padding: 0 20px;
+     border-bottom: 1px solid #030888;
+   }
+   .header h1 {
+     font-size: 20px;
+     font-weight: normal;
+     color: white;
+   }
+   .header .header-right {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+   }
+   .header .header-right button {
+     border: none;
+     background: none;
+     font-size: 16px;
+     cursor: pointer;
+     color: white;
+   }
+   .header .close-btn {
+     font-size: 20px;
+     font-weight: bold;
+     padding: 0 5px;
+   }
+
+
+   /* FLASHCARD CONTAINER */
+   .flashcard-container {
+     display: flex;
+     flex-wrap: wrap;
+     justify-content: center;
+     align-items: center;
+     margin-top: 20px;
+     gap: 20px;
+   }
+   .flashcard {
+     position: relative;
+     width: 800px;
+     height: 450px;
+     perspective: 1000px;
+     border-radius: 10px;
+     transition: box-shadow 0.5s ease-in-out;
+   }
+   .card-inner {
+     width: 100%;
+     height: 100%;
+     transition: transform 0.6s;
+     transform-style: preserve-3d;
+     position: relative;
+   }
+   .flashcard.flipped .card-inner {
+     transform: rotateY(180deg);
+   }
+   .front, .back {
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     backface-visibility: hidden;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     flex-direction: column;
+     border-radius: 10px;
+     padding: 20px;
+     text-align: center;
+   }
+   /* In Flashcard mode, front always shows term, back shows definition */
+   .front {
+     background-color: #99c2ff;
+   }
+   .back {
+     background-color: #66a3ff;
+     transform: rotateY(180deg);
+   }
+   .card-title, .card-term {
+     font-size: 30px;
+     line-height: 1.2;
+   }
+
+
+   /* STAR & EDIT BUTTONS */
+   .top-buttons {
+     position: absolute;
+     top: 10px;
+     right: 10px;
+     display: flex;
+     gap: 5px;
+   }
+   .star-btn, .edit-btn {
+     background-color: white;
+     border: 1px solid #002855;
+     padding: 8px 15px;
+     border-radius: 50px;
+     cursor: pointer;
+     font-weight: bold;
+   }
+   .star-btn {
+      font-size: 16px;
+      color: black; /* default color for not starred */
+    }
+
+    .star-btn.active-star {
+      color: gold;  /* color when starred */
+    }
+
+   .edit-btn:hover {
+     background-color: #0056b3;
+     color: white;
+   }
+
+
+   /* FLASHCARD GLOW EFFECT */
+   .flashcard.flash {
+     animation: flash 0.5s ease-in-out;
+     box-shadow: 0 0 20px 10px rgb(243, 230, 159);
+   }
+   @keyframes flash {
+     0% { box-shadow: 0 0 20px 10px rgb(243, 230, 159); }
+     50% { box-shadow: 0 0 30px 20px rgb(237, 190, 163); }
+     100% { box-shadow: none; }
+   }
+
+
+   /* NAVIGATION CONTAINER */
+   .navigation {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-top: 20px;
+     gap: 10px;
+     background-color: #d3d3d3;
+     border-radius: 25px;
+     padding: 12px 25px;
+     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+     max-width: 350px;
+     height: 50px;
+     margin-left: auto;
+     margin-right: auto;
+   }
+   .nav-btn {
+     background-color: transparent;
+     border: none;
+     color: black;
+     font-size: 22px;
+     font-weight: bold;
+     padding: 8px 12px;
+     cursor: pointer;
+     transition: background-color 0.3s ease-in-out, transform 0.2s;
+     border-radius: 40px;
+   }
+   .nav-btn:hover {
+     background-color: rgba(0, 0, 0, 0.1);
+     transform: scale(1.1);
+   }
+   .card-counter {
+     font-size: 18px;
+     font-weight: bold;
+     color: black;
+     padding: 6px 12px;
+     background: rgba(255, 255, 255, 0.3);
+     border-radius: 30px;
+     text-align: center;
+     min-width: 80px;
+   }
+   .oval-button {
+    background-color: #ccc;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 50px;
+    cursor: pointer;
+  }
+
+  .oval-button:hover {
+      background-color: #aaa;
+  }
+
+
+   /* LEARN/NOT LEARNED BUTTONS */
+   .learning-buttons {
+     display: flex;
+     justify-content: center;
+     gap: 5px;
+     margin-top: 20px;
+   }
+   .learning-btn {
+     font-size: 15px;
+     padding: 15px 40px;
+     border-radius: 10px;
+     border: none;
+     cursor: pointer;
+     font-weight: bold;
+     transition: background-color 0.3s ease-in-out, transform 0.2s;
+   }
+   #learned-btn {
+     background-color: #616eff;
+     color: white;
+   }
+   #learned-btn:hover {
+     background-color: #4a5bd3;
+     transform: scale(1.05);
+   }
+   #not-learned-btn {
+     background-color: #5b9bfb;
+     color: white;
+   }
+   #not-learned-btn:hover {
+     background-color: #4a8cfb;
+     transform: scale(1.05);
+   }
+
+
+   /* MULTIPLE CHOICE STYLES */
+   .mc-question {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     padding: 20px;
+     text-align: center;
+     max-width: 900px;
+     margin: 0 auto;
+   }
+   .mc-question h3 {
+     margin-bottom: 10px;
+     font-weight: bold;
+     font-size: 24px;
+   }
+   .mc-question p {
+     margin-bottom: 1em;
+     font-size: 1.2em;
+   }
+   .mc-image {
+     display: block;
+     max-width: 300px;
+     margin: 1em auto 2em;
+     border-radius: 8px;
+   }
+   .mc-options {
+     display: flex;
+     flex-wrap: wrap;
+     gap: 20px;
+     margin-top: 20px;
+     justify-content: center;
+   }
+   .mc-option {
+     width: 300px;
+     padding: 15px;
+     font-size: 18px;
+     cursor: pointer;
+     background-color: #fff;
+     border: 2px solid #ddd;
+     border-radius: 12px;
+     text-align: center;
+     transition: background-color 0.2s, transform 0.2s;
+   }
+   .mc-option:hover {
+     background-color: #f0f0f0;
+     transform: scale(1.02);
+   }
+
+
+   /* STUDY PROGRESS SECTION */
+   .study-progress {
+     margin-top: 20px;
+     text-align: center;
+     background: #f7f7f7;
+     padding: 20px;
+     border-radius: 10px;
+     display: none;
+   }
+   .chart-container {
+     width: 300px;
+     margin: 0 auto;
+   }
+
+
+   /* MODAL */
+   .modal {
+     display: none;
+     position: fixed;
+     z-index: 9999;
+     left: 0;
+     top: 0;
+     width: 100%;
+     height: 100%;
+     overflow: auto;
+     background-color: rgba(0, 0, 0, 0.7);
+   }
+   .modal-content {
+     max-width: 700px;
+     width: 90%;
+     min-height: 500px;
+     max-height: 100vh;
+     overflow: hidden;
+     border-radius: 25px;
+     background-color:rgb(16,5,140);
+     color: rgb(255, 255, 255);
+     position: relative;
+     margin: 10% auto;
+   }
+   .modal-header, .modal-footer {
+     padding: 20px;
+   }
+   .modal-body {
+     flex: 1;
+     padding: 20px;
+     overflow-y: auto;
+   }
+   .close-modal {
+     position: absolute;
+     top: 15px;
+     right: 20px;
+     font-size: 25px;
+     font-weight: bold;
+     cursor: pointer;
+     color: #fff;
+   }
+   .switch {
+     position: relative;
+     display: inline-block;
+     width: 50px;
+     height: 24px;
+   }
+   .switch input {
+     opacity: 0;
+     width: 0;
+     height: 0;
+   }
+   .slider {
+     position: absolute;
+     cursor: pointer;
+     top: 0; left: 0; right: 0; bottom: 0;
+     background-color: #ccc;
+     transition: 0.4s;
+     border-radius: 24px;
+   }
+   .slider:before {
+     position: absolute;
+     content: "";
+     height: 18px;
+     width: 18px;
+     left: 3px;
+     bottom: 3px;
+     background-color: white;
+     transition: .4s;
+     border-radius: 50%;
+   }
+   input:checked + .slider {
+     background-color: #2196F3;
+   }
+   input:checked + .slider:before {
+     transform: translateX(26px);
+   }
+
+
+   /* NOTIFICATION */
+   .notification {
+     display: none;
+     position: fixed;
+     top: 10px;
+     left: 50%;
+     transform: translateX(-50%);
+     background-color: #333;
+     color: #fff;
+     padding: 10px 20px;
+     border-radius: 5px;
+     z-index: 9999;
+   }
+   .notification.show {
+     display: block;
+   }
+   .setting {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-bottom: 20px;
+   }
+   .setting label {
+     margin-right: 10px;
+   }
+
+
+   /* TIMER WIDGET */
+   .timer-widget {
+     display: none;
+     position: fixed;
+     bottom: 20px;
+     left: 20px;
+     background: #002855;
+     color: white;
+     padding: 10px 20px;
+     border-radius: 8px;
+     font-weight: bold;
+     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+     z-index: 1000;
+     min-width: 200px;
+     align-items: center;
+     justify-content: center;
+     gap: 10px;
+   }
+   #timerDisplay {
+     margin-right: 10px;
+   }
+   #toggleTimerBtn {
+     background-color: #fff;
+     color: #002855;
+     font-weight: bold;
+     border: none;
+     padding: 5px 10px;
+     border-radius: 5px;
+     cursor: pointer;
+   }
+   #toggleTimerBtn:hover {
+     background-color: #eee;
+   }
+
+
+   /* Save Updates Button */
+   .btn-primary {
+     background-color: #3584f3;
+     color: white;
+     font-size: 18px;
+     font-weight: bold;
+     padding: 12px 20px;
+     border-radius: 10px;
+     transition: background-color 0.3s ease-in-out, transform 0.2s;
+     border: none;
+   }
+   .btn-primary:hover {
+     background-color: #3584f3;
+     transform: scale(1.05);
+   }
+   /* Select Box Styles */
+   .form-select {
+     background-color: #3584f3;
+     color: white;
+     font-size: 14px;
+     font-weight: bold;
+     padding: 5px 10px;
+     border-radius: 7px;
+     border: none;
+     outline: none;
+     cursor: pointer;
+     transition: background-color 0.3s ease-in-out, transform 0.2s;
+   }
+   .form-select:hover {
+     background-color: #4a8cfb;
+   }
+   .form-select:focus {
+     border: 2px solid white;
+     box-shadow: 0 0 10px rgba(91,155,251,0.7);
+   }
+   .form-select::-ms-expand {
+     display: none;
+   }
+   .form-select option {
+     background: white;
+     color: #98beea;
+     font-weight: bold;
+   }
+ </style>
+</head>
+<body>
+ <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+
+ <!-- HEADER -->
+ <div class="header">
+   <h1>{{ flashcard_set.title }}</h1>
+   <div class="header-right">
+     <button type="button" onclick="openModal()">Edit Learn Mode</button>
+     <button type="button" class="close-btn" onclick="window.location.href='{% url 'flashcard_set_details' flashcard_set.id %}'">X</button>
+   </div>
+ </div>
+ <br>
+
+
+ <!-- MAIN CONTENT -->
+ <div class="container py-5">
+   <br>
+   <div id="roundInfo" style="text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; display: none;">
+     Round <span id="currentRound">1</span> of <span id="totalRounds">1</span>
+   </div>
+
+
+   <!-- FLASHCARDS -->
+   <div class="flashcard-container" id="flashcardContainer">
+     {% for term in terms %}
+     <div class="flashcard {% if term.is_starred %}starred{% endif %}"
+          id="card{{ term.id }}"
+          data-term="{{ term.term }}"
+          data-definition="{{ term.definition }}"
+          {% if term.image %}data-image-url="{{ term.image.url }}"{% endif %}
+          {% if not forloop.first %}style="display: none;"{% endif %}>
+       <div class="card-inner">
+         <div class="front">
+           <h2 class="card-title">{{ term.term }}</h2>
+           {% if term.image %}
+           <img src="{{ term.image.url }}" alt="{{ term.term }}" style="max-width:200px; margin:1em 0; border-radius:8px;">
+           {% endif %}
+         </div>
+         <div class="back">
+           <h2 class="card-term">{{ term.definition }}</h2>
+         </div>
+       </div>
+       <div class="top-buttons">
+         <button class="oval-button star-btn {% if term.is_starred %}active-star{% endif %}" onclick="toggleStar(this, event)">&#9733;</button>
+         <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+       </div>
+     </div>
+     {% endfor %}
+   </div>
+
+   <div id="noCardsMessage" style="display: none; text-align: center; font-size: 18px; margin-top: 20px;">
+    No starred cards available.
+  </div>
+
+
+   <!-- NAVIGATION -->
+   <div class="navigation" id="navigation">
+     <button id="prevBtn" class="nav-btn">&#8592;</button>
+     <span id="cardCounter">1 / {{ terms|length }}</span>
+     <button id="nextBtn" class="nav-btn">&#8594;</button>
+   </div>
+
+
+   <!-- LEARN/NOT LEARNED BUTTONS (flashcard mode only) -->
+   <div class="learning-buttons text-center mt-3" id="learningButtons">
+     <button id="learned-btn" class="learning-btn">Learned</button>
+     <button id="not-learned-btn" class="learning-btn">Not Learned</button>
+   </div>
+
+
+   <!-- STUDY PROGRESS (only used in MC mode) -->
+   <div class="study-progress" id="studyProgress">
+     <h2>Studying Progress:</h2>
+     <br>
+     <p id="progressText">Progress: 0%</p>
+     <div class="chart-container">
+       <canvas id="myProgressChart"></canvas>
+     </div>
+     <button class="btn-primary mt-3" onclick="resetSession()">Start Another Round</button>
+   </div>
+ </div>
+
+
+ <!-- TIMER WIDGET -->
+ <div id="timer-widget" class="timer-widget">
+   <span id="timerDisplay">No Timer Set</span>
+   <button id="toggleTimerBtn" onclick="toggleTimer()">Start</button>
+ </div>
+
+
+ <!-- MODAL (Edit Learn Mode) -->
+ <div id="editLearnModeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 class="text-center">Edit Flashcards</h2>
+      </div>
+    <div class="modal-body">
+
+
+    <div class="setting d-flex justify-content-between align-items-center mb-3">
+         <label>Study Only Starred Items:</label>
+          <label class="switch">
+              <input type="checkbox" id="starredToggle">
+              <span class="slider"></span>
+          </label>
+    </div>
+
+
+       <div class="setting d-flex justify-content-between align-items-center mb-3">
+         <label>Shuffle Terms:</label>
+         <label class="switch">
+           <input type="checkbox" id="shuffleToggle">
+           <span class="slider"></span>
+         </label>
+       </div>
+       <hr class="border-light">
+       <br>
+       <div class="setting mb-3">
+         <label>Set Study Timer (Pomodoro):</label>
+         <select id="timerSelect" class="form-select mt-2">
+           <option value="none">No Timer</option>
+           <option value="25">25 min study / 5 min break</option>
+           <option value="50">50 min study / 10 min break</option>
+         </select>
+       </div>
+       <div class="setting d-flex justify-content-between align-items-center mb-3">
+         <div>
+           <label class="mb-1"><strong>Ultradian Rhythm</strong></label>
+           <small class="d-block text-secondary">90-minute study / 30-minute break</small>
+         </div>
+         <label class="switch">
+           <input type="checkbox" id="ultradianToggle">
+           <span class="slider"></span>
+         </label>
+       </div>
+       <hr class="border-light">
+       <br>
+       <div class="mb-3"><strong>Question Format:</strong></div>
+       <br>
+       <div class="setting d-flex justify-content-between align-items-center mb-3">
+         <label>Answer with Terms:</label>
+         <label class="switch">
+           <input type="checkbox" id="definitionToggle">
+           <span class="slider"></span>
+         </label>
+       </div>
+       <hr class="border-light">
+       <br>
+       <!-- Multiple Choice Mode Toggle -->
+       <div class="setting d-flex justify-content-between align-items-center mb-3">
+         <label>Multiple Choice Mode:</label>
+         <label class="switch">
+           <input type="checkbox" id="mcToggle">
+           <span class="slider"></span>
+         </label>
+       </div>
+       <!-- Length of rounds applies only in MC mode -->
+       <div class="setting mb-3">
+         <label>Length of Rounds:</label>
+         <select id="roundLength" class="form-select mt-2">
+           {% for i in "123456789"|make_list %}
+           <option value="{{ i }}">{{ i }} Round{{ i|pluralize }}</option>
+           {% endfor %}
+           <option value="10">10 Rounds</option>
+         </select>
+       </div>
+       
+
+        <div class="setting mb-3">
+          <label>Cards per Round:</label>
+          <select id="cardsPerRound" class="form-select mt-2">
+            <option value="5">5 Cards</option>
+            <option value="10" selected>10 Cards</option>
+            <option value="15">15 Cards</option>
+            <option value="20">20 Cards</option>
+          </select>
+        </div>
+
+     </div>
+     <div class="modal-footer" style="text-align: center;">
+       <button class="btn-primary w-100" onclick="saveSettings()">Save Updates</button>
+     </div>
+   </div>
+ </div>
+ <!-- END MODAL -->
+
+
+ <!-- Notification popups -->
+ <div id="saveNotification" class="notification">✅ Settings saved successfully!</div>
+ <div id="timerStartPopup" class="notification">⏳ Study timer started!</div>
+ <div id="ultradianStartPopup" class="notification">⏳ 90-minute study session started!</div>
+ <div id="ultradianEndPopup" class="notification">✅ 90-minute study completed. Please take a 30-minute break.</div>
+ <div id="breakEndPopup" class="notification">⏳ Break over! Time to resume your study session.</div>
+ <div id="timerWidget" class="timer-widget"></div>
+
+
+ <!-- Vendor JS -->
+ <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+ <script src="{% static 'vendor/aos/aos.js' %}"></script>
+ <script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
+ <script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
+ <!-- Chart.js for the progress chart (used only in MC mode) -->
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ <!-- Main JS (ensure it does not conflict with this code) -->
+ <script src="{% static 'js/main.js' %}"></script>
+
+
+ <script>
+   document.addEventListener("DOMContentLoaded", function() {
+    
+     /*GLOBAL VARS*/
+     const setId = "{{ flashcard_set.id }}";
+     const correctSound = new Audio("{% static 'sounds/correct.mp3' %}");
+     const incorrectSound = new Audio("{% static 'sounds/incorrect.mp3' %}");
+
+
+     let countdownInterval = null;
+     let isTimerRunning = false;
+     let remainingTime = 0;
+     let currentIndex = 0;
+     let isStarredOnly = false;
+     let currentRound = 1;
+     let totalRounds = 1;
+     let isMCMode = false;
+     let correctCount = 0;
+     let totalAnswered = 0;
+     let myProgressChart = null;
+     let sessionCompleteFlag = false;
+    
+
+
+     /*OPEN/CLOSE MODAL FUNCTIONS*/
+
+     window.openModal = function() {
+       document.getElementById("editLearnModeModal").style.display = "block";
+     };
+     window.closeModal = function() {
+       document.getElementById("editLearnModeModal").style.display = "none";
+     };
+
+
+     /*FLASHCARD FLIPPING*/
+     const flashcardContainer = document.getElementById("flashcardContainer");
+     flashcardContainer.addEventListener("click", function(e) {
+       if (e.target.closest(".top-buttons")) return;
+       const flashcard = e.target.closest(".flashcard");
+       if (flashcard && !flashcard.classList.contains("editing")) {
+         flashcard.classList.toggle("flipped");
+       }
+     });
+
+
+     /*STARRED TOGGLE*/
+     function setupStarredToggle() {
+       const starredToggle = document.getElementById("starredToggle");
+        if (starredToggle) {
+          starredToggle.addEventListener("change", function() {
+            isStarredOnly = this.checked;
+            currentIndex = 0; 
+            updateCards();
+          });
+        }
+       
+       
+     }
+     function getVisibleCards() {
+       const allCards = Array.from(document.querySelectorAll(".flashcard"));
+       return isStarredOnly ? allCards.filter(card => card.classList.contains("starred")) : allCards;
+     }
+
+
+     /*UPDATE CARDS*/
+     function updateCards() {
+  // In MC mode, only show a subset. Otherwise, show all visible cards.
+  const cardsToDisplay = isMCMode ? getCardsForCurrentRound() : getVisibleCards();
+
+  if (cardsToDisplay.length === 0) {
+    document.getElementById("flashcardContainer").style.display = "none";
+    document.getElementById("noCardsMessage").style.display = "block";
+    document.getElementById("cardCounter").innerText = "0 / 0";
+    return;
+  } else {
+    document.getElementById("flashcardContainer").style.display = "flex";
+    document.getElementById("noCardsMessage").style.display = "none";
+  }
+
+  // Hide all flashcards first
+  document.querySelectorAll(".flashcard").forEach(card => {
+    card.style.display = "none";
+  });
+
+  // If MC mode is on, check for round transitions
+  if (isMCMode) {
+    if (currentIndex >= cardsToDisplay.length) {
+      if (currentRound < totalRounds) {
+        currentRound++;
+        currentIndex = 0;
+      } else {
+        sessionComplete();
+        return;
+      }
+    }
+  } else {
+    // In flashcard mode, just clamp currentIndex
+    if (currentIndex >= cardsToDisplay.length) {
+      currentIndex = cardsToDisplay.length - 1;
+    }
+  }
+
+  // Show the current card
+  cardsToDisplay[currentIndex].style.display = "block";
+  document.getElementById("cardCounter").innerText =
+    `${currentIndex + 1} / ${cardsToDisplay.length}`;
+
+  // If MC mode is active, do MC stuff
+  if (isMCMode) {
+    showMultipleChoiceQuestion(cardsToDisplay[currentIndex]);
+    document.getElementById("roundInfo").style.display = "block";
+    document.getElementById("currentRound").textContent = currentRound;
+    document.getElementById("totalRounds").textContent = totalRounds;
+  } else {
+    document.getElementById("roundInfo").style.display = "none";
+  }
+
+  // Show/hide learning/navigation buttons depending on mode
+  const learnButtons = document.getElementById("learningButtons");
+  const navigation = document.getElementById("navigation");
+  if (learnButtons) learnButtons.style.display = isMCMode ? "none" : "flex";
+  if (navigation) navigation.style.display = isMCMode ? "none" : "flex";
+}
+
+
+    function getCardsForCurrentRound() {
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+      const cardsPerRound = parseInt(document.getElementById("cardsPerRound").value, 10) || 10;
+      const visibleCards = getVisibleCards();
+      const startIndex = (currentRound - 1) * cardsPerRound;
+      const endIndex = startIndex + cardsPerRound;
+      return visibleCards.slice(startIndex, endIndex);
+    }
+
+    
+
+     /*NAVIGATION*/
+     function setupNavigation() {
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        if (prevBtn) {
+          prevBtn.addEventListener("click", function() {
+            if (currentIndex > 0) {
+              currentIndex--;
+            }
+            updateCards();
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener("click", function() {
+            const visibleCards = getVisibleCards();
+            if (!isMCMode && currentIndex < visibleCards.length - 1) {
+              currentIndex++;
+            } else if (isMCMode) {
+              currentIndex++;
+            }
+            updateCards();
+          });
+        }
+      }
+
+
+
+
+     /*TOGGLE STAR*/
+     window.toggleStar = function(button, event) {
+       event.stopPropagation();
+       const card = button.closest(".flashcard");
+       const flashcardId = card.id.replace("card", "");
+       let isStarred = button.classList.contains("active-star");
+
+
+       if (isStarred) {
+          button.classList.remove("active-star");
+          card.classList.remove("starred");
+        } else {
+          button.classList.add("active-star");
+          card.classList.add("starred");
+          card.offsetWidth;
+          card.classList.add("flash");
+          setTimeout(() => card.classList.remove("flash"), 500);
+        }
+
+       fetch(`/update_star_status/${flashcardId}/`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+           "X-CSRFToken": getCSRFToken()
+         },
+         body: JSON.stringify({ starred: !isStarred })
+       })
+       .then(response => response.json())
+       .then(data => {
+         if (!data.success) {
+           console.error("Error toggling star:", data.error);
+         }
+       })
+       .catch(error => console.error("API Error:", error));
+     };
+
+
+     /*LEARNED BUTTONS*/
+     function setupLearnedButtons() {
+       const learnedBtn = document.getElementById("learned-btn");
+       const notLearnedBtn = document.getElementById("not-learned-btn");
+       if (learnedBtn) {
+         learnedBtn.addEventListener("click", () => markLearned(true));
+       }
+       if (notLearnedBtn) {
+         notLearnedBtn.addEventListener("click", () => markLearned(false));
+       }
+     }
+     function markLearned(learned) {
+       const visibleCards = getVisibleCards();
+       if (visibleCards.length === 0) return;
+       const card = visibleCards[currentIndex];
+       const flashcardId = card.id.replace("card", "");
+       fetch(`/update_flashcard_status/${flashcardId}/`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+           "X-CSRFToken": getCSRFToken()
+         },
+         body: JSON.stringify({ learned: learned })
+       })
+       .then(response => response.json())
+       .then(data => {
+         if (data.success) {
+           console.log(`Flashcard ${flashcardId} marked as ${learned ? "Learned" : "Not Learned"}`);
+           currentIndex = Math.min(getVisibleCards().length - 1, currentIndex + 1);
+           updateCards();
+         } else {
+           console.error("Error updating status:", data.error);
+         }
+       })
+       .catch(error => console.error("API Error:", error));
+     }
+
+
+     /*MULTIPLE CHOICE LOGIC*/
+     function shuffleArray(array) {
+       for (let i = array.length - 1; i > 0; i--) {
+         const j = Math.floor(Math.random() * (i + 1));
+         [array[i], array[j]] = [array[j], array[i]];
+       }
+     }
+     window.showMultipleChoiceQuestion = function(card) {
+       const term = card.getAttribute("data-term");
+       const definition = card.getAttribute("data-definition");
+       const correctAnswer = term;
+       const possibleImg = card.querySelector("img");
+       let imageHtml = "";
+       if (possibleImg) {
+         imageHtml = `
+           <img
+             src="${possibleImg.src}"
+             alt="${term}"
+             class="mc-image"
+           >
+         `;
+       }
+
+       const allCards = Array.from(document.querySelectorAll(".flashcard"));
+       const allTerms = allCards.map(c => c.getAttribute("data-term"));
+       const otherTerms = allTerms.filter(t => t !== correctAnswer);
+       shuffleArray(otherTerms);
+       const incorrectOptions = otherTerms.slice(0, 3);
+       const options = incorrectOptions.concat(correctAnswer);
+       shuffleArray(options);
+
+       let html = `
+         <div class="mc-question">
+           <h3>Definition:</h3>
+           <p>${definition}</p>
+           ${imageHtml}
+           <h3>Choose matching term:</h3>
+           <div class="mc-options">
+       `;
+       options.forEach((opt, index) => {
+         html += `
+           <button class="mc-option" data-answer="${opt}"
+             onclick="checkMCAnswer(this, '${correctAnswer.replace(/'/g, "\\'")}')">
+             ${String.fromCharCode(65 + index)}. ${opt}
+           </button>
+         `;
+       });
+       html += `</div></div>`;
+       card.innerHTML = html;
+     };
+     window.checkMCAnswer = function(button, correctAnswer) {
+       totalAnswered++;
+       const selected = button.getAttribute("data-answer");
+       if (selected === correctAnswer) {
+         correctCount++;
+         button.style.backgroundColor = "green";
+         correctSound.play(); // play correct sound
+       } else {
+         button.style.backgroundColor = "red";
+         incorrectSound.play(); // play wrong sound
+       }
+       setTimeout(() => {
+         currentIndex++;
+         updateCards();
+       }, 1000);
+     };
+
+     window.restoreFlashcard = function(card) {
+      const term = card.getAttribute("data-term");
+      const definition = card.getAttribute("data-definition");
+      const imageUrl = card.getAttribute("data-image-url");
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+      const answerWithDefinition = savedSettings.answer_with_definition; // true means answer with definition
+
+      let frontContent, backContent;
+      if (answerWithDefinition) {
+        // Show definition on the front and term on the back
+        frontContent = `<h2 class="card-term">${definition}</h2>`;
+        backContent = `<h2 class="card-title">${term}</h2>`;
+      } else {
+        // Default: term on the front and definition on the back
+        frontContent = `<h2 class="card-title">${term}</h2>`;
+        backContent = `<h2 class="card-term">${definition}</h2>`;
+      }
+
+      let imageHtml = "";
+      // Optionally show the image only on the front if in default mode
+      if (imageUrl && !answerWithDefinition) {
+        imageHtml = `<img src="${imageUrl}" alt="${term}" style="max-width:200px; margin:1em 0; border-radius:8px;">`;
+      }
+
+      // Render the flashcard with the determined content
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="front">
+            ${frontContent}
+            ${imageHtml}
+          </div>
+          <div class="back">
+            ${backContent}
+          </div>
+        </div>
+        <div class="top-buttons">
+          <button class="oval-button star-btn" onclick="toggleStar(this, event)">&#9733;</button>
+          <button class="oval-button edit-btn" onclick="toggleEdit(this, event)">Edit</button>
+        </div>
+      `;
+      if (card.classList.contains("starred")) {
+        card.querySelector(".star-btn").classList.add("active-star");
+      }
+      
+      card.classList.remove("flipped");
+    };
+
+
+
+
+     /*TIMER LOGIC (Modified for Persistence)*/
+     function stopCountdownTimer() {
+       if (countdownInterval) {
+         clearInterval(countdownInterval);
+         countdownInterval = null;
+       }
+       isTimerRunning = false;
+     }
+     function startCountdownTimer() {
+       const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+       if (savedSettings.remainingTime && !savedSettings.timerChanged) {
+         remainingTime = savedSettings.remainingTime;
+       } else if (savedSettings.ultradian) {
+         remainingTime = 90 * 60;
+       } else if (savedSettings.timer && savedSettings.timer !== "none") {
+         remainingTime = parseInt(savedSettings.timer, 10) * 60;
+       } else {
+         document.getElementById("timer-widget").style.display = "none";
+         return;
+       }
+       document.getElementById("timer-widget").style.display = "flex";
+       updateTimerDisplay(remainingTime);
+
+
+       countdownInterval = setInterval(() => {
+         remainingTime--;
+         updateTimerDisplay(remainingTime);
+         savedSettings.remainingTime = remainingTime;
+         localStorage.setItem("studySettings", JSON.stringify(savedSettings));
+
+
+         if (remainingTime <= 0) {
+           clearInterval(countdownInterval);
+           countdownInterval = null;
+           isTimerRunning = false;
+           document.getElementById("timerDisplay").textContent = "✅ Timer Completed!";
+           setTimeout(() => {}, 3000);
+         }
+       }, 1000);
+     }
+     function updateTimerDisplay(seconds) {
+       const timerDisplay = document.getElementById("timerDisplay");
+       let min = Math.floor(seconds / 60);
+       let sec = seconds % 60;
+       timerDisplay.textContent = `⏳ ${min}:${sec < 10 ? "0" : ""}${sec} remaining`;
+     }
+     window.toggleTimer = function() {
+       const toggleBtn = document.getElementById("toggleTimerBtn");
+       const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+       if (!savedSettings.ultradian && (!savedSettings.timer || savedSettings.timer === "none")) {
+         document.getElementById("timer-widget").style.display = "none";
+         return;
+       }
+       if (isTimerRunning) {
+         clearInterval(countdownInterval);
+         countdownInterval = null;
+         isTimerRunning = false;
+         toggleBtn.textContent = "Start";
+       } else {
+         if (remainingTime <= 0) {
+           if (savedSettings.ultradian) {
+             remainingTime = 90 * 60;
+           } else {
+             remainingTime = parseInt(savedSettings.timer, 10) * 60;
+           }
+         }
+         if (remainingTime <= 0) return;
+         isTimerRunning = true;
+         toggleBtn.textContent = "Pause";
+         countdownInterval = setInterval(() => {
+           remainingTime--;
+           updateTimerDisplay(remainingTime);
+           savedSettings.remainingTime = remainingTime;
+           localStorage.setItem("studySettings", JSON.stringify(savedSettings));
+           if (remainingTime <= 0) {
+             clearInterval(countdownInterval);
+             countdownInterval = null;
+             isTimerRunning = false;
+             document.getElementById("timerDisplay").textContent = "✅ Timer Completed!";
+             setTimeout(() => {}, 3000);
+           }
+         }, 1000);
+       }
+     };
+
+
+     /*LEARN MODE SETTINGS / MODAL*/
+     function forceFlashcardFrontBack() {
+      const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+      const answerWithTerm = savedSettings.answer_with_term;
+      const answerWithDefinition = savedSettings.answer_with_definition;
+
+      document.querySelectorAll(".flashcard").forEach(card => {
+        const term = card.getAttribute("data-term");
+        const definition = card.getAttribute("data-definition");
+        const front = card.querySelector(".front");
+        const back = card.querySelector(".back");
+
+        if (front && back) {
+          // If user wants the definition on the front:
+          if (answerWithDefinition && !answerWithTerm) {
+            front.innerHTML = `<h2 class="card-title">${definition}</h2>`;
+            back.innerHTML = `<h2 class="card-term">${term}</h2>`;
+          }
+          // If user wants the term on the front:
+          else if (answerWithTerm && !answerWithDefinition) {
+            front.innerHTML = `<h2 class="card-title">${term}</h2>`;
+            back.innerHTML = `<h2 class="card-term">${definition}</h2>`;
+          }
+          // If both toggles are on or off, decide on a default:
+          else {
+            // Default: Term on the front, Definition on the back
+            front.innerHTML = `<h2 class="card-title">${term}</h2>`;
+            back.innerHTML = `<h2 class="card-term">${definition}</h2>`;
+          }
+        }
+      });
+}
+
+
+window.saveSettings = function() {
+    const starredToggle = document.getElementById("starredToggle");
+    const shuffleToggle = document.getElementById("shuffleToggle");
+    const timerSelect = document.getElementById("timerSelect");
+    const ultradianToggle = document.getElementById("ultradianToggle");
+    const definitionToggle = document.getElementById("definitionToggle");
+    const mcToggle = document.getElementById("mcToggle");
+    const roundLengthSelect = document.getElementById("roundLength");
+    const cardsPerRoundSelect = document.getElementById("cardsPerRound");
+
+    // 🛑 Fix: Handle missing `termToggle` to avoid null reference error
+    const termToggle = document.getElementById("termToggle");
+    const answerWithTerm = termToggle ? termToggle.checked : false; // Default to `false`
+
+    if (!starredToggle || !shuffleToggle || !timerSelect || !ultradianToggle || 
+        !definitionToggle || !mcToggle || !roundLengthSelect || !cardsPerRoundSelect) {
+        console.error("❌ One or more required elements are missing in the DOM.");
+        return;
+    }
+
+    const starred = starredToggle.checked;
+    const shuffle = shuffleToggle.checked;
+    const timer = timerSelect.value;
+    const ultradian = ultradianToggle.checked;
+    const answerWithDefinition = definitionToggle.checked;
+    const mcMode = mcToggle.checked;
+    const roundLength = roundLengthSelect.value;
+    const cardsPerRound = cardsPerRoundSelect.value;
+
+    let savedSettingsLS = JSON.parse(localStorage.getItem("studySettings")) || {};
+
+    const timerChanged =
+        savedSettingsLS.timer !== timer || savedSettingsLS.ultradian !== ultradian;
+
+    fetch("{% url 'update_learn_settings' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify({
+            starred: starred,
+            shuffle: shuffle,
+            timer: timer,
+            ultradian: ultradian,
+            answer_with_term: answerWithTerm, // Fix: Now optional
+            answer_with_definition: answerWithDefinition,
+            multiple_choice: mcMode,
+            round_length: roundLength
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("✅ Settings saved on the server!");
+            showPopup("saveNotification");
+
+            if (shuffle) {
+                shuffleFlashcards();
+            }
+
+            if (timerChanged) {
+                stopCountdownTimer();
+            }
+
+            savedSettingsLS.timer = timer;
+            savedSettingsLS.ultradian = ultradian;
+            savedSettingsLS.answer_with_definition = answerWithDefinition;
+            savedSettingsLS.multiple_choice = mcMode;
+            savedSettingsLS.timerChanged = timerChanged;
+            localStorage.setItem("studySettings", JSON.stringify(savedSettingsLS));
+
+            if ((timer === "none") && !ultradian) {
+                document.getElementById("timer-widget").style.display = "none";
+            } else {
+                document.getElementById("timer-widget").style.display = "flex";
+                if (timerChanged) {
+                    stopCountdownTimer();
+                    if (ultradian) {
+                        remainingTime = 90 * 60;
+                    } else {
+                        const totalSeconds = parseInt(timer, 10) * 60;
+                        if (!isNaN(totalSeconds) && totalSeconds > 0) {
+                            remainingTime = totalSeconds;
+                        }
+                    }
+                    updateTimerDisplay(remainingTime);
+                    document.getElementById("toggleTimerBtn").textContent = "Start";
+                }
+            }
+
+            if (ultradian) {
+                showPopup("ultradianStartPopup");
+            }
+
+            if (!mcMode && sessionCompleteFlag) {
+                document.getElementById("studyProgress").style.display = "none";
+                document.getElementById("flashcardContainer").style.display = "flex";
+                document.getElementById("navigation").style.display = "flex";
+                document.getElementById("learningButtons").style.display = "flex";
+                sessionCompleteFlag = false;
+            }
+
+            if (!mcMode) {
+                isMCMode = false;
+                document.querySelectorAll(".flashcard").forEach(card => restoreFlashcard(card));
+                forceFlashcardFrontBack();
+                currentIndex = 0;
+                updateCards();
+            } else {
+                isMCMode = true;
+                totalRounds = parseInt(roundLength, 10) || 1;
+                resetSession();
+            }
+
+            closeModal();
+        } else {
+            console.error("❌ Error saving settings:", data);
+        }
+    })
+    .catch(err => console.error("❌ API Error:", err));
+};
+
+
+     /*FLASHCARD EDIT*/
+     window.toggleEdit = function(button, event) {
+       event.stopPropagation();
+       const card = button.closest(".flashcard");
+       const fields = card.querySelectorAll(".card-title, .card-term");
+       const isEditing = card.classList.contains("editing");
+
+       if (isEditing) {
+         fields.forEach(el => {
+           el.contentEditable = "false";
+           el.classList.remove("editable");
+         });
+         card.classList.remove("editing");
+         button.textContent = "Edit";
+
+         const flashcardId = card.id.replace("card", "");
+         const newTerm = card.querySelector(".card-title").innerText;
+         const newDefinition = card.querySelector(".card-term").innerText;
+
+         fetch(`/update_flashcard_text/${flashcardId}/`, {
+           method: "POST",
+           headers: {
+             "Content-Type": "application/json",
+             "X-CSRFToken": getCSRFToken()
+           },
+           body: JSON.stringify({ term: newTerm, definition: newDefinition })
+         })
+         .then(response => response.json())
+         .then(data => {
+           if (!data.success) {
+             console.error("Error updating flashcard text:", data.error);
+           } else {
+             card.setAttribute("data-term", newTerm);
+             card.setAttribute("data-definition", newDefinition);
+           }
+         })
+         .catch(error => console.error("API Error:", error));
+       } else {
+         fields.forEach(el => {
+           el.contentEditable = "true";
+           el.classList.add("editable");
+         });
+         card.classList.add("editing");
+         button.textContent = "Save";
+       }
+     };
+
+
+     /*UTILITY FUNCTIONS*/
+     function getCSRFToken() {
+       return document.querySelector("[name=csrfmiddlewaretoken]").value;
+     }
+     function showPopup(id) {
+       const popup = document.getElementById(id);
+       popup.classList.add("show");
+       setTimeout(() => {
+         popup.classList.remove("show");
+       }, 5000);
+     }
+
+
+     /*SESSION COMPLETE & PROGRESS CHART*/
+     function sessionComplete() {
+       sessionCompleteFlag = true;
+       document.getElementById("flashcardContainer").style.display = "none";
+       document.getElementById("navigation").style.display = "none";
+       document.getElementById("learningButtons").style.display = "none";
+
+       const progressDiv = document.getElementById("studyProgress");
+       progressDiv.style.display = "block";
+
+       let progressPercent = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
+       document.getElementById("progressText").innerText = "Progress: " + progressPercent + "%";
+      
+       let prevCorrect = parseInt(localStorage.getItem("overallLearnedCount_" + setId), 10) || 0;
+       let prevIncorrect = parseInt(localStorage.getItem("overallNotLearnedCount_" + setId), 10) || 0;
+
+        localStorage.setItem("overallLearnedCount_" + setId, prevCorrect + correctCount);
+        localStorage.setItem("overallNotLearnedCount_" + setId, prevIncorrect + (totalAnswered - correctCount));
+       const ctx = document.getElementById("myProgressChart").getContext("2d");
+       if (myProgressChart) {
+         myProgressChart.destroy();
+       }
+       myProgressChart = new Chart(ctx, {
+         type: 'doughnut',
+         data: {
+           labels: ['Correct', 'Incorrect'],
+           datasets: [{
+             data: [correctCount, totalAnswered - correctCount],
+             backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)']
+           }]
+         },
+         options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           plugins: {
+             title: {
+               display: true,
+             }
+           }
+         }
+       });
+     }
+    
+     window.resetSession = function() {
+       correctCount = 0;
+       totalAnswered = 0;
+
+       localStorage.setItem("overallLearnedCount_" + setId, 0);
+       localStorage.setItem("overallNotLearnedCount_" + setId, 0);
+
+       currentIndex = 0;
+       currentRound = 1;
+       sessionCompleteFlag = false;
+
+       document.getElementById("studyProgress").style.display = "none";
+       document.getElementById("flashcardContainer").style.display = "flex";
+       document.getElementById("navigation").style.display = "flex";
+       document.getElementById("learningButtons").style.display = isMCMode ? "none" : "flex";
+       updateCards();
+     };
+
+
+     /*SHUFFLE FLASHCARDS*/
+     function shuffleFlashcards() {
+      const container = document.getElementById("flashcardContainer");
+      const flashcards = Array.from(container.querySelectorAll(".flashcard"));
+      
+      // Restore each flashcard to its original HTML
+      flashcards.forEach(card => restoreFlashcard(card));
+      
+      // Shuffle the flashcards (Fisher–Yates)
+      for (let i = flashcards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+      }
+      
+      // Reorder the container's children with the shuffled cards
+      container.replaceChildren(...flashcards);
+      updateCards();
+}
+
+
+
+     /*LOAD SETTINGS*/
+     function loadSettings() {
+       const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+        if (savedSettings.starred) {
+          document.getElementById("starredToggle").checked = true;
+        }
+       if (savedSettings.timer) {
+         document.getElementById("timerSelect").value = savedSettings.timer;
+       }
+       if (savedSettings.ultradian) {
+         document.getElementById("ultradianToggle").checked = true;
+       }
+       if (savedSettings.answer_with_definition) {
+         document.getElementById("definitionToggle").checked = true;
+       }
+       if (savedSettings.multiple_choice) {
+         document.getElementById("mcToggle").checked = true;
+         isMCMode = true;
+       } else {
+         isMCMode = false;
+       }
+       totalRounds = savedSettings.roundLength ? parseInt(savedSettings.roundLength, 10) : 1;
+     }
+
+
+     function checkIfOnTimerPage() {
+       const savedSettings = JSON.parse(localStorage.getItem("studySettings")) || {};
+       if ((!savedSettings.timer || savedSettings.timer === "none") && !savedSettings.ultradian) {
+         document.getElementById("timer-widget").style.display = "none";
+       } else {
+         document.getElementById("timer-widget").style.display = "flex";
+         if (savedSettings.ultradian) {
+           remainingTime = 90 * 60;
+           updateTimerDisplay(remainingTime);
+         } else {
+           const totalSeconds = parseInt(savedSettings.timer, 10) * 60;
+           if (!isNaN(totalSeconds) && totalSeconds > 0) {
+             remainingTime = totalSeconds;
+             updateTimerDisplay(remainingTime);
+           }
+         }
+       }
+     }
+
+
+     /*INITIALIZATION*/
+     setupStarredToggle();
+     setupNavigation();
+     setupLearnedButtons();
+     loadSettings();
+     checkIfOnTimerPage();
+     updateCards();
+
+     if (!isMCMode) {
+       document.querySelectorAll(".flashcard").forEach(card => restoreFlashcard(card));
+     }
+   });
+ </script>
+</body>
+</html>
+
+
+

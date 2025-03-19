@@ -1,0 +1,49 @@
+{% load static %}
+
+<header id="header" class="header d-flex align-items-center fixed-top">
+  <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+    <a href="{% url 'landing_page' %}" class="logo d-flex align-items-center">
+      <img src="{% static 'img/logo.png' %}" alt="FlashFlicks Logo" 
+           style="height: 40px; margin-right: 10px;">
+      <h1 class="sitename m-0">FlashFlicks</h1>
+    </a>
+    
+    <nav id="navmenu" class="navmenu">
+      <ul>
+
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'about' %}" class="{% if request.path == '/about/' %}active{% endif %}">About</a></li>
+            <li><a href="{% url 'home' %}" class="{% if request.path == '/homepage/' %}active{% endif %}">Home</a></li>
+            <li><a href="{% url 'folder_list' %}" class="{% if request.path == '/folder/' %}active{% endif %}">Folders</a></li>
+            <li><a href="{% url 'learning' %}" class="{% if request.path == '/learning-styles/' %}active{% endif %}">Learning</a></li>
+            {# REMOVED FOR NOW <li><a href="{% url 'calendar' %}" class="{% if request.path == '/calendar/' %}active{% endif %}">Calendar</a></li> #}
+            <!--<li><a href="{% url 'edit_learn_mode' %}" class="{% if request.path == '/edit-learn-mode/' %}active{% endif %}">Study Mode</a></li> -->
+            <li><a href="{% url 'settings' %}" class="{% if request.path == '/settings/' %}active{% endif %}">Settings</a></li>
+            <li>
+                <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="text-danger btn btn-link" style="padding: 0; border: none;">Logout</button>
+                 </form>
+            </li>
+        {% else %}
+          <li><a href="{% url 'about' %}" class="{% if request.path == '/about/' %}active{% endif %}">About</a></li>
+          <li><a href="{% url 'learning' %}" class="{% if request.path == '/learning-styles/' %}active{% endif %}">Learning</a></li>
+          <li><a href="{% url 'login' %}" class="text-primary">Login</a></li>
+        {% endif %}
+
+      </ul>
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </nav>
+
+  </div>
+</header>
+
+<style>
+  .disabled-link {
+      pointer-events: none;
+      color: gray !important;
+      text-decoration: none;
+      cursor: default;
+  }
+</style>

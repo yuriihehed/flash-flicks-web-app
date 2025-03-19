@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Learning Styles - Flash Flicks
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/learning_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section id="hero" class="hero section dark-background">
+    <img src="{% static 'img/hero-bg-2.jpg' %}" alt="Hero Background" class="hero-bg">
+    <div class="container text-center">
+        <h1 class="text-white">Learning Styles</h1>
+        <p class="text-white-75">
+            Not all study techniques are created equal. Discover different approaches 
+            to find one that matches your style!
+        </p>
+    </div>
+</section>
+
+<!-- DASHBOARD SECTION -->
+<section class="dashboard section py-5 light-background">
+    <div class="container">
+        <h2 class="text-center mb-4">Explore Popular Study Methods</h2>
+
+        <!-- Creative CTA with Animation -->
+        <div class="text-center mb-4">
+            <p class="flip-instruction">
+                🔄 <strong>Flip each learning method to learn more!</strong>  🔄
+            </p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Memory Palaces &amp; Visualization</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                Memory palaces link information to familiar locations, aiding recall. Visualize a known place, assign key details to specific spots, and mentally walk through it to retrieve them—used by memory champions for complex memorization.
+                                <br><strong>Best for:</strong> Visual learners and those needing to memorize large amounts of information.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Leitner System</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                The Leitner System sorts flashcards into boxes based on recall. Correct answers move up, while mistakes return to Box 1. Lower boxes are reviewed more frequently, ensuring you focus more on difficult cards and reinforce learning efficiently.
+                                <br><strong>Best for:</strong> Learners who want a simple, time-efficient method.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Spaced Repetition (SRS)</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                Spaced repetition involves reviewing flashcards at increasing intervals over time, proven by research to enhance long-term memory.
+                                Tools like Anki schedule reviews automatically, ensuring you study just before forgetting, reinforcing knowledge efficiently.
+                                <br><strong>Best for:</strong> Students aiming for long-term retention.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Peer Quizzing</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                Studying with friends brings interactive and engaging elements into learning. Ask each other questions and discuss the answers to deepen understanding.
+                                Explaining concepts aloud can strengthen retention and highlight areas that need further review.
+                                <br><strong>Best for:</strong> Social learners who thrive on discussion and active engagement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Traditional Self-Testing</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                A straightforward approach: read the front of the flashcard, try to recall the answer, and check the back. Repeat until you've mastered all the cards.
+                                This simple method is effective for reinforcing recall through direct repetition.
+                                <br><strong>Best for:</strong> Students preferring a direct, structured study approach.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-4">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h5>Writing &amp; Speaking Responses</h5>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>
+                                Writing your answers forces you to structure your thoughts, while speaking them aloud can enhance auditory learning.
+                                Consistently expressing responses in words (written or spoken) strengthens understanding and retention.
+                                <br><strong>Best for:</strong> Learners who retain information better by articulating concepts.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".flip-card").forEach(card => {
+            card.addEventListener("click", function() {
+                this.classList.toggle("flipped");
+            });
+        });
+    });
+</script>
+{% endblock %}

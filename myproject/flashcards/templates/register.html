@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Register - FlashFlicks{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="register-container d-flex align-items-center justify-content-center">
+    <div class="register-box d-flex shadow-lg">
+        <!-- Left Side (Text + Image) -->
+        <div class="register-left d-flex flex-column justify-content-center align-items-center text-white text-center p-4">
+            <h2 class="mb-4 text-center" style="color: #FFFFFF;">
+                You’re one step away from the full <span class="text-primary">FlashFlicks</span> experience.
+            </h2>
+            <p class="text-white-75">Let’s get you set up and start learning smarter!</p>
+            <img src="{% static 'images/thunder.gif' %}" alt="Thunder Animation" class="img-fluid thunder-image mt-3" />
+        </div>
+
+        <!-- Right Side (Register Form) -->
+        <div class="register-form-container p-4">
+            <h2 class="text-center mb-3">Create an Account</h2>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger text-center">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'register' %}" class="register-form">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Full Name" required>
+                </div>
+                <div class="mb-3">
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+                </div>
+                <div class="mb-3">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                </div>
+                <div class="mb-3">
+                    <input type="password" id="confirm" name="confirm" class="form-control" placeholder="Confirm Password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+                <p class="text-center mt-3">
+                    Already have an account? <a href="{% url 'login' %}" class="text-primary">Log in</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
