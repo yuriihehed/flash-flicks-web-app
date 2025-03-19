@@ -73,57 +73,6 @@
 
     <link rel="stylesheet" href="{% static 'css/auth.css' %}?v=2">
 
-    {% block extra_js %}
-    <!--<script> I took this out because there doesnt need to be a timer on every page 
-        document.addEventListener("DOMContentLoaded", function () {
-            checkIfOnTimerPage();
-        });
-
-        function checkIfOnTimerPage() {
-            const currentPath = window.location.pathname;
-            const heroTimer = document.getElementById("heroTimerWidget");
-
-            // Check if page is Study Page, Set Page, or Flashcards
-            if (heroTimer && (currentPath.includes('/studypage/') ||  currentPath.match(/^\/flashcards\/\d+\/$/))) {
-                startCountdownTimer(heroTimer);
-            }
-        }
-
-        function startCountdownTimer(timerElement) {
-            const savedSettings = JSON.parse(localStorage.getItem("studySettings"));
-
-            if (savedSettings && savedSettings.timer !== "none") {
-                let remainingTime = parseInt(savedSettings.remainingTime) || (parseInt(savedSettings.timer) * 60);
-
-                // Display Timer
-                timerElement.style.display = "block";
-                updateTimerDisplay(timerElement, remainingTime);
-
-                // Start Countdown
-                const countdownInterval = setInterval(() => {
-                    remainingTime--;
-                    localStorage.setItem("studySettings", JSON.stringify({ ...savedSettings, remainingTime }));
-
-                    updateTimerDisplay(timerElement, remainingTime);
-
-                    if (remainingTime <= 0) {
-                        clearInterval(countdownInterval);
-                        timerElement.textContent = "✅ Timer Completed!";
-                        setTimeout(() => {
-                            timerElement.style.display = "none";
-                        }, 5000);
-                    }
-                }, 1000);
-            }
-        }
-
-        function updateTimerDisplay(timerElement, seconds) {
-            let minutes = Math.floor(seconds / 60);
-            let sec = seconds % 60;
-            timerElement.textContent = `⏳ ${minutes}:${sec < 10 ? "0" : ""}${sec} remaining`;
-        }
-    </script>
-    {% endblock %} -->
     
 </body>
 </html>

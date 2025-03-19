@@ -588,7 +588,7 @@
 
 
     <div class="setting d-flex justify-content-between align-items-center mb-3">
-         <label>Study only starred items:</label>
+         <label>Study Only Starred Items:</label>
           <label class="switch">
               <input type="checkbox" id="starredToggle">
               <span class="slider"></span>
@@ -597,7 +597,7 @@
 
 
        <div class="setting d-flex justify-content-between align-items-center mb-3">
-         <label>Shuffle terms:</label>
+         <label>Shuffle Terms:</label>
          <label class="switch">
            <input type="checkbox" id="shuffleToggle">
            <span class="slider"></span>
@@ -606,7 +606,7 @@
        <hr class="border-light">
        <br>
        <div class="setting mb-3">
-         <label>Set study timer (Pomodoro):</label>
+         <label>Set Study Timer (Pomodoro):</label>
          <select id="timerSelect" class="form-select mt-2">
            <option value="none">No Timer</option>
            <option value="25">25 min study / 5 min break</option>
@@ -628,7 +628,7 @@
        <div class="mb-3"><strong>Question Format:</strong></div>
        <br>
        <div class="setting d-flex justify-content-between align-items-center mb-3">
-         <label>Answer with Definition:</label>
+         <label>Answer with Terms:</label>
          <label class="switch">
            <input type="checkbox" id="definitionToggle">
            <span class="slider"></span>
@@ -646,7 +646,7 @@
        </div>
        <!-- Length of rounds applies only in MC mode -->
        <div class="setting mb-3">
-         <label>Length of rounds:</label>
+         <label>Length of Rounds:</label>
          <select id="roundLength" class="form-select mt-2">
            {% for i in "123456789"|make_list %}
            <option value="{{ i }}">{{ i }} Round{{ i|pluralize }}</option>
