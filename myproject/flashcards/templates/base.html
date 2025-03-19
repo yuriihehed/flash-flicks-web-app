@@ -72,7 +72,19 @@
     <script src="{% static 'js/main.js' %}"></script>
 
     <link rel="stylesheet" href="{% static 'css/auth.css' %}?v=2">
+
     {% block extra_js %}
+    <script defer>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                document.querySelectorAll(".flip-card").forEach(card => {
+                    card.addEventListener("click", function() {
+                        this.querySelector(".flip-card-inner").classList.toggle("flipped");
+                    });
+                });
+            }, 500);
+        });
+    </script>
     {% endblock %}
     
 </body>
