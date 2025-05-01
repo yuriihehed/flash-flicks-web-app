@@ -29,15 +29,15 @@ In the early stages, Yurii created the proof of concept and implemented the flas
 
 Beyond testing, Yurii contributed to both the frontend and backend of the app:
 
-Implemented the Login and Forgot Password pages
+    Implemented the Login and Forgot Password pages
 
-Added the Timer feature on the Study Page
+    Added the Timer feature on the Study Page
 
-Helped improve the Edit Learn Mode UI
+    Helped improve the Edit Learn Mode UI
 
-Contributed to the Requirements and Proof of Concept documents
+    Contributed to the Requirements and Proof of Concept documents
 
-Participated in creating and connecting the database models used for flashcards, decks, and user accounts in the backend
+    Participated in creating and connecting the database models used for flashcards, decks, and user accounts in the backend
 
 On the UX side, he designed the FlashFlicks logo, including the small thunder icon, and created the favicon.
 
